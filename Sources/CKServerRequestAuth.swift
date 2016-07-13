@@ -61,13 +61,13 @@ struct CKServerRequestAuth {
     static func signature(requestDate: String, requestBody: NSData, urlSubpath: String, privateKeyPath: String) -> String? {
         
         let bodyHash = requestBody.sha256()
-        let hashedBody = bodyHash.base64EncodedString([])
+        let hashedBody = bodyHash.base64EncodedString(options: [])
         let rawPayloadString = "\(requestDate):\(hashedBody):\(urlSubpath)"
         let requestData = rawPayloadString.data(using: String.Encoding.utf8)!
         
         let signedData = sign(data: requestData, privateKeyPath: privateKeyPath)
         
-        let requestSigniture = signedData!.base64EncodedString([])
+        let requestSigniture = signedData!.base64EncodedString(options: [])
         return requestSigniture
     }
     

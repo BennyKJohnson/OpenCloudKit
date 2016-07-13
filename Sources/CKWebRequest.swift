@@ -111,7 +111,7 @@ class CKWebRequest {
             fatalError("Failed to sign request")
         }
         
-        let session = URLSession.shared()
+        let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, response, networkError) in
             if let networkError = networkError {
                 
