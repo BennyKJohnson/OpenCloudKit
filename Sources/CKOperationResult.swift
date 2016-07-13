@@ -7,8 +7,8 @@
 //
 
 import Foundation
-
-class CKURLRequest: NSObject, NSURLSessionDataDelegate {
+/*
+class CKURLRequest: NSObject, URLSessionDataDelegate {
     
     var url: NSURL!
     
@@ -38,3 +38,4 @@ class CKURLRequest: NSObject, NSURLSessionDataDelegate {
         
     }
 }
+ */

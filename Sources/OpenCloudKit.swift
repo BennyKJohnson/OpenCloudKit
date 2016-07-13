@@ -1,6 +1,5 @@
 import Foundation
 
-
 enum CKEnvironment: String {
     case development
     case production
@@ -51,9 +50,6 @@ class CloudKit {
     }
 }
 
-
-
-
 extension CKRecordID {
     var isDefaultName: Bool {
         return recordName == CloudKit.defaultName
@@ -72,7 +68,11 @@ public class CKRecordZoneID {
     
     public let ownerName: String
     
+    var dictionary: [String: AnyObject] {
+        return ["zoneName": zoneName]
+    }
 }
+
 
 extension CKRecordZoneID {
     var isDefaultZone: Bool {

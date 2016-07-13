@@ -113,7 +113,7 @@ struct CKValueType {
 }
 
 struct CKRecordLog {
-    let timestamp: NSTimeInterval
+    let timestamp: TimeInterval
     let userRecordName: String
     let deviceID: String
     
@@ -219,7 +219,7 @@ extension CKRecord {
                 case CKValueType.string:
                     return NSString(string: string)
                 case CKValueType.data:
-                    return NSData(base64: string)
+                    return NSData(base64Encoded: string)
                 default:
                     return NSString(string: string)
                 }

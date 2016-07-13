@@ -24,14 +24,14 @@ public class CKQuery {
     
     public var recordType: String
     
-    public var predicate: NSPredicate
+    public var predicate: Predicate
     
-    public init(recordType: String, predicate: NSPredicate) {
+    public init(recordType: String, predicate: Predicate) {
         self.recordType = recordType
         self.predicate = predicate
     }
     
-    public var sortDescriptors: [NSSortDescriptor] = []
+    public var sortDescriptors: [SortDescriptor] = []
     
     // Returns a Dictionary Representation of a Query Dictionary
     var dictionary: [String: AnyObject] {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class CKOperation: NSOperation {
+public class CKOperation: Operation {
     
     public var container: CKContainer?
 
@@ -18,7 +18,7 @@ public class CKOperation: NSOperation {
     
     var _isExecuting: Bool = false
     
-    var urlSessionTask: NSURLSessionTask?
+    var urlSessionTask: URLSessionTask?
     
     override init() {
         super.init()

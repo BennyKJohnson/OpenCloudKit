@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SHA2
 
 enum CKWebServiceAuth {
     case APIToken
@@ -31,24 +30,22 @@ class CKWebRequest {
     
     let authType: CKWebServiceAuth = .server
     
+    private init() {}
     
-    private init() {
-    }
-    
-    var authQueryItems: [NSURLQueryItem]? {
+    var authQueryItems: [URLQueryItem]? {
         
         if authType == .server {
             return nil
         } else {
             
-            var queryItems: [NSURLQueryItem] = []
+            var queryItems: [URLQueryItem] = []
             if let currentAPIToken = currentAPIToken  {
-                let apiTokenQueryItem = NSURLQueryItem(name: "ckAPIToken", value: currentAPIToken)
+                let apiTokenQueryItem = URLQueryItem(name: "ckAPIToken", value: currentAPIToken)
                 queryItems.append(apiTokenQueryItem)
             }
             
             if let currentWebAuthToken = currentWebAuthToken {
-                let webAuthTokenQueryItem = NSURLQueryItem(name: "ckWebAuthToken", value: currentWebAuthToken)
+                let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: currentWebAuthToken)
                 queryItems.append(webAuthTokenQueryItem)
             }
             
@@ -93,46 +90,45 @@ class CKWebRequest {
         }
     }
 
-    func request(withURL url: String, parameters: [String: AnyObject], completetion: ([String: AnyObject]?, NSError?) -> Void) -> NSURLSessionTask? {
+    func request(withURL url: String, parameters: [String: AnyObject], completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
         
         // Build URL
-        let components = NSURLComponents(string: url)
+        var components = URLComponents(string: url)
         components?.queryItems = authQueryItems
         print(components?.path)
         guard let requestURL = components?.url else {
             return nil
         }
         
-        let jsonData: NSData = try! NSJSONSerialization.data(withJSONObject: parameters, options: [])
-        let urlRequest = NSMutableURLRequest(url: requestURL)
+        let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+        var urlRequest = URLRequest(url: requestURL)
         
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
         urlRequest.httpBody = jsonData
         
-        if(!CKServerRequestAuth.authenticate(request: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL)) {
-            print("Failed to auth request")
+        guard let request  = CKServerRequestAuth.authenticate(request: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL) else {
+            fatalError("Failed to sign request")
         }
         
-        let session = NSURLSession.shared()
-        let task = session.dataTask(with: urlRequest, completionHandler: { (data, response, networkError) in
-            
+        let session = URLSession.shared()
+        let task = session.dataTask(with: request) { (data, response, networkError) in
             if let networkError = networkError {
                 
-               let error = self.ckError(forNetworkError: networkError)
+                let error = self.ckError(forNetworkError: networkError)
                 completetion(nil, error)
                 
             } else if let data = data {
-                let dataString = NSString(data: data, encoding: NSUTF8StringEncoding)
+                let dataString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
                 print(dataString)
-                let dictionary = try! NSJSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
+                let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
                 
-                if let httpResponse = response as? NSHTTPURLResponse {
+                if let httpResponse = response as? HTTPURLResponse {
                     if httpResponse.statusCode >= 400 {
                         // Error Occurred
                         let error = self.ckError(forServerResponseDictionary: dictionary)
                         completetion(nil, error)
-
+                        
                     } else {
                         completetion(dictionary, nil)
                     }
@@ -140,8 +136,8 @@ class CKWebRequest {
                 
             }
             
-            
-        })
+        }
+      
         task.resume()
         
         return task

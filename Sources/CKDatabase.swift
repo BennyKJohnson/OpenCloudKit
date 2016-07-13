@@ -48,7 +48,7 @@ public class CKDatabase {
     
     weak var container: CKContainer!
     let scope: CKDatabaseScope
-    let operationQueue = NSOperationQueue()
+    let operationQueue = OperationQueue()
     
     init(container: CKContainer, scope: CKDatabaseScope) {
         self.container = container

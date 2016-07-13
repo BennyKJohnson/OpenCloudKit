@@ -10,10 +10,10 @@ import Foundation
 
 struct CKServerRequestAuth {
     
-    static let ISO8601DateFormatter: NSDateFormatter = {
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-        dateFormatter.timeZone = NSTimeZone(abbreviation: "GMT")
+    static let ISO8601DateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(localeIdentifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         
         return dateFormatter
@@ -32,7 +32,7 @@ struct CKServerRequestAuth {
     
     init?(requestBody: NSData, urlPath: String, privateKeyPath: String) {
         
-        self.requestDate = CKServerRequestAuth.ISO8601DateFormatter.string(from: NSDate())
+        self.requestDate = CKServerRequestAuth.ISO8601DateFormatter.string(from: Date())
         
         if let signature = CKServerRequestAuth.signature(requestDate: requestDate,requestBody: requestBody, urlSubpath: urlPath, privateKeyPath: privateKeyPath) {
             
@@ -60,10 +60,10 @@ struct CKServerRequestAuth {
     
     static func signature(requestDate: String, requestBody: NSData, urlSubpath: String, privateKeyPath: String) -> String? {
         
-        let bodyHash = requestBody.sha256Hash()
-        let hashedBody = bodyHash.base64
+        let bodyHash = requestBody.sha256()
+        let hashedBody = bodyHash.base64EncodedString([])
         let rawPayloadString = "\(requestDate):\(hashedBody):\(urlSubpath)"
-        let requestData = rawPayloadString.data(using: NSUTF8StringEncoding)!
+        let requestData = rawPayloadString.data(using: String.Encoding.utf8)!
         
         let signedData = sign(data: requestData, privateKeyPath: privateKeyPath)
         
@@ -71,10 +71,10 @@ struct CKServerRequestAuth {
         return requestSigniture
     }
     
-    static func authenticate(request: NSMutableURLRequest, serverKeyID: String, privateKeyPath: String) -> Bool {
-        
+    static func authenticate(request: URLRequest, serverKeyID: String, privateKeyPath: String) -> URLRequest? {
+        var request = request
         guard let requestBody = request.httpBody, path = request.url?.path, auth = CKServerRequestAuth(requestBody: requestBody, urlPath: path, privateKeyPath: privateKeyPath) else {
-            return false
+            return nil
         }
         
         request.setValue(serverKeyID, forHTTPHeaderField: CKRequestKeyIDHeaderKey)
@@ -82,6 +82,7 @@ struct CKServerRequestAuth {
         request.setValue(auth.signature, forHTTPHeaderField: CKRequestSignatureHeaderKey)
         
         
-        return true
+        return request
     }
 }
+

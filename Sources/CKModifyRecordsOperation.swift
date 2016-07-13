@@ -18,6 +18,39 @@ public enum CKRecordSavePolicy : Int {
 let CKErrorRetryAfterKey = "CKRetryAfter"
 let CKPartialErrorsByItemIDKey: String = "CKPartialErrors"
 
+struct CKSubscriptionFetchErrorDictionary {
+    
+    static let subscriptionIDKey = "subscriptionID"
+    
+    static let reasonKey = "reason"
+    
+    static let serverErrorCodeKey = "serverErrorCode"
+    
+    static let redirectURLKey = "redirectURL"
+    
+    let subscriptionID: String
+    
+    let reason: String
+    
+    let serverErrorCode: String
+    
+    let redirectURL: String?
+    
+    init?(dictionary: [String: AnyObject]) {
+        guard let subscriptionID = dictionary[CKSubscriptionFetchErrorDictionary.subscriptionIDKey] as? String,
+        reason = dictionary[CKSubscriptionFetchErrorDictionary.reasonKey] as? String,
+            serverErrorCode = dictionary[CKSubscriptionFetchErrorDictionary.serverErrorCodeKey] as? String else {
+                return nil
+        }
+        
+        self.subscriptionID = subscriptionID
+        self.reason = reason
+        self.serverErrorCode = serverErrorCode
+        self.redirectURL = dictionary[CKSubscriptionFetchErrorDictionary.redirectURLKey] as? String
+        
+    }
+}
+
 struct CKRecordFetchErrorDictionary {
     
     static let recordNameKey = "recordName"

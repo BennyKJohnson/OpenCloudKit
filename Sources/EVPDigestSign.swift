@@ -96,7 +96,9 @@ public final class MessageDigestContext {
         BIO_free_all(privateKeyFilePointer)
         
         let signatureBytes = Array(signature.prefix(upTo: Int(length)))
-        return NSData(bytes: signatureBytes)
+        
+      
+        return  NSData(bytes: signatureBytes, length: signatureBytes.count)
     }
 }
 
