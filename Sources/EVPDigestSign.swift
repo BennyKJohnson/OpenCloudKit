@@ -37,6 +37,89 @@ public enum MessageDigestContextError: ErrorProtocol {
     case updateFailed
     case signFailed
     case privateKeyLoadFailed
+    case privateKeyNotFound
+}
+
+public enum EVPKeyType {
+    case Public
+    case Private
+}
+
+public final class EVPKey {
+    
+    let pkey: UnsafeMutablePointer<EVP_PKEY>!
+    let type: EVPKeyType
+    
+    deinit {
+        EVP_PKEY_free(pkey)
+    }
+    
+    public init(contentsOfFile path: String, type: EVPKeyType) throws {
+        // Load Private Key
+        let filePointer = BIO_new_file(path, "r")
+        guard let file = filePointer else {
+            throw MessageDigestContextError.privateKeyNotFound
+        }
+        
+        self.type = type
+        
+        switch type {
+        case .Private:
+            guard let privateKey  = PEM_read_bio_PrivateKey(file, nil, nil, nil) else {
+                throw MessageDigestContextError.privateKeyLoadFailed
+            }
+            pkey = privateKey
+
+        case .Public:
+            guard let publicKey = PEM_read_bio_PUBKEY(file, nil, nil, nil) else {
+                throw MessageDigestContextError.privateKeyLoadFailed
+            }
+            pkey = publicKey
+        }
+      
+        BIO_free_all(file)
+    }
+}
+
+public final class MessageVerifyContext {
+    
+    let context: UnsafeMutablePointer<EVP_MD_CTX>
+
+    deinit {
+        EVP_MD_CTX_destroy(context)
+    }
+    
+    public init(_ messageDigest: MessageDigest, withKey key: EVPKey) throws {
+        
+        let context: UnsafeMutablePointer<EVP_MD_CTX>! = EVP_MD_CTX_create()
+        
+        if EVP_DigestVerifyInit(context, nil, messageDigest.messageDigest, nil, key.pkey) == 0 {
+            throw MessageDigestContextError.initializationFailed
+        }
+        
+        guard let c = context else {
+            throw MessageDigestContextError.initializationFailed
+        }
+        
+        self.context = c
+    }
+    
+    // Message
+    func update(data: NSData) throws {
+        
+        if EVP_DigestUpdate(context, data.bytes, data.length) == 0 {
+            throw MessageDigestContextError.updateFailed
+        }
+        
+    }
+    
+    // Signature
+    func verify(signature: NSData) -> Bool {
+        
+        let bytes = Array(UnsafeBufferPointer(start: UnsafePointer<UInt8>(signature.bytes), count: signature.length))
+        return EVP_DigestVerifyFinal(context,bytes, bytes.count) == 1
+    }
+    
 }
 
 public final class MessageDigestContext {
@@ -74,9 +157,9 @@ public final class MessageDigestContext {
         // Load Private Key
         let privateKeyFilePointer = BIO_new_file(privateKeyURL, "r")
         guard let privateKeyFile = privateKeyFilePointer else {
-            fatalError("Unable to load key file")
+            throw MessageDigestContextError.privateKeyNotFound
         }
-        
+    
         guard let privateKey  = PEM_read_bio_PrivateKey(privateKeyFile, nil, nil, nil) else {
             throw MessageDigestContextError.privateKeyLoadFailed
         }

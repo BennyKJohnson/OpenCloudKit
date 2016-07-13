@@ -15,7 +15,7 @@ extension NSData {
     
     func sha256() -> NSData {
         
-        let shaContext: UnsafeMutablePointer<SHA256_CTX>! = nil
+        let shaContext = UnsafeMutablePointer<SHA256_CTX>(allocatingCapacity: 1)
         SHA256_Init(shaContext)
         SHA256_Update(shaContext, self.bytes, self.length)
         

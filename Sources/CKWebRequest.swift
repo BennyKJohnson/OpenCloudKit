@@ -107,7 +107,7 @@ class CKWebRequest {
         urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
         urlRequest.httpBody = jsonData
         
-        guard let request  = CKServerRequestAuth.authenticate(request: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL) else {
+        guard let request  = CKServerRequestAuth.authenticateServer(forRequest: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL) else {
             fatalError("Failed to sign request")
         }
         
