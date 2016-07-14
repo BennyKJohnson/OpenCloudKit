@@ -57,6 +57,9 @@ public class CKOperation: Operation {
         
     }
     
+    func finishOnCallbackQueueWithError(error: NSError) {
+    }
+    
     func performCKOperation() {}
 
     override public var isConcurrent: Bool {
@@ -89,14 +92,19 @@ public class CKDatabaseOperation : CKOperation {
     
 }
 
+extension CKOperation {
+    var databaseURL: String {
+        let operationContainer = container ?? CKContainer.defaultContainer()
+        return "\(CloudKit.path)/database/\(CloudKit.version)/\(operationContainer.containerIdentifier)/\(CloudKit.shared.environment)/"
+    }
+}
+
 extension CKDatabaseOperation {
     var operationURL: String {
         
         // Create URL
-        let operationContainer = container ?? CKContainer.defaultContainer()
         let operationDatabase = database?.scope ?? CKDatabaseScope.Public
-        
-        let urlForDatabaseOperation = "\(CloudKit.path)/database/\(CloudKit.version)/\(operationContainer.containerIdentifier)/\(CloudKit.shared.environment)/\(operationDatabase)"
+        let urlForDatabaseOperation = "\(databaseURL)\(operationDatabase)"
         
         return urlForDatabaseOperation
     }

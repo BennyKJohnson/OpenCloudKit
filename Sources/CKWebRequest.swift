@@ -90,26 +90,7 @@ class CKWebRequest {
         }
     }
 
-    func request(withURL url: String, parameters: [String: AnyObject], completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
-        
-        // Build URL
-        var components = URLComponents(string: url)
-        components?.queryItems = authQueryItems
-        print(components?.path)
-        guard let requestURL = components?.url else {
-            return nil
-        }
-        
-        let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
-        var urlRequest = URLRequest(url: requestURL)
-        
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
-        urlRequest.httpBody = jsonData
-        
-        guard let request  = CKServerRequestAuth.authenticateServer(forRequest: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL) else {
-            fatalError("Failed to sign request")
-        }
+    func perform(request: URLRequest, completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, response, networkError) in
@@ -137,10 +118,56 @@ class CKWebRequest {
             }
             
         }
-      
+        
         task.resume()
         
         return task
+    }
+    
+    
+    func request(withURL url: String, completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
+       
+        // Build URL
+        var components = URLComponents(string: url)
+        components?.queryItems = authQueryItems
+        print(components?.path)
+        guard let requestURL = components?.url else {
+            return nil
+        }
+        
+        let jsonData: Data = try! JSONSerialization.data(withJSONObject: [:] as [String: AnyObject], options: [])
+        var urlRequest = URLRequest(url: requestURL)
+        
+        urlRequest.httpMethod = "GET"
+        urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = jsonData
+        
+        return perform(request: urlRequest, completetion: completetion)
+    }
+    
+    
+    func request(withURL url: String, parameters: [String: AnyObject], completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
+        
+        // Build URL
+        var components = URLComponents(string: url)
+        components?.queryItems = authQueryItems
+        print(components?.path)
+        guard let requestURL = components?.url else {
+            return nil
+        }
+        
+        let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+        var urlRequest = URLRequest(url: requestURL)
+        
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = jsonData
+        
+        guard let request  = CKServerRequestAuth.authenticateServer(forRequest: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL) else {
+            fatalError("Failed to sign request")
+        }
+        
+        return perform(request: request, completetion: completetion)
     }
     
     
