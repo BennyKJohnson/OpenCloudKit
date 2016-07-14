@@ -1,0 +1,12 @@
+{
+  "containers": [{
+  "containerIdentifier":"com.example.apple-samplecode.cloudkit-catalog",
+  "environment": "development",
+
+  "serverToServerKeyAuth": {
+    "keyID": "KEY_ID",
+
+    "privateKeyFile": "eckey.pem"
+  }
+    }]
+}

@@ -1,6 +1,6 @@
 import Foundation
 
-enum CKEnvironment: String {
+public enum CKEnvironment: String {
     case development
     case production
 }
@@ -12,16 +12,8 @@ enum CKOperationType {
     case forceReplace
 }
 
-struct CKContainerConfiguration {
-    let containerIdentifier: String
-    let apiToken: String
-    let privateKeyPath: String?
-}
 
-struct CKConfiguration {
-    
-    let containers: [CKContainerConfiguration]
-}
+
 
 class CloudKit {
     
@@ -35,17 +27,17 @@ class CloudKit {
     
     var environment: CKEnvironment = .development
     
-    var containers: [CKContainerConfiguration] = []
+    var containers: [CKContainerConfig] = []
     
     static let shared = CloudKit()
     
     private init() {}
     
-    func configure(with configuration: CKConfiguration) {
+    func configure(with configuration: CKConfig) {
         self.containers = configuration.containers
         
         if let defaultContainer = containers.first {
-            CKWebRequest.shared.currentAPIToken = defaultContainer.apiToken
+            CKWebRequest.shared.currentAPIToken = defaultContainer.apiTokenAuth
         }
     }
 }
