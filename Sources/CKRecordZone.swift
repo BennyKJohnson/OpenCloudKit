@@ -69,4 +69,8 @@ extension CKRecordZone {
             capabilities = CKRecordZoneCapabilities.atomic
         }
     }
+    
+    var dictionary: [String: AnyObject] {
+        return ["zoneID": zoneID.dictionary]
+    }
 }
