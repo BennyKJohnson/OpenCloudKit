@@ -42,7 +42,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
             request["subscriptions"] = subscriptionIDs
         }
         
-        urlSessionTask = CKWebRequest.shared.request(withURL: url, parameters: request) { (dictionary, networkError) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
             if let error = networkError {
                 
                 self.fetchSubscriptionCompletionBlock?(nil, error)

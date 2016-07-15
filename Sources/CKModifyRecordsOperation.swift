@@ -16,6 +16,7 @@ public enum CKRecordSavePolicy : Int {
 
 
 let CKErrorRetryAfterKey = "CKRetryAfter"
+let CKErrorRedirectURLKey = "CKRedirectURL"
 let CKPartialErrorsByItemIDKey: String = "CKPartialErrors"
 
 struct CKSubscriptionFetchErrorDictionary {
@@ -205,7 +206,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         
         request["operations"] = operationsDictionary()
         
-        urlSessionTask = CKWebRequest.shared.request(withURL: url, parameters: request) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             // Check if cancelled
             if self.isCancelled {

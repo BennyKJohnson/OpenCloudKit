@@ -34,7 +34,7 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
         
         let url = "\(databaseURL)/public/users/discover"
       
-        urlSessionTask = CKWebRequest.shared.request(withURL: url) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url) { (dictionary, error) in
             
             // Check if cancelled
             if self.isCancelled {

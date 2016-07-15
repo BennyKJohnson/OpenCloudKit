@@ -80,7 +80,8 @@ class OpenCloudKitTests: XCTestCase {
         
         // Verify signature
         let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBody, urlSubpath: urlPath)
-        let payload = rawPayload.data(using: String.Encoding.utf8)!
+        let payload = rawPayload.data(using: String.Encoding.utf8)! as NSData
+        
         let publicKey = try! EVPKey(contentsOfFile: publicECKeyPath(), type: EVPKeyType.Public)
         let context = try! MessageVerifyContext(try! MessageDigest("sha256WithRSAEncryption"), withKey: publicKey)
         try! context.update(data: payload)

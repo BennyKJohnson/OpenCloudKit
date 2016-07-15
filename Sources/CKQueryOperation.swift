@@ -61,7 +61,7 @@ public class CKQueryOperation: CKDatabaseOperation {
         
         let url = "\(operationURL)/records/\(CKRecordOperation.query)"
         print(url)
-        urlSessionTask = CKWebRequest.shared.request(withURL: url, parameters: parameters) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: parameters) { (dictionary, error) in
             
             // Check if cancelled
             if self.isCancelled {

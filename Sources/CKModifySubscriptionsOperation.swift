@@ -64,7 +64,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         
         let request: [String: AnyObject] = ["operations": operationsDictionary()]
         
-        urlSessionTask = CKWebRequest.shared.request(withURL: url, parameters: request) { (dictionary, networkError) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
             if let error = networkError {
                 self.modifySubscriptionsCompletionBlock?(nil, nil, error)
                 

@@ -45,7 +45,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
         
         let request: [String: AnyObject] = ["lookupInfos": lookUpInfos]
         
-        urlSessionTask = CKWebRequest.shared.request(withURL: url, parameters: request) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             // Check if cancelled
             if self.isCancelled {

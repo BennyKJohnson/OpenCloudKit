@@ -23,6 +23,10 @@ public class CKOperation: Operation {
     override init() {
         super.init()
     }
+    
+    var operationContainer: CKContainer {
+        return container ?? CKContainer.defaultContainer()
+    }
 
     public override func start() {
         

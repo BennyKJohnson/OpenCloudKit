@@ -12,9 +12,6 @@ enum CKOperationType {
     case forceReplace
 }
 
-
-
-
 class CloudKit {
     
     static let path = "https://api.apple-cloudkit.com"
@@ -22,8 +19,6 @@ class CloudKit {
     static let version = "1"
     
     static let defaultZone = "_defaultZone"
-    
-    static let defaultName = "_defaultName"
     
     var environment: CKEnvironment = .development
     
@@ -35,34 +30,44 @@ class CloudKit {
     
     func configure(with configuration: CKConfig) {
         self.containers = configuration.containers
-        
-        if let defaultContainer = containers.first {
-            CKWebRequest.shared.currentAPIToken = defaultContainer.apiTokenAuth
-        }
+    }
+    
+    func containerConfig(forContainer container: CKContainer) -> CKContainerConfig? {
+        return containers.filter({ (config) -> Bool in
+            return config.containerIdentifier == container.containerIdentifier
+        }).first
     }
 }
 
 extension CKRecordID {
     var isDefaultName: Bool {
-        return recordName == CloudKit.defaultName
+        return recordName == CKRecordZoneDefaultName
     }
 }
 
 
-public class CKRecordZoneID {
+public class CKRecordZoneID: NSObject {
     
     public init(zoneName: String, ownerName: String) {
         self.zoneName = zoneName
         self.ownerName = ownerName
+        super.init()
+        
     }
     
     public let zoneName: String
     
     public let ownerName: String
     
-    var dictionary: [String: AnyObject] {
-        return ["zoneName": zoneName]
+    
+    convenience public required init?(dictionary: [String: AnyObject]) {
+        guard let zoneName = dictionary["zoneName"] as? String, ownerName = dictionary["ownerRecordName"] as? String else {
+            return nil
+        }
+        
+        self.init(zoneName: zoneName, ownerName: ownerName)
     }
+    
 }
 
 
@@ -70,13 +75,19 @@ extension CKRecordZoneID {
     var isDefaultZone: Bool {
         return zoneName == CloudKit.defaultZone
     }
+  
     
-    convenience init?(dictionary: [String: AnyObject]) {
-        guard let zoneName = dictionary["zoneName"] as? String, ownerName = dictionary["ownerRecordName"] as? String else {
-            return nil
+    var dictionary: [String: AnyObject] {
+        
+        var zoneIDDictionary: [String: AnyObject] = [
+        "zoneName": zoneName
+        ]
+        
+        if ownerName != CKRecordZoneIDDefaultOwnerName {
+            zoneIDDictionary["ownerRecordName"] = ownerName
         }
         
-        self.init(zoneName: zoneName, ownerName: ownerName)
+        return zoneIDDictionary
     }
 }
 

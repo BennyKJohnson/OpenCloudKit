@@ -8,41 +8,31 @@
 
 import Foundation
 
-enum CKWebServiceAuth {
-    case APIToken
-    case webAuthToken
-    case server
-}
-
-
-
 class CKWebRequest {
-    
-    static let shared = CKWebRequest()
-    
-    var currentAPIToken: String?
+
     
     var currentWebAuthToken: String?
     
-    var serverKeyID: String!
+    let containerConfig: CKContainerConfig
     
-    var privateKeyURL = "eckey.pem"
+  
     
-    let authType: CKWebServiceAuth = .server
+    init(containerConfig: CKContainerConfig) {
+        self.containerConfig = containerConfig
+    }
     
-    private init() {}
+    convenience init(container: CKContainer) {
+        self.init(containerConfig: CloudKit.shared.containerConfig(forContainer: container)!)
+    }
     
     var authQueryItems: [URLQueryItem]? {
         
-        if authType == .server {
-            return nil
-        } else {
-            
+        if let apiTokenAuth = containerConfig.apiTokenAuth {
             var queryItems: [URLQueryItem] = []
-            if let currentAPIToken = currentAPIToken  {
-                let apiTokenQueryItem = URLQueryItem(name: "ckAPIToken", value: currentAPIToken)
-                queryItems.append(apiTokenQueryItem)
-            }
+
+            let apiTokenQueryItem = URLQueryItem(name: "ckAPIToken", value: apiTokenAuth)
+            queryItems.append(apiTokenQueryItem)
+            
             
             if let currentWebAuthToken = currentWebAuthToken {
                 let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: currentWebAuthToken)
@@ -50,7 +40,13 @@ class CKWebRequest {
             }
             
             return queryItems
+        } else {
+            return nil
         }
+    }
+    
+    var serverToServerKeyAuth: CKServerToServerKeyAuth? {
+        return containerConfig.serverToServerKeyAuth
     }
     
     func ckError(forNetworkError networkError: NSError) -> NSError {
@@ -146,7 +142,7 @@ class CKWebRequest {
     }
     
     
-    func request(withURL url: String, parameters: [String: AnyObject], completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
+    func request(withURL url: String, parameters: [String: AnyObject]?, completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
         
         // Build URL
         var components = URLComponents(string: url)
@@ -156,18 +152,26 @@ class CKWebRequest {
             return nil
         }
         
-        let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
         var urlRequest = URLRequest(url: requestURL)
-        
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
-        urlRequest.httpBody = jsonData
-        
-        guard let request  = CKServerRequestAuth.authenticateServer(forRequest: urlRequest, serverKeyID: serverKeyID, privateKeyPath: privateKeyURL) else {
-            fatalError("Failed to sign request")
+        if let parameters = parameters {
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+            urlRequest.httpBody = jsonData
+            urlRequest.httpMethod = "POST"
+        } else {
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: [:], options: [])
+            urlRequest.httpBody = jsonData
+            urlRequest.httpMethod = "GET"
         }
         
-        return perform(request: request, completetion: completetion)
+        urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
+        
+        if let serverToServerKeyAuth = serverToServerKeyAuth {
+            if let signedRequest  = CKServerRequestAuth.authenicateServer(forRequest: urlRequest, withServerToServerKeyAuth: serverToServerKeyAuth) {
+                urlRequest = signedRequest
+            }
+        }
+       
+        return perform(request: urlRequest, completetion: completetion)
     }
     
     
