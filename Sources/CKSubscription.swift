@@ -36,7 +36,7 @@ public class CKSubscription: NSObject {
     
     public var notificationInfo: CKNotificationInfo?
 
-    public init(subscriptionID: String, subscriptionType: CKSubscriptionType) {
+    init(subscriptionID: String, subscriptionType: CKSubscriptionType) {
         
         self.subscriptionID = subscriptionID
         
@@ -110,13 +110,13 @@ public struct CKQuerySubscriptionOptions : OptionSet {
 
 public class CKQuerySubscription : CKSubscription {
     
-    public convenience init(recordType: String, predicate: Predicate, options querySubscriptionOptions: CKQuerySubscriptionOptions = []) {
+    public convenience init(recordType: String, predicate: Predicate, options querySubscriptionOptions: CKQuerySubscriptionOptions) {
         
         let subscriptionID = NSUUID().uuidString
         self.init(recordType: recordType, predicate: predicate, subscriptionID: subscriptionID, options: querySubscriptionOptions)
     }
     
-    public init(recordType: String, predicate: Predicate, subscriptionID: String, options querySubscriptionOptions: CKQuerySubscriptionOptions = []) {
+    public init(recordType: String, predicate: Predicate, subscriptionID: String, options querySubscriptionOptions: CKQuerySubscriptionOptions) {
         
         self.predicate = predicate
         

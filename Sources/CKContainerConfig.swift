@@ -20,13 +20,17 @@ public struct CKConfig {
         self.containers = [container]
     }
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: AnyObject], workingDirectory: String?) {
         guard let containerDictionaries = dictionary["containers"] as? [[String: AnyObject]] else {
             return nil
         }
         
         let containers = containerDictionaries.flatMap { (containerDictionary) -> CKContainerConfig? in
-            return CKContainerConfig(dictionary: containerDictionary)
+            var containerConfig = CKContainerConfig(dictionary: containerDictionary)
+            if let workingDirectory = workingDirectory, privateKeyFile = containerConfig?.serverToServerKeyAuth?.privateKeyFile {
+                containerConfig?.serverToServerKeyAuth?.privateKeyFile = "\(workingDirectory)/\(privateKeyFile)"
+            }
+            return containerConfig
         }
         
         if containers.count > 0 {
@@ -38,9 +42,12 @@ public struct CKConfig {
     
     public init?(contentsOfFile path: String) {
         do {
+            let url = URL(string: path)!
+            let directory = try! url.deletingLastPathComponent()
+            
             let jsonData = try NSData(contentsOfFile: path, options: [])
             if let dictionary = try JSONSerialization.jsonObject(with: jsonData as Data, options: []) as? [String: AnyObject] {
-                self.init(dictionary: dictionary)
+                self.init(dictionary: dictionary, workingDirectory: directory.absoluteString!)
             } else {
                 return nil
             }
@@ -55,7 +62,7 @@ public struct CKContainerConfig {
     public let environment: CKEnvironment
     public let apnsEnvironment: CKEnvironment
     public let apiTokenAuth: String?
-    public let serverToServerKeyAuth: CKServerToServerKeyAuth?
+    public var serverToServerKeyAuth: CKServerToServerKeyAuth?
     
     public init(containerIdentifier: String, environment: CKEnvironment,apiTokenAuth: String, apnsEnvironment: CKEnvironment? = nil) {
         self.containerIdentifier = containerIdentifier
@@ -118,7 +125,7 @@ public struct CKServerToServerKeyAuth: Equatable {
     // A unique identifier for the key generated using CloudKit Dashboard. To create this key, read
     let keyID: String
     // The path to the PEM encoded key file.
-    let privateKeyFile: String
+    var privateKeyFile: String
     
     //The pass phrase for the key.
     let privateKeyPassPhrase: String?

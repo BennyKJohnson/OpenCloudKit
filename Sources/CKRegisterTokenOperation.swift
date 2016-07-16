@@ -10,9 +10,9 @@ import Foundation
 
 public class CKRegisterTokenOperation : CKOperation {
     
-    let apnsEnvironment: CKEnvironment
+    public let apnsEnvironment: CKEnvironment
     
-    var apnsToken: String?
+    public var apnsToken: String?
     
     public init(apnsEnvironment: CKEnvironment) {
         self.apnsEnvironment = apnsEnvironment
@@ -26,10 +26,10 @@ public class CKRegisterTokenOperation : CKOperation {
     }
     
     override func finishOnCallbackQueueWithError(error: NSError) {
-        createTokenCompletionBlock?(nil, error)
+        registerTokenCompletionBlock?(nil, error)
     }
     
-    var createTokenCompletionBlock: ((CKTokenInfo?, NSError?) -> Void)?
+    public var registerTokenCompletionBlock: ((CKTokenInfo?, NSError?) -> Void)?
     
     override func performCKOperation() {
         let url: String
@@ -39,9 +39,9 @@ public class CKRegisterTokenOperation : CKOperation {
             request["apnsToken"] = apnsToken
         } else {
             url = "\(databaseURL)/tokens/create"
-
         }
         
+        print(url)
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             if self.isCancelled {
@@ -60,7 +60,7 @@ public class CKRegisterTokenOperation : CKOperation {
                 tokenInfo = nil
             }
             
-            self.createTokenCompletionBlock?(tokenInfo, error)
+            self.registerTokenCompletionBlock?(tokenInfo, error)
             
             // Mark operation as complete
             self.isExecuting = false

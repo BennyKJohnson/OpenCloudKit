@@ -11,22 +11,22 @@ import Foundation
 
 public class CKContainer {
     
-    let containerIdentifier: String
+    public let containerIdentifier: String
     
-    init(containerIdentifier: String) {
+    public init(containerIdentifier: String) {
         self.containerIdentifier = containerIdentifier
     }
     
-    class func defaultContainer() -> CKContainer {
+    public class func defaultContainer() -> CKContainer {
         // Get Default Container
         return CKContainer(containerIdentifier: CloudKit.shared.containers.first!.containerIdentifier)
     }
     
-    lazy var publicCloudDatabase: CKDatabase = {
+    public lazy var publicCloudDatabase: CKDatabase = {
         return CKDatabase(container: self, scope: .Public)
     }()
     
-    lazy var privateCloudDatabase: CKDatabase = {
+    public lazy var privateCloudDatabase: CKDatabase = {
         return CKDatabase(container: self, scope: .Private)
     }()
     

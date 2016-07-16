@@ -8,12 +8,12 @@
 
 import Foundation
 
-enum CKDatabaseScope: Int, CustomStringConvertible {
+public enum CKDatabaseScope: Int, CustomStringConvertible {
     case Public = 1
     case Private
     case Shared
     
-    var description: String {
+    public var description: String {
         switch(self) {
         case .Private:
             return "private"
@@ -47,7 +47,7 @@ enum CKModifyOperation: String {
 public class CKDatabase {
     
     weak var container: CKContainer!
-    let scope: CKDatabaseScope
+    public let scope: CKDatabaseScope
     let operationQueue = OperationQueue()
     
     init(container: CKContainer, scope: CKDatabaseScope) {
@@ -55,14 +55,14 @@ public class CKDatabase {
         self.scope = scope
     }
     
-    func addOperation(_ operation: CKDatabaseOperation) {
+    public func addOperation(_ operation: CKDatabaseOperation) {
         operation.database = self
         // Add to queue
         operationQueue.addOperation(operation)
         
     }
     
-    func perform(query: CKQuery, inZoneWithID zoneID: CKRecordZoneID?,completionHandler: ([CKRecord]?,
+    public func perform(query: CKQuery, inZoneWithID zoneID: CKRecordZoneID?,completionHandler: ([CKRecord]?,
         NSError?) -> Void) {
         
         let queryOperation = CKQueryOperation(query: query)
@@ -88,7 +88,7 @@ public class CKDatabase {
         queryOperation.start()
     }
     
-    func fetch(withRecordID recordID: CKRecordID, completionHandler: (CKRecord?,
+    public func fetch(withRecordID recordID: CKRecordID, completionHandler: (CKRecord?,
         NSError?) -> Void) {
         
      let fetchRecordOperation = CKFetchRecordsOperation(recordIDs: [recordID])
@@ -102,7 +102,7 @@ public class CKDatabase {
         fetchRecordOperation.start()
     }
     
-    func save(record: CKRecord, completionHandler: (CKRecord?,
+    public func save(record: CKRecord, completionHandler: (CKRecord?,
         NSError?) -> Void) {
     
         let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
@@ -116,7 +116,7 @@ public class CKDatabase {
     }
 
 
-    func delete(withRecordID recordID: CKRecordID, completionHandler: (CKRecordID?,
+    public func delete(withRecordID recordID: CKRecordID, completionHandler: (CKRecordID?,
         NSError?) -> Void) {
         
         let operation = CKModifyRecordsOperation(recordsToSave: [], recordIDsToDelete: [recordID])
@@ -128,6 +128,41 @@ public class CKDatabase {
         
         operation.start()
         
+    }
+    
+    /* CKFetchSubscriptionsOperation and CKModifySubscriptionsOperation are the more configurable,
+     CKOperation-based alternative to these methods */
+    public func fetch(withSubscriptionID subscriptionID: String, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {
+        
+        
+        
+        
+    }
+    
+    public func fetchAll(completionHandler: ([CKSubscription]?, NSError?) -> Swift.Void) {
+        
+    }
+    
+    public func save(_ subscription: CKSubscription, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {
+        let modifyOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+        modifyOperation.modifySubscriptionsCompletionBlock = {
+            (subscriptions, deleted, error) in
+            
+            completionHandler(subscriptions?.first, error)
+        }
+        
+        modifyOperation.start()
+    }
+    
+    public func delete(withSubscriptionID subscriptionID: String, completionHandler: (String?, NSError?) -> Swift.Void) {
+        let modifyOperation = CKModifySubscriptionsOperation(subscriptionsToSave: nil, subscriptionIDsToDelete: [subscriptionID])
+        modifyOperation.modifySubscriptionsCompletionBlock = {
+            (subscriptions, deleted, error) in
+            
+            completionHandler(deleted?.first, error)
+        }
+        
+        modifyOperation.start()
     }
  
 }

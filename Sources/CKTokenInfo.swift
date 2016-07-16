@@ -8,10 +8,10 @@
 
 import Foundation
 
-struct CKTokenInfo {
-    let apnsEnvironment: CKEnvironment
-    let apnsToken: String
-    let webcourierURL: String
+public struct CKTokenInfo {
+    public let apnsEnvironment: CKEnvironment
+    public let apnsToken: String
+    public let webcourierURL: String
 }
 
 extension CKTokenInfo {

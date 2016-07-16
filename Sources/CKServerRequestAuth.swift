@@ -60,7 +60,7 @@ struct CKServerRequestAuth {
     
     static func rawPayload(withRequestDate requestDate: String, requestBody: NSData, urlSubpath: String) -> String {
         let bodyHash = requestBody.sha256()
-        let hashedBody = bodyHash.base64EncodedString([])
+        let hashedBody = bodyHash.base64EncodedString(options: [])
         return "\(requestDate):\(hashedBody):\(urlSubpath)"
     }
     
@@ -72,7 +72,7 @@ struct CKServerRequestAuth {
         
         let signedData = sign(data: requestData, privateKeyPath: privateKeyPath)
         
-        return signedData?.base64EncodedString([]) 
+        return signedData?.base64EncodedString(options: []) 
     }
     
     static func authenicateServer(forRequest request: URLRequest, withServerToServerKeyAuth auth: CKServerToServerKeyAuth) -> URLRequest? {

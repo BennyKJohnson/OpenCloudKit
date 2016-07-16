@@ -14,7 +14,7 @@ public class CKUserIdentity : NSObject {
     // This is the lookupInfo you passed in to CKDiscoverUserIdentitiesOperation or CKFetchShareParticipantsOperation
     public let lookupInfo: CKUserIdentityLookupInfo?
     
-    public let nameComponents: PersonNameComponents?
+   // public let nameComponents: PersonNameComponents?
     
     public let userRecordID: CKRecordID?
     
@@ -32,7 +32,7 @@ public class CKUserIdentity : NSObject {
         
         hasiCloudAccount = false
         
-        nameComponents = nil
+    //    nameComponents = nil
         
         super.init()
     }
@@ -53,11 +53,11 @@ public class CKUserIdentity : NSObject {
         }
         
         if let nameComponentsDictionary = dictionary["nameComponents"] as? [String: AnyObject] {
-            self.nameComponents = PersonNameComponents(dictionary: nameComponentsDictionary)
-            self.firstName = nameComponents?.givenName
-            self.lastName = nameComponents?.familyName
+       //     self.nameComponents = PersonNameComponents(dictionary: nameComponentsDictionary)
+       //     self.firstName = nameComponents?.givenName
+        //    self.lastName = nameComponents?.familyName
         } else {
-            self.nameComponents = nil
+       //     self.nameComponents = nil
         }
         
         self.hasiCloudAccount = false
@@ -67,7 +67,7 @@ public class CKUserIdentity : NSObject {
     }
     
 }
-
+/*
 extension PersonNameComponents {
     init?(dictionary: [String: AnyObject]) {
         self.init()
@@ -81,3 +81,4 @@ extension PersonNameComponents {
        // phoneticRepresentation
     }
 }
+ */

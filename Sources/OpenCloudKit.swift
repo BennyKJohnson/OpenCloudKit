@@ -12,7 +12,7 @@ enum CKOperationType {
     case forceReplace
 }
 
-class CloudKit {
+public class CloudKit {
     
     static let path = "https://api.apple-cloudkit.com"
     
@@ -20,15 +20,15 @@ class CloudKit {
     
     static let defaultZone = "_defaultZone"
     
-    var environment: CKEnvironment = .development
+    public var environment: CKEnvironment = .development
     
-    var containers: [CKContainerConfig] = []
+    public private(set) var containers: [CKContainerConfig] = []
     
-    static let shared = CloudKit()
+    public static let shared = CloudKit()
     
     private init() {}
     
-    func configure(with configuration: CKConfig) {
+   public func configure(with configuration: CKConfig) {
         self.containers = configuration.containers
     }
     

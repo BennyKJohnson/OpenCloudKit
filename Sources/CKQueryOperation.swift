@@ -56,7 +56,7 @@ public class CKQueryOperation: CKDatabaseOperation {
         parameters["query"] = query?.dictionary ?? [:]
         
         if let cursor = cursor {
-            parameters["continuationMarker"] = cursor.data.base64EncodedString([])
+            parameters["continuationMarker"] = cursor.data.base64EncodedString(options: [])
         }
         
         let url = "\(operationURL)/records/\(CKRecordOperation.query)"
