@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 public class CKContainer {
     
     let containerIdentifier: String
@@ -28,4 +29,19 @@ public class CKContainer {
     lazy var privateCloudDatabase: CKDatabase = {
         return CKDatabase(container: self, scope: .Private)
     }()
+    
+    var isRegisteredForNotifications: Bool {
+        return false
+    }
+    
+    func registerForNotifications() {
+        
+        
+        
+        
+        
+        
+        
+        
+    }
 }
