@@ -18,8 +18,6 @@ public class CloudKit {
     
     static let version = "1"
     
-    static let defaultZone = "_defaultZone"
-    
     public var environment: CKEnvironment = .development
     
     public private(set) var containers: [CKContainerConfig] = []
@@ -72,11 +70,8 @@ public class CKRecordZoneID: NSObject {
 
 
 extension CKRecordZoneID {
-    var isDefaultZone: Bool {
-        return zoneName == CloudKit.defaultZone
-    }
-  
     
+
     var dictionary: [String: AnyObject] {
         
         var zoneIDDictionary: [String: AnyObject] = [

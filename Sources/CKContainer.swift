@@ -23,11 +23,11 @@ public class CKContainer {
     }
     
     public lazy var publicCloudDatabase: CKDatabase = {
-        return CKDatabase(container: self, scope: .Public)
+        return CKDatabase(container: self, scope: .public)
     }()
     
     public lazy var privateCloudDatabase: CKDatabase = {
-        return CKDatabase(container: self, scope: .Private)
+        return CKDatabase(container: self, scope: .private)
     }()
     
     var isRegisteredForNotifications: Bool {

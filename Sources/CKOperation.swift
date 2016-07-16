@@ -107,7 +107,7 @@ extension CKDatabaseOperation {
     var operationURL: String {
         
         // Create URL
-        let operationDatabase = database?.scope ?? CKDatabaseScope.Public
+        let operationDatabase = database?.scope ?? CKDatabaseScope.public
         let urlForDatabaseOperation = "\(databaseURL)\(operationDatabase)"
         
         return urlForDatabaseOperation

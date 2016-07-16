@@ -48,8 +48,9 @@ public class CKQueryOperation: CKDatabaseOperation {
         var parameters: [String: AnyObject] = [:]
         
         let isZoneWide = false
-        if  let zoneID = zoneID where !zoneID.isDefaultZone {
+        if  let zoneID = zoneID where zoneID.zoneName != CKRecordZoneDefaultName {
             // Add ZoneID Dictionary to parameters
+            
         }
         
         parameters["zoneWide"] = isZoneWide

@@ -9,17 +9,17 @@
 import Foundation
 
 public enum CKDatabaseScope: Int, CustomStringConvertible {
-    case Public = 1
-    case Private
-    case Shared
+    case `public` = 1
+    case `private`
+    case  shared
     
     public var description: String {
         switch(self) {
-        case .Private:
+        case .private:
             return "private"
-        case .Public:
+        case .public:
             return "public"
-        case .Shared:
+        case .shared:
             return "shared"
         }
     }
@@ -55,10 +55,55 @@ public class CKDatabase {
         self.scope = scope
     }
     
-    public func addOperation(_ operation: CKDatabaseOperation) {
+    public func add(_ operation: CKDatabaseOperation) {
         operation.database = self
         // Add to queue
         operationQueue.addOperation(operation)
+        
+    }
+}
+
+extension CKDatabase {
+    
+    /* Records convenience methods */
+    public func fetch(withRecordID recordID: CKRecordID, completionHandler: (CKRecord?,
+        NSError?) -> Void) {
+        
+        let fetchRecordOperation = CKFetchRecordsOperation(recordIDs: [recordID])
+        fetchRecordOperation.database = self
+        fetchRecordOperation.fetchRecordsCompletionBlock = {
+            (recordIDsForRecords, error) in
+            
+            completionHandler(recordIDsForRecords?[recordID], error)
+        }
+        
+        fetchRecordOperation.start()
+    }
+    
+    public func save(record: CKRecord, completionHandler: (CKRecord?,
+        NSError?) -> Void) {
+        
+        let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
+        operation.modifyRecordsCompletionBlock = {
+            (records, recordIDs, error) in
+            
+            completionHandler(records?.first, error)
+        }
+        
+        operation.start()
+    }
+    
+    public func delete(withRecordID recordID: CKRecordID, completionHandler: (CKRecordID?,
+        NSError?) -> Void) {
+        
+        let operation = CKModifyRecordsOperation(recordsToSave: [], recordIDsToDelete: [recordID])
+        operation.modifyRecordsCompletionBlock = {
+            (records, recordIDs, error) in
+            
+            completionHandler(recordIDs?.first, error)
+        }
+        
+        operation.start()
         
     }
     
@@ -88,59 +133,81 @@ public class CKDatabase {
         queryOperation.start()
     }
     
-    public func fetch(withRecordID recordID: CKRecordID, completionHandler: (CKRecord?,
-        NSError?) -> Void) {
-        
-     let fetchRecordOperation = CKFetchRecordsOperation(recordIDs: [recordID])
-        fetchRecordOperation.database = self
-        fetchRecordOperation.fetchRecordsCompletionBlock = {
-            (recordIDsForRecords, error) in
-            
-           completionHandler(recordIDsForRecords?[recordID], error)
-        }
-        
-        fetchRecordOperation.start()
-    }
-    
-    public func save(record: CKRecord, completionHandler: (CKRecord?,
-        NSError?) -> Void) {
-    
-        let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
-        operation.modifyRecordsCompletionBlock = {
-            (records, recordIDs, error) in
-            
-            completionHandler(records?.first, error)
-        }
+    /* Zones convenience methods */
 
-        operation.start()
-    }
-
-
-    public func delete(withRecordID recordID: CKRecordID, completionHandler: (CKRecordID?,
-        NSError?) -> Void) {
-        
-        let operation = CKModifyRecordsOperation(recordsToSave: [], recordIDsToDelete: [recordID])
-        operation.modifyRecordsCompletionBlock = {
-            (records, recordIDs, error) in
-            
-            completionHandler(recordIDs?.first, error)
+    public func fetchAll(completionHandler: ([CKRecordZone]?, NSError?) -> Swift.Void) {
+        let operation = CKFetchRecordZonesOperation.fetchAllRecordZonesOperation()
+        operation.fetchRecordZonesCompletionBlock = {
+            (recordZoneByZoneID, error) in
+            if let recordZones = recordZoneByZoneID?.values {
+                completionHandler(Array(recordZones), error)
+            } else {
+                completionHandler(nil, error)
+            }
         }
         
         operation.start()
-        
     }
     
-    /* CKFetchSubscriptionsOperation and CKModifySubscriptionsOperation are the more configurable,
-     CKOperation-based alternative to these methods */
-    public func fetch(withSubscriptionID subscriptionID: String, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {
+    public func fetch(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: (CKRecordZone?, NSError?) -> Swift.Void) {
+        let operation = CKFetchRecordZonesOperation(recordZoneIDs: [zoneID])
+        operation.fetchRecordZonesCompletionBlock = {
+            (recordZoneByZoneID, error) in
+            
+            completionHandler(recordZoneByZoneID?[zoneID], error)
+
+        }
         
-        
-        
-        
+        operation.start()
     }
+    
+    public func save(_ zone: CKRecordZone, completionHandler: (CKRecordZone?, NSError?) -> Swift.Void) {
+        let operation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
+        operation.modifyRecordZonesCompletionBlock = {
+            (savedZones, deletedZones, error) in
+            
+            completionHandler(savedZones?.first, error)
+        }
+        
+        operation.start()
+    }
+    
+    public func delete(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: (CKRecordZoneID?, NSError?) -> Swift.Void) {
+        let operation = CKModifyRecordZonesOperation(recordZonesToSave: [], recordZoneIDsToDelete: [zoneID])
+        operation.modifyRecordZonesCompletionBlock = {
+            (savedZones, deletedZones, error) in
+            
+            completionHandler(deletedZones?.first, error)
+        }
+        
+        operation.start()
+    }
+
+    /* Subscriptions convenience methods */
     
     public func fetchAll(completionHandler: ([CKSubscription]?, NSError?) -> Swift.Void) {
-        
+        let operation = CKFetchSubscriptionsOperation.fetchAllSubscriptionsOperation()
+        operation.fetchSubscriptionCompletionBlock = {
+            (subscriptionsBySubscriptionID, error) in
+            
+            if let subscriptions = subscriptionsBySubscriptionID?.values {
+                completionHandler(Array(subscriptions), error)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+        operation.start()
+    }
+    
+    public func fetch(withSubscriptionID subscriptionID: String, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {
+        let operation = CKFetchSubscriptionsOperation(subscriptionIDs: [subscriptionID])
+        operation.fetchSubscriptionCompletionBlock = {
+            (subscriptionsBySubscriptionID, error) in
+            
+            completionHandler(subscriptionsBySubscriptionID?[subscriptionID], error)
+          
+        }
+        operation.start()
     }
     
     public func save(_ subscription: CKSubscription, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {

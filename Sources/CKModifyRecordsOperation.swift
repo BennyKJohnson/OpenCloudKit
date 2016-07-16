@@ -198,7 +198,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         
         var request: [String: AnyObject] = [:]
       
-        if database?.scope == .Public {
+        if database?.scope == .public {
             request["atomic"] = false
         } else {
             request["atomic"] = isAtomic

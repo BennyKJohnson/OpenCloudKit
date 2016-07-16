@@ -263,7 +263,7 @@ extension CKRecord {
         if let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject] {
             zoneID = CKRecordZoneID(dictionary: zoneIDDictionary)!
         } else {
-            zoneID = CKRecordZoneID(zoneName: CloudKit.defaultZone, ownerName: "_defaultOwner")
+            zoneID = CKRecordZoneID(zoneName: CKRecordZoneDefaultName, ownerName: "_defaultOwner")
         }
 
         let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
