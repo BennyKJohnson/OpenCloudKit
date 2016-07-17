@@ -2,6 +2,13 @@
 An open source framework for CloudKit written in Swift and inspired by Apple's CloudKit framework. 
 OpenCloudKit is backed by CloudKit Web Services and is designed to allow easy CloudKit integration into Swift Servers whilst being familiar for developers who have experience with CloudKit on Apple's platforms.
 
+## Features
+
+- [x] Fully featured wrapper around CloudKit Web Services
+- [x] Same API as Apple's CloudKit
+- [x] Supports all major operations supported by Apple’s CloudKit Framework
+- [x] Server-to-Server Key Auth Support
+
 # Installation
 
 ## Installing Dependencies 
