@@ -12,6 +12,8 @@ public let CKRecordTypeUserRecord: String = "Users"
 
 public protocol CKRecordValue : NSObjectProtocol {}
 
+
+
 public class CKRecord: NSObject {
     
     var values: [String: CKRecordValue] = [:]
@@ -98,14 +100,7 @@ struct CKRecordFieldDictionary {
 }
 
 
-class CKAsset: NSObject {
-    
-    @NSCopying var fileURL : NSURL
-    
-    init(fileURL: NSURL) {
-        self.fileURL = fileURL
-    }
-}
+
 
 struct CKValueType {
     static let string = "STRING"
@@ -207,6 +202,11 @@ extension CKRecord {
                     let longitude = (dictionary["longitude"] as! NSNumber).doubleValue
                     
                     return Location(latitude: latitude, longitude: longitude)
+                case "ASSETID":
+                    // size
+                    // downloadURL
+                    // fileChecksum
+                    return CKAsset(dictionary: dictionary)
                 default:
                     fatalError("Type not supported")
                 }
@@ -296,3 +296,23 @@ extension CKRecord {
     }
     
 }
+
+extension NSString : CKRecordValue {
+}
+
+extension NSNumber : CKRecordValue {
+}
+
+extension NSArray : CKRecordValue {
+}
+
+extension NSDate : CKRecordValue {
+}
+
+extension NSData : CKRecordValue {
+}
+
+extension Location: CKRecordValue {
+}
+
+extension CKAsset: CKRecordValue {}

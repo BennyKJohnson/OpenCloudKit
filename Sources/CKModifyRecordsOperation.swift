@@ -14,7 +14,6 @@ public enum CKRecordSavePolicy : Int {
     case AllKeys
 }
 
-
 let CKErrorRetryAfterKey = "CKRetryAfter"
 let CKErrorRedirectURLKey = "CKRedirectURL"
 let CKPartialErrorsByItemIDKey: String = "CKPartialErrors"

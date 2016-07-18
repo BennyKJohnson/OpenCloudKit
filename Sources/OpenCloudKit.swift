@@ -118,23 +118,6 @@ public struct LocationCoordinate2D {
 
 
 
-extension NSString : CKRecordValue {
-}
-
-extension NSNumber : CKRecordValue {
-}
-
-extension NSArray : CKRecordValue {
-}
-
-extension NSDate : CKRecordValue {
-}
-
-extension NSData : CKRecordValue {
-}
-
-extension Location: CKRecordValue {
-}
 
 
 

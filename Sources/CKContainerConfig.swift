@@ -121,16 +121,22 @@ public struct CKContainerConfig {
     }
 }
 
-public struct CKServerToServerKeyAuth: Equatable {
+public struct CKServerToServerKeyAuth {
     // A unique identifier for the key generated using CloudKit Dashboard. To create this key, read
-    let keyID: String
+    public let keyID: String
     // The path to the PEM encoded key file.
-    var privateKeyFile: String
+    public var privateKeyFile: String
     
     //The pass phrase for the key.
-    let privateKeyPassPhrase: String?
+    public let privateKeyPassPhrase: String?
+    
+    public init(keyID: String, privateKeyFile: String, privateKeyPassPhrase: String? = nil) {
+        self.keyID = keyID
+        self.privateKeyFile = privateKeyFile
+        self.privateKeyPassPhrase = privateKeyPassPhrase
+    }
 }
-
+extension CKServerToServerKeyAuth:Equatable {}
 
 public func ==(lhs: CKServerToServerKeyAuth, rhs: CKServerToServerKeyAuth) -> Bool {
     return lhs.keyID == rhs.keyID && lhs.privateKeyFile == rhs.privateKeyFile && lhs.privateKeyPassPhrase == rhs.privateKeyPassPhrase

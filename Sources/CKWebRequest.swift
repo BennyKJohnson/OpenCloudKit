@@ -118,6 +118,35 @@ class CKWebRequest {
         return task
     }
     
+    func urlRequest(with url: URL, parameters: [String: AnyObject]? = nil) -> URLRequest? {
+        // Build URL
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        components?.queryItems = authQueryItems
+        print(components?.path)
+        guard let requestURL = components?.url else {
+            return nil
+        }
+        
+        var urlRequest = URLRequest(url: requestURL)
+        if let parameters = parameters {
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+            urlRequest.httpBody = jsonData
+            urlRequest.httpMethod = "POST"
+        } else {
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: [:], options: [])
+            urlRequest.httpBody = jsonData
+            urlRequest.httpMethod = "GET"
+        }
+        
+        if let serverToServerKeyAuth = serverToServerKeyAuth {
+            if let signedRequest  = CKServerRequestAuth.authenicateServer(forRequest: urlRequest, withServerToServerKeyAuth: serverToServerKeyAuth) {
+                urlRequest = signedRequest
+            }
+        }
+        
+        return urlRequest
+    }
+
     
     func request(withURL url: String, completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
        
@@ -169,9 +198,6 @@ class CKWebRequest {
             }
         }
         
-    
-       let headers = urlRequest.allHTTPHeaderFields!
-            print(headers)
         return perform(request: urlRequest, completetion: completetion)
     }
     

@@ -27,7 +27,9 @@ public class CKQueryOperation: CKDatabaseOperation {
         self.cursor = cursor
     }
     
-    public  var query: CKQuery?
+    public var shouldFetchAssetContent = true
+    
+    public var query: CKQuery?
     
     public var cursor: CKQueryCursor?
     
