@@ -38,7 +38,6 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
     
     func prepareForDownload() {
         
-        let webRequest = CKWebRequest(container: operationContainer)
         downloadSession = URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: nil)
         if let downloadSession = downloadSession {
             

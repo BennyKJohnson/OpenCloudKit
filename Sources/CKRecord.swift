@@ -9,8 +9,22 @@
 import Foundation
 
 public let CKRecordTypeUserRecord: String = "Users"
-
-public protocol CKRecordValue : NSObjectProtocol {}
+public protocol CKRecordFieldProvider {
+    var recordFieldDictionary: [String: AnyObject] { get }
+}
+extension CKRecordFieldProvider where Self: AnyObject {
+    public var recordFieldDictionary: [String: AnyObject] {
+        return ["value": self]
+    }
+}
+/*
+extension CKRecordFieldProvider where Self: CustomDictionaryConvertible {
+    public var recordFieldDictionary: [String: AnyObject] {
+        return ["value": self.dictionary]
+    }
+}
+*/
+public protocol CKRecordValue : CKRecordFieldProvider, NSObjectProtocol {}
 
 
 
@@ -55,6 +69,13 @@ public class CKRecord: NSObject {
             changedKeysSet.add(key)
         }
         
+        switch object {
+        case let asset as CKAsset:
+            asset.recordID = self.recordID
+        default:
+            break
+        }
+        
         values[key] = object
     }
 
@@ -75,6 +96,7 @@ public class CKRecord: NSObject {
         return changedKeysSet.allObjects as! [String]
     }
     
+ 
     override public var description: String {
         return "<\(self.dynamicType): \(unsafeAddress(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
     }
@@ -201,7 +223,7 @@ extension CKRecord {
                     let latitude = (dictionary["latitude"] as! NSNumber).doubleValue
                     let longitude = (dictionary["longitude"] as! NSNumber).doubleValue
                     
-                    return Location(latitude: latitude, longitude: longitude)
+                    return CKLocation(latitude: latitude, longitude: longitude)
                 case "ASSETID":
                     // size
                     // downloadURL
@@ -298,21 +320,27 @@ extension CKRecord {
 }
 
 extension NSString : CKRecordValue {
+    public var recordFieldDictionary: [String : AnyObject] {
+        return ["value": self, "type":"STRING"]
+    }
 }
 
-extension NSNumber : CKRecordValue {
-}
+extension NSNumber : CKRecordValue {}
 
-extension NSArray : CKRecordValue {
-}
+extension NSArray : CKRecordValue {}
 
 extension NSDate : CKRecordValue {
+    public var recordFieldDictionary: [String : AnyObject] {
+        return ["value": self.timeIntervalSince1970, "type":"TIMESTAMP"]
+    }
 }
 
-extension NSData : CKRecordValue {
-}
-
-extension Location: CKRecordValue {
-}
+extension NSData : CKRecordValue {}
 
 extension CKAsset: CKRecordValue {}
+
+extension CKLocation: CKRecordValue {
+    public var recordFieldDictionary: [String: AnyObject] {
+        return ["value": self.dictionary, "type": "LOCATION"]
+    }
+}

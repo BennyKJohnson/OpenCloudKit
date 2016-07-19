@@ -8,13 +8,16 @@
 
 import Foundation
 
+
+
+
 public class CKUserIdentity : NSObject {
     
     
     // This is the lookupInfo you passed in to CKDiscoverUserIdentitiesOperation or CKFetchShareParticipantsOperation
     public let lookupInfo: CKUserIdentityLookupInfo?
     
-   // public let nameComponents: PersonNameComponents?
+    public let nameComponents: CKPersonNameComponentsType?
     
     public let userRecordID: CKRecordID?
     
@@ -32,7 +35,7 @@ public class CKUserIdentity : NSObject {
         
         hasiCloudAccount = false
         
-    //    nameComponents = nil
+        nameComponents = nil
         
         super.init()
     }
@@ -53,11 +56,17 @@ public class CKUserIdentity : NSObject {
         }
         
         if let nameComponentsDictionary = dictionary["nameComponents"] as? [String: AnyObject] {
-       //     self.nameComponents = PersonNameComponents(dictionary: nameComponentsDictionary)
+            if #available(OSX 10.11, *) {
+                self.nameComponents = PersonNameComponents(dictionary: nameComponentsDictionary)
+            } else {
+                // Fallback on earlier versions
+                self.nameComponents = CKPersonNameComponents(dictionary: nameComponentsDictionary)
+            }
+            
        //     self.firstName = nameComponents?.givenName
         //    self.lastName = nameComponents?.familyName
         } else {
-       //     self.nameComponents = nil
+            self.nameComponents = nil
         }
         
         self.hasiCloudAccount = false

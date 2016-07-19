@@ -33,12 +33,18 @@ public class CKQuery {
     
     public var sortDescriptors: [SortDescriptor] = []
     
+
+    
     // Returns a Dictionary Representation of a Query Dictionary
     var dictionary: [String: AnyObject] {
         
         var queryDictionary: [String: AnyObject] = ["recordType": recordType]
         
-        queryDictionary["filterBy"] = []
+        let ckPredicate = CKPredicate(predicate: predicate)
+        
+        queryDictionary["filterBy"] = ckPredicate.filters().map({ (filter) -> [String: AnyObject] in
+            return filter.dictionary
+        })
         
         // Create Sort Descriptor Dictionaries
         queryDictionary["sortBy"] = sortDescriptors.flatMap { (sortDescriptor) -> [String: AnyObject]? in

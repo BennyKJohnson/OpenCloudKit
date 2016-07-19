@@ -67,7 +67,7 @@ class OpenCloudKitTests: XCTestCase {
         
     }
     
-    
+    /*
     func testValidSignature() {
         
         let requestDate = "2016-07-13T03:16:51Z"
@@ -88,7 +88,7 @@ class OpenCloudKitTests: XCTestCase {
         
         XCTAssert(context.verify(signature: signature), "Signature should verify successfully")
     }
- 
+ */
     func testAuthenicateServerWithURLRequest() {
         
         let url = URL(string: "https://api.apple-cloudkit.com/database/1/iCloud.benjamin.CloudTest/development/public/records/query")!

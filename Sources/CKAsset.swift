@@ -21,7 +21,7 @@ public class CKAsset: NSObject {
     var recordID: CKRecordID?
     
     var downloadBaseURL: String?
-    
+        
     var downloadURL: URL? {
         get {
             if let downloadBaseURL = downloadBaseURL {
@@ -47,8 +47,7 @@ public class CKAsset: NSObject {
     init?(dictionary: [String: AnyObject]) {
         
         guard let downloadURL = dictionary["downloadURL"] as? String,
-        size = dictionary["size"] as? NSNumber,
-        fileChecksum = dictionary["fileChecksum"] as? String
+        size = dictionary["size"] as? NSNumber
         else  {
             return nil
         }
@@ -58,5 +57,18 @@ public class CKAsset: NSObject {
         self.size = size.uintValue
         downloaded = false
 
+    }
+}
+
+extension CKAsset: CustomDictionaryConvertible {
+    var dictionary: [String: AnyObject] {
+        var fieldDictionary: [String: AnyObject] = [:]
+        if let recordID = recordID, recordKey = recordKey {
+            fieldDictionary["recordName"] = recordID.recordName
+            fieldDictionary["recordType"] = "Items"
+            fieldDictionary["fieldName"] = recordKey
+        }
+        
+        return fieldDictionary
     }
 }

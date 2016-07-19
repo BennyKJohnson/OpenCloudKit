@@ -66,7 +66,7 @@ public class CKSubscription: NSObject {
 }
 
 extension CKSubscription: CustomDictionaryConvertible {
-    var dictionary: [String: AnyObject] {
+    public var dictionary: [String: AnyObject] {
         return [:]
     }
 }
@@ -145,7 +145,7 @@ public class CKQuerySubscription : CKSubscription {
 
 
 extension CKQuerySubscription {
-    override var dictionary: [String: AnyObject] {
+    override public var dictionary: [String: AnyObject] {
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
        
@@ -187,7 +187,7 @@ public class CKRecordZoneSubscription : CKSubscription {
 
 extension CKRecordZoneSubscription {
     
-    override var dictionary: [String: AnyObject] {
+    override public var dictionary: [String: AnyObject] {
 
         var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID,
                                                   "subscriptionType": subscriptionType.description,
