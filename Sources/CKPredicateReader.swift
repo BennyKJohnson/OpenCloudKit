@@ -179,7 +179,7 @@ struct CKPredicateReader {
             case "\"":
                 currentIndex += 1
                 let string = try parseString(currentIndex)!
-                parameters.append(string.0)
+                parameters.append(string.0.bridge())
                 
                 currentIndex = string.1
                 chunkIndex = currentIndex
@@ -209,11 +209,16 @@ struct CKPredicateReader {
     func takeValue(begin: Index, end: Index) -> AnyObject? {
         let token = source.takeString(begin: begin, end: end)
         if !token.isEmpty {
-            if let number = CKPredicateReader.numberFormatter.number(from: token) {
+            #if os(Linux)
+                 let number = CKPredicateReader.numberFormatter.numberFromString(token)
+            #else
+                 let number = CKPredicateReader.numberFormatter.number(from: token)
+            #endif
+            
+            if let number = number {
                 return number
             } else {
-                return token
-                
+                return token.bridge()
             }
         } else {
             return nil

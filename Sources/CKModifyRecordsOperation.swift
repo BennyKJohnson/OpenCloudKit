@@ -137,8 +137,8 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         if let recordIDsToDelete = recordIDsToDelete {
            let deleteOperations = recordIDsToDelete.map({ (recordID) -> [String: AnyObject] in
                 let operationDictionary: [String: AnyObject] = [
-                    "operationType": "delete",
-                    "record":["recordName":recordID.recordName]
+                    "operationType": "delete".bridge(),
+                    "record":(["recordName":recordID.recordName.bridge()] as [String: AnyObject]).bridge()
                 ]
                 
                 return operationDictionary
@@ -152,7 +152,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                 let operationType: String
                 let fieldsDictionary: [String: AnyObject]
                 
-                var recordDictionary: [String: AnyObject] = ["recordType": record.recordType, "recordName": record.recordID.recordName]
+                var recordDictionary: [String: AnyObject] = ["recordType": record.recordType.bridge(), "recordName": record.recordID.recordName.bridge()]
                 if let recordChangeTag = record.recordChangeTag {
                     
                     if savePolicy == .IfServerRecordUnchanged {
@@ -168,7 +168,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                         fieldsDictionary = record.fieldsDictionary(forKeys: record.changedKeys())
                     }
                   
-                    recordDictionary["recordChangeTag"] = recordChangeTag
+                    recordDictionary["recordChangeTag"] = recordChangeTag.bridge()
                     
                 } else {
                     // Create new record
@@ -176,8 +176,9 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                     operationType = "create"
                 }
                 
-                recordDictionary["fields"] = fieldsDictionary
-                
+        
+                recordDictionary["fields"] = fieldsDictionary.bridge()
+               
                 let operationDictionary: [String: AnyObject] = ["operationType": operationType, "record": recordDictionary]
                 return operationDictionary
             })
@@ -198,12 +199,16 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         var request: [String: AnyObject] = [:]
       
         if database?.scope == .public {
-            request["atomic"] = false
+            request["atomic"] = NSNumber(value: false)
         } else {
-            request["atomic"] = isAtomic
+            request["atomic"] = NSNumber(value: isAtomic)
         }
         
-        request["operations"] = operationsDictionary()
+        #if os(Linux)
+            request["operations"] = operationsDictionary().bridge()
+        #else
+            request["operations"] = operationsDictionary()
+        #endif
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

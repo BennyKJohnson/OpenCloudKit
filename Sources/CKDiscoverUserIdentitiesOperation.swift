@@ -43,7 +43,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
             return lookupInfo.dictionary
         }
         
-        let request: [String: AnyObject] = ["lookupInfos": lookUpInfos]
+        let request: [String: AnyObject] = ["lookupInfos": lookUpInfos.bridge()]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

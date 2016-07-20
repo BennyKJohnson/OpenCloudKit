@@ -45,7 +45,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         
         var request: [String: AnyObject] = [:]
         let lookupRecords = recordIDs?.map { (recordID) -> [String: AnyObject] in
-            return ["recordName": recordID.recordName]
+            return ["recordName": recordID.recordName.bridge()]
         }
         
         request["records"] = lookupRecords

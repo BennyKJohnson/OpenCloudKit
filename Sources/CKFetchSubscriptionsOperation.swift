@@ -39,8 +39,9 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         var request: [String: AnyObject] = [:]
         if let subscriptionIDs = subscriptionIDs {
-            request["subscriptions"] = subscriptionIDs
+            request["subscriptions"] = subscriptionIDs.bridge()
         }
+        
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
             if let error = networkError {

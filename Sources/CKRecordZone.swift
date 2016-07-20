@@ -71,6 +71,6 @@ extension CKRecordZone {
     }
     
     var dictionary: [String: AnyObject] {
-        return ["zoneID": zoneID.dictionary]
+        return ["zoneID": zoneID.dictionary.bridge()]
     }
 }

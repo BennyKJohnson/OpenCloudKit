@@ -50,9 +50,9 @@ struct CKFetchErrorDictionary<T: CKFetchErrorDictionaryIdentifier> {
     func error() -> NSError {
         
         let errorCode = CKErrorCode.errorCode(serverError: serverErrorCode)!
-        var userInfo: [String: AnyObject] = [NSLocalizedDescriptionKey: reason, "serverErrorCode": serverErrorCode]
+        var userInfo: [String: AnyObject] = [NSLocalizedDescriptionKey: reason.bridge(), "serverErrorCode": serverErrorCode]
         if let redirectURL = redirectURL {
-            userInfo[CKErrorRedirectURLKey] = redirectURL
+            userInfo[CKErrorRedirectURLKey] = redirectURL.bridge()
         }
         if let retryAfter = retryAfter {
             userInfo[CKErrorRetryAfterKey] = retryAfter

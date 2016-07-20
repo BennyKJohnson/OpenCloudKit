@@ -41,4 +41,17 @@ import Foundation
         }
     }
     
+    extension Dictionary {
+        public func bridge() -> Dictionary {
+            return self
+        }
+    }
+    
+    extension Array {
+        public func bridge() -> Array {
+            return self
+        }
+    }
+    
 #endif
+

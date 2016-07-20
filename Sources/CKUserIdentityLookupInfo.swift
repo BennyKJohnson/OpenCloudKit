@@ -74,9 +74,9 @@ extension CKUserIdentityLookupInfo {
     var dictionary: [String: AnyObject] {
         
         var lookupInfo: [String: AnyObject] = [:]
-        lookupInfo["emailAddress"] = emailAddress
-        lookupInfo["phoneNumber"] = phoneNumber
-        lookupInfo["userRecordName"] = userRecordID?.recordName
+        lookupInfo["emailAddress"] = emailAddress?.bridge()
+        lookupInfo["phoneNumber"] = phoneNumber?.bridge()
+        lookupInfo["userRecordName"] = userRecordID?.recordName.bridge()
         
         return lookupInfo
     }

@@ -52,6 +52,7 @@ public class CKAsset: NSObject {
             return nil
         }
         
+        
         fileURL = NSURL()
         self.downloadBaseURL = downloadURL.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
         self.size = size.uintValue
@@ -64,9 +65,9 @@ extension CKAsset: CustomDictionaryConvertible {
     public var dictionary: [String: AnyObject] {
         var fieldDictionary: [String: AnyObject] = [:]
         if let recordID = recordID, recordKey = recordKey {
-            fieldDictionary["recordName"] = recordID.recordName
-            fieldDictionary["recordType"] = "Items"
-            fieldDictionary["fieldName"] = recordKey
+            fieldDictionary["recordName"] = recordID.recordName.bridge()
+        //    fieldDictionary["recordType"] = "Items".bridge()
+            fieldDictionary["fieldName"] = recordKey.bridge()
         }
         
         return fieldDictionary

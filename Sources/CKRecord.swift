@@ -93,7 +93,14 @@ public class CKRecord: NSObject {
     }
     
     public func changedKeys() -> [String] {
-        return changedKeysSet.allObjects as! [String]
+        var changedKeysArray: [String] = []
+        for changedKey in changedKeysSet.allObjects {
+            if let key = (changedKey as? NSString)?.bridge() {
+                changedKeysArray.append(key)
+            }
+        }
+        
+        return changedKeysArray
     }
     
  
@@ -120,9 +127,6 @@ struct CKRecordFieldDictionary {
     static let value = "value"
     static let type = "type"
 }
-
-
-
 
 struct CKValueType {
     static let string = "STRING"
@@ -159,7 +163,7 @@ extension CKRecord {
                 default:
                     valueDictionary = ["value": value]
                 }
-                fieldsDictionary[key] = valueDictionary
+                fieldsDictionary[key] = valueDictionary.bridge()
             }
         }
         
@@ -180,14 +184,14 @@ extension CKRecord {
 
             }
             
-            fieldsDictionary[key] = valueDictionary
+            fieldsDictionary[key] = valueDictionary.bridge()
         }
         
         
         let recordDictionary: [String: AnyObject] = [
-        "fields": fieldsDictionary,
-        "recordType": recordType as NSString,
-        "recordName": recordID.recordName as NSString
+        "fields": fieldsDictionary.bridge(),
+        "recordType": recordType.bridge(),
+        "recordName": recordID.recordName.bridge()
         ]
         
         return recordDictionary
@@ -321,7 +325,7 @@ extension CKRecord {
 
 extension NSString : CKRecordValue {
     public var recordFieldDictionary: [String : AnyObject] {
-        return ["value": self, "type":"STRING" as NSString]
+        return ["value": self, "type":"STRING".bridge()]
     }
 }
 
@@ -331,7 +335,7 @@ extension NSArray : CKRecordValue {}
 
 extension NSDate : CKRecordValue {
     public var recordFieldDictionary: [String : AnyObject] {
-        return ["value": self.timeIntervalSince1970, "type":"TIMESTAMP" as NSString]
+        return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
     }
 }
 
@@ -341,12 +345,13 @@ extension CKAsset: CKRecordValue {}
 
 extension CKLocation: CKRecordValue {
     public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary, "type": "LOCATION" as NSString]
+        
+        return ["value": self.dictionary.bridge(), "type": "LOCATION".bridge()]
     }
 }
 
 extension CKLocationType {
     public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary, "type": "LOCATION" as NSString]
+        return ["value": self.dictionary.bridge(), "type": "LOCATION".bridge()]
     }
 }

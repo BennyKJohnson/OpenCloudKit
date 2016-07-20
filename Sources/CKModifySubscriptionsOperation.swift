@@ -47,8 +47,8 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
             for subscriptionID in subscriptionIDsToDelete {
                 
                 let operation: [String: AnyObject] = [
-                    "operationType": "create",
-                    "subscription": ["subscriptionID": subscriptionID]
+                    "operationType": "create".bridge(),
+                    "subscription": (["subscriptionID": subscriptionID.bridge()] as [String: AnyObject]).bridge()
                 ]
                 
                 operations.append(operation)
@@ -62,7 +62,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         
         let url = "\(operationURL)/subscriptions/modify"
         
-        let request: [String: AnyObject] = ["operations": operationsDictionary()]
+        let request: [String: AnyObject] = ["operations": operationsDictionary().bridge()]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
             if let error = networkError {

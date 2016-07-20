@@ -17,7 +17,21 @@ extension FileManager {
         return FileManager.default
     }
 }
- 
+    
+    
+extension Data {
+    public var base64Encoded: String {
+        return base64EncodedString(options: [])
+    }
+}
+    
+    
+extension NSData {
+    public var base64Encoded: String {
+        return base64EncodedString(options: [])
+    }
+}
+    
  extension URLSessionConfiguration {
  static func defaultConfiguration() -> URLSessionConfiguration {
  #if os(Linux)
@@ -88,33 +102,27 @@ extension NSURL {
         return deletingPathExtension!
     }
 }
-#if os(Linux)
+    
 extension NSUUID {
     var uuidString: String {
         return UUIDString
     }
 }
-#endif
-
-extension NSURLSessionConfiguration {
-    static func defaultConfiguration() -> URLSessionConfiguration {
-        return URLSessionConfiguration.default()
-    }
-}
-#endif
-
-
+    
 extension Data {
     public var base64Encoded: String {
         return base64EncodedString(options: [])
     }
 }
 
-extension NSData {
-    public var base64Encoded: String {
-        return base64EncodedString(options: [])
+extension NSURLSessionConfiguration {
+    static func defaultConfiguration() -> URLSessionConfiguration {
+        return URLSessionConfiguration.default()
     }
 }
+
+#endif
+
 
 
 

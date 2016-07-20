@@ -55,8 +55,8 @@ public class CKQueryOperation: CKDatabaseOperation {
             
         }
         
-        parameters["zoneWide"] = isZoneWide
-        parameters["query"] = query?.dictionary ?? [:]
+        parameters["zoneWide"] = NSNumber(value: isZoneWide)
+        parameters["query"] = query?.dictionary.bridge()
         
         if let cursor = cursor {
             

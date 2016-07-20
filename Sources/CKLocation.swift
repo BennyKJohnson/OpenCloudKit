@@ -142,14 +142,14 @@ extension CKLocationType {
     
     public var dictionary: [String: AnyObject] {
         return [
-        "latitude": coordinateType.latitude,
-        "longitude": coordinateType.longitude,
-        "horizontalAccuracy": horizontalAccuracy,
-        "verticalAccuracy": verticalAccuracy,
-        "altitude": altitude,
-        "speed": speed,
-        "course": course,
-        "timestamp": timestamp.timeIntervalSince1970
+        "latitude": NSNumber(value: coordinateType.latitude),
+        "longitude": NSNumber(value: coordinateType.longitude),
+        "horizontalAccuracy": NSNumber(value: horizontalAccuracy),
+        "verticalAccuracy": NSNumber(value: verticalAccuracy),
+        "altitude": NSNumber(value: altitude),
+        "speed": NSNumber(value: speed),
+        "course": NSNumber(value: course),
+        "timestamp": NSNumber(value: timestamp.timeIntervalSince1970)
         ]
     }
 }

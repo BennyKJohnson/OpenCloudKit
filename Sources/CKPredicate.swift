@@ -161,7 +161,14 @@ struct CKPredicate {
     }
     
     func value(forString string: String) -> CKRecordValue {
-        if let number = numberFormatter.number(from: string) {
+        
+        #if os(Linux)
+        let numberFromString = numberFormatter.numberFromString(string)
+        #else
+        let numberFromString = numberFormatter.number(from: string)
+        #endif
+        
+        if let number = numberFromString {
             return number
         } else {
             if string.hasPrefix("CAST") {
