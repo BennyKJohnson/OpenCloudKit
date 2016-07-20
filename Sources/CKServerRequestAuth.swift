@@ -67,8 +67,11 @@ struct CKServerRequestAuth {
     static func signature(requestDate: String, requestBody: NSData, urlSubpath: String, privateKeyPath: String) -> String? {
         
         let rawPayloadString = rawPayload(withRequestDate: requestDate, requestBody: requestBody, urlSubpath: urlSubpath)
-        
-        let requestData = rawPayloadString.data(using: String.Encoding(rawValue: CKUTF8StringEncoding))!
+        #if os(Linux)
+            let requestData = rawPayloadString.data(using: CKUTF8StringEncoding)!
+        #else
+            let requestData = rawPayloadString.data(using: String.Encoding(rawValue: CKUTF8StringEncoding))!
+        #endif
         
         let signedData = sign(data: requestData, privateKeyPath: privateKeyPath)
         

@@ -131,11 +131,12 @@ class CKWebRequest {
         
         var urlRequest = URLRequest(url: requestURL)
         if let parameters = parameters {
-            let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+            let dictionary = NSDictionary(dictionary: parameters)
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: dictionary, options: [])
             urlRequest.httpBody = jsonData
             urlRequest.httpMethod = "POST"
         } else {
-            let jsonData: Data = try! JSONSerialization.data(withJSONObject: [:], options: [])
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: NSDictionary(), options: [])
             urlRequest.httpBody = jsonData
             urlRequest.httpMethod = "GET"
         }

@@ -47,8 +47,8 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
             let saveOperations = recordZonesToSave.map({ (zone) -> [String: AnyObject] in
                 
                 let operation: [String: AnyObject] = [
-                    "operationType": "create",
-                    "zone": ["zoneID": zone.zoneID.dictionary]
+                    "operationType": "create" as NSString,
+                    "zone": ["zoneID": zone.zoneID.dictionary] as NSDictionary
                 ]
                 
                 return operation
@@ -61,8 +61,8 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
             let deleteOperations = recordZoneIDsToDelete.map({ (zoneID) -> [String: AnyObject] in
                 
                 let operation: [String: AnyObject] = [
-                    "operationType": "delete",
-                    "zone": ["zoneID": zoneID]
+                    "operationType": "delete" as NSString,
+                    "zone": ["zoneID": zoneID] as NSDictionary
                 ]
                 
                 return operation
@@ -78,7 +78,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         
         let url = "\(databaseURL)/zones/modify"
         let zoneOperations = self.zoneOperations()
-        let request: [String: AnyObject] = ["operations": zoneOperations]
+        let request: [String: AnyObject] = ["operations": zoneOperations as NSArray]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

@@ -186,8 +186,8 @@ extension CKRecord {
         
         let recordDictionary: [String: AnyObject] = [
         "fields": fieldsDictionary,
-        "recordType": recordType,
-        "recordName": recordID.recordName
+        "recordType": recordType as NSString,
+        "recordName": recordID.recordName as NSString
         ]
         
         return recordDictionary
@@ -321,7 +321,7 @@ extension CKRecord {
 
 extension NSString : CKRecordValue {
     public var recordFieldDictionary: [String : AnyObject] {
-        return ["value": self, "type":"STRING"]
+        return ["value": self, "type":"STRING" as NSString]
     }
 }
 
@@ -331,7 +331,7 @@ extension NSArray : CKRecordValue {}
 
 extension NSDate : CKRecordValue {
     public var recordFieldDictionary: [String : AnyObject] {
-        return ["value": self.timeIntervalSince1970, "type":"TIMESTAMP"]
+        return ["value": self.timeIntervalSince1970, "type":"TIMESTAMP" as NSString]
     }
 }
 
@@ -341,12 +341,12 @@ extension CKAsset: CKRecordValue {}
 
 extension CKLocation: CKRecordValue {
     public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary, "type": "LOCATION"]
+        return ["value": self.dictionary, "type": "LOCATION" as NSString]
     }
 }
 
 extension CKLocationType {
     public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary, "type": "LOCATION"]
+        return ["value": self.dictionary, "type": "LOCATION" as NSString]
     }
 }

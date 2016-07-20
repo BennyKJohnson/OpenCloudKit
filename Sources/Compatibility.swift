@@ -116,6 +116,9 @@ extension NSData {
     }
 }
 
+
+
+
 /*
 extension Data {
     func base64EncodedString(options options: NSDataBase64EncodingOptions) -> String {

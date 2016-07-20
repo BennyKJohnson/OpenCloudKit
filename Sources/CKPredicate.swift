@@ -170,8 +170,7 @@ struct CKPredicate {
                 return value(forCastParameters: parseFunction!.parameters)!
                 
             } else {
-                return string as NSString
-
+                return string.bridge()
             }
         }
     }
@@ -200,13 +199,13 @@ extension CKFilter: CustomDictionaryConvertible {
     
     public var dictionary: [String: AnyObject] {
         var filterDictionary: [String: AnyObject] = [
-        "comparator": comparator.rawValue,
-        "fieldName": fieldName,
+        "comparator": comparator.rawValue.bridge(),
+        "fieldName": fieldName.bridge(),
         "fieldValue": fieldValue.recordFieldDictionary
         ]
         
         if let distance = distance {
-            filterDictionary["distance"] = distance
+            filterDictionary["distance"] = NSNumber(value: distance)
         }
         
         return filterDictionary

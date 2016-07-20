@@ -154,11 +154,12 @@ extension CKQuerySubscription {
                 "query": query.dictionary,
                 "firesOn": querySubscriptionOptions.firesOnArray]
         if querySubscriptionOptions.contains(CKQuerySubscriptionOptions.firesOnce) {
-            subscription["firesOnce"] = true
+            subscription["firesOnce"] = NSNumber(value: true)
         }
         
         if let notificationInfo = notificationInfo {
-            subscription["notificationInfo"] = notificationInfo.dictionary
+            subscription["notificationInfo"] = NSDictionary(dictionary: notificationInfo.dictionary)
+
         }
     
         return subscription
@@ -189,8 +190,8 @@ extension CKRecordZoneSubscription {
     
     override public var dictionary: [String: AnyObject] {
 
-        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID,
-                                                  "subscriptionType": subscriptionType.description,
+        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID as NSString,
+                                                  "subscriptionType": subscriptionType.description as NSString,
                                                   "zoneID": zoneID.dictionary
                                                 ]
        
@@ -244,21 +245,25 @@ extension CKNotificationInfo {
         
         var notificationInfo: [String: AnyObject] = [:]
         
-        notificationInfo[CKNotificationInfoDictionary.alertBodyKey] = alertBody
+        notificationInfo[CKNotificationInfoDictionary.alertBodyKey] = alertBody?.bridge()
         
-        notificationInfo[CKNotificationInfoDictionary.alertLocalizationKey] = alertLocalizationKey
+        notificationInfo[CKNotificationInfoDictionary.alertLocalizationKey] = alertLocalizationKey?.bridge()
         
+        #if os(Linux)
+        notificationInfo[CKNotificationInfoDictionary.alertLocalizationArgsKey] = alertLocalizationArgs?.bridge()
+        #else
         notificationInfo[CKNotificationInfoDictionary.alertLocalizationArgsKey] = alertLocalizationArgs
+        #endif
+
+        notificationInfo[CKNotificationInfoDictionary.alertActionLocalizationKeyKey] = alertActionLocalizationKey?.bridge()
         
-        notificationInfo[CKNotificationInfoDictionary.alertActionLocalizationKeyKey] = alertActionLocalizationKey
+        notificationInfo[CKNotificationInfoDictionary.alertLaunchImageKey] = alertLaunchImage?.bridge()
         
-        notificationInfo[CKNotificationInfoDictionary.alertLaunchImageKey] = alertLaunchImage
+        notificationInfo[CKNotificationInfoDictionary.soundName] = soundName?.bridge()
         
-        notificationInfo[CKNotificationInfoDictionary.soundName] = soundName
+        notificationInfo[CKNotificationInfoDictionary.shouldBadge] = NSNumber(value: shouldBadge)
         
-        notificationInfo[CKNotificationInfoDictionary.shouldBadge] = shouldBadge
-        
-        notificationInfo[CKNotificationInfoDictionary.shouldSendContentAvailable] = shouldSendContentAvailable
+        notificationInfo[CKNotificationInfoDictionary.shouldSendContentAvailable] = NSNumber(value: shouldSendContentAvailable)
         
         
         return notificationInfo
