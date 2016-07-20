@@ -47,7 +47,7 @@ public struct CKConfig {
             
             let jsonData = try NSData(contentsOfFile: path, options: [])
             if let dictionary = try JSONSerialization.jsonObject(with: jsonData as Data, options: []) as? [String: AnyObject] {
-                self.init(dictionary: dictionary, workingDirectory: directory.absoluteString!)
+                self.init(dictionary: dictionary, workingDirectory: directory.absoluteString)
             } else {
                 return nil
             }

@@ -94,7 +94,9 @@ class CKWebRequest {
                 completetion(nil, error)
                 
             } else if let data = data {
-                let dataString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
+                
+                
+                let dataString = NSString(data: data, encoding: CKUTF8StringEncoding)
                 print(dataString)
                 let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
                 

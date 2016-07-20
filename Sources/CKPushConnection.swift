@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+/*
 class CKPushConnection: NSObject, URLSessionDataDelegate {
 
     var longPollingTask: URLSessionDataTask?
@@ -29,12 +29,6 @@ class CKPushConnection: NSObject, URLSessionDataDelegate {
         
     }
     
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: (URLSession.ResponseDisposition) -> Void) {
-    
-        completionHandler(.allow)
-    }
-
-    
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
         if let error = error {
             print(error)
@@ -46,3 +40,4 @@ class CKPushConnection: NSObject, URLSessionDataDelegate {
     
   
 }
+*/

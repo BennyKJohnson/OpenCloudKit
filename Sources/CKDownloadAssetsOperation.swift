@@ -38,7 +38,7 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
     
     func prepareForDownload() {
         
-        downloadSession = URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: nil)
+        downloadSession = URLSession(configuration: URLSessionConfiguration.defaultConfiguration(), delegate: self, delegateQueue: nil)
         if let downloadSession = downloadSession {
             
             // Create URLSessionDownloadTasks
@@ -134,9 +134,10 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             let destinationURL = URL(fileURLWithPath: "\(temporaryDirectory)\(filename)")
             
             print(destinationURL)
-            
-            let fileManager = FileManager.default
+        
+            let fileManager = FileManager.defaultFileManager
             do {
+                
                 try fileManager.removeItem(at: destinationURL)
             } catch {}
             

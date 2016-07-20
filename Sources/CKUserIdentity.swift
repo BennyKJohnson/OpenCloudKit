@@ -57,7 +57,7 @@ public class CKUserIdentity : NSObject {
         
         if let nameComponentsDictionary = dictionary["nameComponents"] as? [String: AnyObject] {
             if #available(OSX 10.11, *) {
-                self.nameComponents = PersonNameComponents(dictionary: nameComponentsDictionary)
+                self.nameComponents = CKPersonNameComponents(dictionary: nameComponentsDictionary)
             } else {
                 // Fallback on earlier versions
                 self.nameComponents = CKPersonNameComponents(dictionary: nameComponentsDictionary)

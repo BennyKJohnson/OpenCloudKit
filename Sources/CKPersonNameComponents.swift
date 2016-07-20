@@ -69,10 +69,10 @@ extension CKPersonNameComponents: CKPersonNameComponentsType {
     }
 }
 
-
+/*
 @available(OSX 10.11, *)
 extension PersonNameComponents: CKPersonNameComponentsType {
-    public init?(dictionary: [String: AnyObject]) {
+    public convenience init?(dictionary: [String: AnyObject]) {
         self.init()
         
         namePrefix = dictionary["namePrefix"] as? String
@@ -84,3 +84,4 @@ extension PersonNameComponents: CKPersonNameComponentsType {
         // phoneticRepresentation
     }
 }
+*/
