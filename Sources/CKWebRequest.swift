@@ -131,8 +131,13 @@ class CKWebRequest {
         
         var urlRequest = URLRequest(url: requestURL)
         if let parameters = parameters {
-            let dictionary = NSDictionary(dictionary: parameters)
-            let jsonData: Data = try! JSONSerialization.data(withJSONObject: dictionary, options: [])
+            
+            #if os(Linux)
+                let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters.bridge(), options: [])
+            #else
+                let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+            #endif
+            
             urlRequest.httpBody = jsonData
             urlRequest.httpMethod = "POST"
         } else {
@@ -161,7 +166,7 @@ class CKWebRequest {
             return nil
         }
         
-        let jsonData: Data = try! JSONSerialization.data(withJSONObject: [:] as [String: AnyObject], options: [])
+        let jsonData: Data = try! JSONSerialization.data(withJSONObject: NSDictionary(), options: [])
         var urlRequest = URLRequest(url: requestURL)
         
         urlRequest.httpMethod = "GET"
@@ -184,7 +189,13 @@ class CKWebRequest {
         
         var urlRequest = URLRequest(url: requestURL)
         if let parameters = parameters {
+            
+            #if os(Linux)
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters.bridge(), options: [])
+            #else
             let jsonData: Data = try! JSONSerialization.data(withJSONObject: parameters, options: [])
+            #endif
+            
             urlRequest.httpBody = jsonData
             urlRequest.httpMethod = "POST"
         } else {

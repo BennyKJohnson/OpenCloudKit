@@ -190,8 +190,8 @@ extension CKRecordZoneSubscription {
     
     override public var dictionary: [String: AnyObject] {
 
-        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID as NSString,
-                                                  "subscriptionType": subscriptionType.description as NSString,
+        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID.bridge(),
+                                                  "subscriptionType": subscriptionType.description.bridge(),
                                                   "zoneID": zoneID.dictionary
                                                 ]
        

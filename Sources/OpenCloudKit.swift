@@ -26,7 +26,7 @@ public class CloudKit {
     
     private init() {}
     
-   public func configure(with configuration: CKConfig) {
+    public func configure(with configuration: CKConfig) {
         self.containers = configuration.containers
     }
     
@@ -75,11 +75,11 @@ extension CKRecordZoneID {
     var dictionary: [String: AnyObject] {
         
         var zoneIDDictionary: [String: AnyObject] = [
-        "zoneName": zoneName
+        "zoneName": zoneName.bridge()
         ]
         
         if ownerName != CKRecordZoneIDDefaultOwnerName {
-            zoneIDDictionary["ownerRecordName"] = ownerName
+            zoneIDDictionary["ownerRecordName"] = ownerName.bridge()
         }
         
         return zoneIDDictionary
