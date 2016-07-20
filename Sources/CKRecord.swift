@@ -344,3 +344,9 @@ extension CKLocation: CKRecordValue {
         return ["value": self.dictionary, "type": "LOCATION"]
     }
 }
+
+extension CKLocationType {
+    public var recordFieldDictionary: [String: AnyObject] {
+        return ["value": self.dictionary, "type": "LOCATION"]
+    }
+}

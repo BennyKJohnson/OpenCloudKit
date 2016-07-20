@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol CKLocationType: CustomDictionaryConvertible {
+public protocol CKLocationType: CustomDictionaryConvertible, CKRecordFieldProvider {
     
     var coordinateType: CKLocationCoordinate2DType { get }
     
