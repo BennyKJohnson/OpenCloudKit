@@ -61,7 +61,7 @@ public class CKAsset: NSObject {
 }
 
 extension CKAsset: CustomDictionaryConvertible {
-    var dictionary: [String: AnyObject] {
+    public var dictionary: [String: AnyObject] {
         var fieldDictionary: [String: AnyObject] = [:]
         if let recordID = recordID, recordKey = recordKey {
             fieldDictionary["recordName"] = recordID.recordName

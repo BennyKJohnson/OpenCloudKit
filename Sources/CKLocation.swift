@@ -8,6 +8,31 @@
 
 import Foundation
 
+public protocol CKLocationType: CustomDictionaryConvertible {
+    
+    var coordinateType: CKLocationCoordinate2DType { get }
+    
+    var altitude: CKLocationDistance { get }
+    
+    var horizontalAccuracy: CKLocationAccuracy { get }
+    
+    var verticalAccuracy: CKLocationAccuracy { get }
+    
+    var course: CKLocationDirection { get }
+    
+    var speed: CKLocationSpeed { get }
+    
+    var timestamp: Date { get }
+}
+
+public protocol CKLocationCoordinate2DType {
+    
+    var latitude: CKLocationDegrees { get }
+    
+    var longitude: CKLocationDegrees { get }
+    
+}
+
 public typealias CKLocationDegrees = Double
 
 public typealias CKLocationDistance = Double
@@ -18,7 +43,7 @@ public typealias CKLocationSpeed = Double
 
 public typealias CKLocationDirection = Double
 
-public struct CKLocationCoordinate2D: Equatable {
+public struct CKLocationCoordinate2D: Equatable, CKLocationCoordinate2DType {
     
     public var latitude: CKLocationDegrees
     
@@ -107,12 +132,18 @@ public class CKLocation: NSObject {
     }
 }
 
-extension CKLocation: CustomDictionaryConvertible {
+extension CKLocation: CKLocationType {
+    public var coordinateType: CKLocationCoordinate2DType {
+        return coordinate
+    }
+}
+
+extension CKLocationType {
     
     public var dictionary: [String: AnyObject] {
         return [
-        "latitude": coordinate.latitude,
-        "longitude": coordinate.longitude,
+        "latitude": coordinateType.latitude,
+        "longitude": coordinateType.longitude,
         "horizontalAccuracy": horizontalAccuracy,
         "verticalAccuracy": verticalAccuracy,
         "altitude": altitude,

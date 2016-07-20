@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol CustomDictionaryConvertible {
+public protocol CustomDictionaryConvertible {
     var dictionary: [String: AnyObject] { get }
 }
 

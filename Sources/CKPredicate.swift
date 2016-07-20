@@ -198,7 +198,7 @@ public struct CKFilter: Equatable {
 
 extension CKFilter: CustomDictionaryConvertible {
     
-    var dictionary: [String: AnyObject] {
+    public var dictionary: [String: AnyObject] {
         var filterDictionary: [String: AnyObject] = [
         "comparator": comparator.rawValue,
         "fieldName": fieldName,

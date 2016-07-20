@@ -33,8 +33,6 @@ public class CKQuery {
     
     public var sortDescriptors: [SortDescriptor] = []
     
-
-    
     // Returns a Dictionary Representation of a Query Dictionary
     var dictionary: [String: AnyObject] {
         
@@ -48,9 +46,16 @@ public class CKQuery {
         
         // Create Sort Descriptor Dictionaries
         queryDictionary["sortBy"] = sortDescriptors.flatMap { (sortDescriptor) -> [String: AnyObject]? in
+            
             if let fieldName = sortDescriptor.key {
-                return [CKSortDescriptorDictionary.fieldName: fieldName,
-                        CKSortDescriptorDictionary.ascending: sortDescriptor.ascending]
+                var sortDescriptionDictionary: [String: AnyObject] =  [CKSortDescriptorDictionary.fieldName: fieldName,
+                                                         CKSortDescriptorDictionary.ascending: sortDescriptor.ascending]
+                if let locationSortDescriptor = sortDescriptor as? CKLocationSortDescriptor {
+                    sortDescriptionDictionary[CKSortDescriptorDictionary.relativeLocation] = locationSortDescriptor.relativeLocation.dictionary
+                }
+                
+                return sortDescriptionDictionary
+               
             } else {
                 return nil
             }
