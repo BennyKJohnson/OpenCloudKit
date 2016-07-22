@@ -91,10 +91,21 @@ extension CharacterSet {
     }
 }
     
+extension NSURLComponents {
+    var url: NSURL {
+        return URL
+    }
+}
+    
 extension NSURLSession {
     static var shared: NSURLSession {
         return NSURLSession.shared()
     }
+    
+    func dataTask(with request: request) -> NSURLSessionDataTask {
+        return dataTaskWithRequest(request) -> NSURLSessionDataTask
+    }
+    
 }
 
 extension NSURL {

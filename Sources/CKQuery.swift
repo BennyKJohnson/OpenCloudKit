@@ -37,7 +37,7 @@ public class CKQuery {
     public init(recordType: String, filters: [CKFilter]) {
         self.recordType = recordType
         self.filters = filters
-        self.predicate = Predicate()
+        self.predicate = Predicate(value: true)
     }
     
     public var sortDescriptors: [SortDescriptor] = []
@@ -45,11 +45,11 @@ public class CKQuery {
     // Returns a Dictionary Representation of a Query Dictionary
     var dictionary: [String: AnyObject] {
         
-        var queryDictionary: [String: AnyObject] = ["recordType": recordType]
+        var queryDictionary: [String: AnyObject] = ["recordType": recordType.bridge()]
         
         queryDictionary["filterBy"] = filters.map({ (filter) -> [String: AnyObject] in
-            return filter.dictionary
-        })
+            return filter.dictionary.bridge()
+        }).bridge()
         
         // Create Sort Descriptor Dictionaries
         queryDictionary["sortBy"] = sortDescriptors.flatMap { (sortDescriptor) -> [String: AnyObject]? in
@@ -61,12 +61,12 @@ public class CKQuery {
                     sortDescriptionDictionary[CKSortDescriptorDictionary.relativeLocation] = locationSortDescriptor.relativeLocation.recordFieldDictionary
                 }
                 
-                return sortDescriptionDictionary
+                return sortDescriptionDictionary.bridge()
                
             } else {
                 return nil
             }
-        }
+        }.bridge()
         
         return queryDictionary
     }

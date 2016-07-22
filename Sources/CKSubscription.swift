@@ -143,16 +143,15 @@ public class CKQuerySubscription : CKSubscription {
 }
 
 
-
 extension CKQuerySubscription {
     override public var dictionary: [String: AnyObject] {
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
        
-        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID,
-                "subscriptionType": subscriptionType.description,
-                "query": query.dictionary,
-                "firesOn": querySubscriptionOptions.firesOnArray]
+        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID.bridge(),
+                "subscriptionType": subscriptionType.description.bridge(),
+                "query": query.dictionary.bridge(),
+                "firesOn": querySubscriptionOptions.firesOnArray.bridge()]
         if querySubscriptionOptions.contains(CKQuerySubscriptionOptions.firesOnce) {
             subscription["firesOnce"] = NSNumber(value: true)
         }
@@ -179,7 +178,6 @@ public class CKRecordZoneSubscription : CKSubscription {
         super.init(subscriptionID: subscriptionID, subscriptionType: CKSubscriptionType.recordZone)
     }
     
-    
     public let zoneID: CKRecordZoneID
     
     public var recordType: String?
@@ -192,12 +190,12 @@ extension CKRecordZoneSubscription {
 
         var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID.bridge(),
                                                   "subscriptionType": subscriptionType.description.bridge(),
-                                                  "zoneID": zoneID.dictionary
+                                                  "zoneID": zoneID.dictionary.bridge()
                                                 ]
        
 
         if let notificationInfo = notificationInfo {
-            subscription["notificationInfo"] = notificationInfo.dictionary
+            subscription["notificationInfo"] = notificationInfo.dictionary.bridge()
         }
         
         return subscription

@@ -80,7 +80,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
                         } else {
                             
                             // Create Error
-                            let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server"])
+                            let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server".bridge()])
                             // Call RecordCallback
                             self.perRecordCompletionBlock?(nil, nil, error)
                             

@@ -71,16 +71,16 @@ class CKWebRequest {
             
             var userInfo:[ NSObject: AnyObject] = [:]
             
-            userInfo["redirectURL"] = recordFetchError.redirectURL
-            userInfo[NSLocalizedDescriptionKey] = recordFetchError.reason
+            userInfo["redirectURL".bridge()] = recordFetchError.redirectURL?.bridge()
+            userInfo[NSLocalizedDescriptionKey.bridge()] = recordFetchError.reason.bridge()
             
-            userInfo[CKErrorRetryAfterKey] = recordFetchError.retryAfter
-            userInfo["uuid"] = recordFetchError.uuid
+            userInfo[CKErrorRetryAfterKey.bridge()] = recordFetchError.retryAfter
+            userInfo["uuid".bridge()] = recordFetchError.uuid.bridge()
 
             return NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)
             
         } else {
-            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: [:])
+            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: [:].bridge())
         }
     }
 
