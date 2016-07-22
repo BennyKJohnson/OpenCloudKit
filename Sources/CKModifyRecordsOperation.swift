@@ -179,7 +179,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         
                 recordDictionary["fields"] = fieldsDictionary.bridge()
                
-                let operationDictionary: [String: AnyObject] = ["operationType": operationType, "record": recordDictionary]
+                let operationDictionary: [String: AnyObject] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge()]
                 return operationDictionary
             })
             

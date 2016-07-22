@@ -306,7 +306,7 @@ struct CKPredicateReader {
             }
         }
         
-        throw NSError(domain: NSCocoaErrorDomain, code: NSCocoaError.propertyListReadCorruptError.rawValue, userInfo: [
+        throw NSError(domain: NSCocoaErrorDomain, code: CKPropertyListCorruptionError.rawValue, userInfo: [
             "NSDebugDescription" : "Invalid escape sequence at position \(currentIndex)"
             ])
     }

@@ -208,7 +208,7 @@ extension CKFilter: CustomDictionaryConvertible {
         var filterDictionary: [String: AnyObject] = [
         "comparator": comparator.rawValue.bridge(),
         "fieldName": fieldName.bridge(),
-        "fieldValue": fieldValue.recordFieldDictionary
+        "fieldValue": fieldValue.recordFieldDictionary.bridge()
         ]
         
         if let distance = distance {
@@ -220,5 +220,5 @@ extension CKFilter: CustomDictionaryConvertible {
 }
 
 public func ==(lhs: CKFilter, rhs: CKFilter) -> Bool {
-    return lhs.fieldName == rhs.fieldName && lhs.comparator == rhs.comparator && lhs.fieldValue.isEqual(rhs.fieldValue)
+    return lhs.fieldName == rhs.fieldName && lhs.comparator == rhs.comparator && lhs.fieldValue.isEqual(rhs.fieldValue as! AnyObject)
 }

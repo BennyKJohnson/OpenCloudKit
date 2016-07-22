@@ -48,8 +48,11 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
                     // Create request for download URL
                     let downloadRequest = URLRequest(url: downloadURL)
                     // Create download task
+                    #if os(Linux)
+                    let downloadTask = downloadSession.downloadTaskWithRequest(downloadRequest)
+                    #else
                     let downloadTask = downloadSession.downloadTask(with: downloadRequest)
-                    
+                    #endif
                     // Add to dictionary
                     assetsByDownloadTask[downloadTask] = asset
                     
@@ -122,8 +125,15 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
         }
     }
     
+
+    #if os(Linux)
+    public func URLSession(_ session: NSURLSession,downloadTask: NSURLSessionDownloadTask,didFinishDownloadingToURL location: NSURL) {
+        urlSession(session, downloadTask: downloadTask,didFinishDownloadingTo: location)
+    }
+
+    #endif
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        
+
         guard let currentAsset = assetsByDownloadTask[downloadTask] else {
             fatalError("Asset should belong to completed download task")
         }
@@ -156,5 +166,5 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             perAssetCompletionBlock?(currentAsset, nil)
   
     }
+ }
 
-}

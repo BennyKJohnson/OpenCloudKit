@@ -65,9 +65,16 @@ public class CKSubscription: NSObject {
     }
 }
 
-extension CKSubscription: CustomDictionaryConvertible {
-    public var dictionary: [String: AnyObject] {
-        return [:]
+extension CKSubscription {
+    public var subscriptionDictionary: [String : AnyObject] {
+        switch self {
+        case let querySub as CKQuerySubscription where self.subscriptionType == .query:
+            return querySub.dictionary
+        case let recordZoneSubscript as CKRecordZoneSubscription where self.subscriptionType == .recordZone:
+            return recordZoneSubscript.dictionary
+        default:
+            return [:]
+        }
     }
 }
 
@@ -144,7 +151,7 @@ public class CKQuerySubscription : CKSubscription {
 
 
 extension CKQuerySubscription {
-    override public var dictionary: [String: AnyObject] {
+     public var dictionary: [String: AnyObject] {
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
        
@@ -157,7 +164,7 @@ extension CKQuerySubscription {
         }
         
         if let notificationInfo = notificationInfo {
-            subscription["notificationInfo"] = NSDictionary(dictionary: notificationInfo.dictionary)
+            subscription["notificationInfo"] = notificationInfo.dictionary.bridge()
 
         }
     
@@ -186,7 +193,7 @@ public class CKRecordZoneSubscription : CKSubscription {
 
 extension CKRecordZoneSubscription {
     
-    override public var dictionary: [String: AnyObject] {
+    public var dictionary: [String: AnyObject] {
 
         var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID.bridge(),
                                                   "subscriptionType": subscriptionType.description.bridge(),

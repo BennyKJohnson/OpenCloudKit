@@ -35,8 +35,8 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
             for subscription in subscriptionsToSave {
                 
                 let operation: [String: AnyObject] = [
-                    "operationType": "create",
-                    "subscription": subscription.dictionary
+                    "operationType": "create".bridge(),
+                    "subscription": subscription.subscriptionDictionary.bridge()
                 ]
                 
                 operations.append(operation)

@@ -60,7 +60,7 @@ public class CKQueryOperation: CKDatabaseOperation {
         
         if let cursor = cursor {
             
-            parameters["continuationMarker"] = cursor.data.base64Encoded
+            parameters["continuationMarker"] = cursor.data.base64Encoded.bridge()
         }
         
         let url = "\(operationURL)/records/\(CKRecordOperation.query)"
@@ -79,7 +79,14 @@ public class CKQueryOperation: CKDatabaseOperation {
             } else if let dictionary = dictionary {
                 // Process cursor
                 if let continuationMarker = dictionary["continuationMarker"] as? String {
-                    self.cursor = CKQueryCursor(data: NSData(base64Encoded: continuationMarker)!, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
+                    
+                    #if os(Linux)
+                        let data = NSData(base64Encoded: continuationMarker, options: [])
+                    #else
+                        let data = NSData(base64Encoded: continuationMarker)!
+                    #endif
+                    
+                    self.cursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
                 }
                 
                 

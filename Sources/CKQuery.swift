@@ -48,20 +48,20 @@ public class CKQuery {
         var queryDictionary: [String: AnyObject] = ["recordType": recordType.bridge()]
         
         queryDictionary["filterBy"] = filters.map({ (filter) -> [String: AnyObject] in
-            return filter.dictionary.bridge()
+            return filter.dictionary
         }).bridge()
         
         // Create Sort Descriptor Dictionaries
         queryDictionary["sortBy"] = sortDescriptors.flatMap { (sortDescriptor) -> [String: AnyObject]? in
             
             if let fieldName = sortDescriptor.key {
-                var sortDescriptionDictionary: [String: AnyObject] =  [CKSortDescriptorDictionary.fieldName: fieldName,
-                                                         CKSortDescriptorDictionary.ascending: sortDescriptor.ascending]
+                var sortDescriptionDictionary: [String: AnyObject] =  [CKSortDescriptorDictionary.fieldName: fieldName.bridge(),
+                                                                       CKSortDescriptorDictionary.ascending: NSNumber(value: sortDescriptor.ascending)]
                 if let locationSortDescriptor = sortDescriptor as? CKLocationSortDescriptor {
-                    sortDescriptionDictionary[CKSortDescriptorDictionary.relativeLocation] = locationSortDescriptor.relativeLocation.recordFieldDictionary
+                    sortDescriptionDictionary[CKSortDescriptorDictionary.relativeLocation] = locationSortDescriptor.relativeLocation.recordFieldDictionary.bridge()
                 }
                 
-                return sortDescriptionDictionary.bridge()
+                return sortDescriptionDictionary
                
             } else {
                 return nil

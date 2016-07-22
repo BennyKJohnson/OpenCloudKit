@@ -71,20 +71,24 @@ public class CKOperation: Operation {
     public var isFinished: Bool {
         get { return _isFinished }
         set {
-        willChangeValue(forKey: "isFinished")
+        //willChangeValue(forKey: "isFinished")
         _isFinished = newValue
-        didChangeValue(forKey: "isFinished")
+        //didChangeValue(forKey: "isFinished")
         }
     }
     
     public var isExecuting: Bool {
         get { return _isExecuting}
         set {
-            willChangeValue(forKey: "isExecuting")
+          //  willChangeValue(forKey: "isExecuting")
             _isExecuting = isExecuting
-            didChangeValue(forKey: "isExecuting")
+          //  didChangeValue(forKey: "isExecuting")
     
         }
+    }
+    
+    public var isCancelled: Bool {
+        get { return cancelled }
     }
     
     public var isConcurrent: Bool {
@@ -95,18 +99,18 @@ public class CKOperation: Operation {
     override public var isFinished: Bool {
         get { return _isFinished }
         set {
-            willChangeValue(forKey: "isFinished")
+           // willChangeValue(forKey: "isFinished")
             _isFinished = newValue
-            didChangeValue(forKey: "isFinished")
+           // didChangeValue(forKey: "isFinished")
         }
     }
     
     override public var isExecuting: Bool {
         get { return _isExecuting}
         set {
-            willChangeValue(forKey: "isExecuting")
+           // willChangeValue(forKey: "isExecuting")
             _isExecuting = isExecuting
-            didChangeValue(forKey: "isExecuting")
+           // didChangeValue(forKey: "isExecuting")
             
         }
     }

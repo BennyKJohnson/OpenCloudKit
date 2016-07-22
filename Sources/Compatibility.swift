@@ -12,6 +12,8 @@ import Foundation
 
 let CKUTF8StringEncoding = String.Encoding.utf8.rawValue
     
+public typealias NSErrorUserInfoType = [NSObject : AnyObject]
+    
 extension FileManager {
     static var defaultFileManager: FileManager {
         return FileManager.default
@@ -42,11 +44,15 @@ extension NSData {
  }
  }
  
-
+let CKPropertyListCorruptionError = NSCocoaError.propertyListReadCorruptError
 
 #elseif os(Linux)
 //#if os(OSX) || os(iOS)
+    
+public typealias NSErrorUserInfoType = [String:Any]
 
+
+let CKPropertyListCorruptionError = NSCocoaError.PropertyListReadCorruptError
 let CKUTF8StringEncoding = NSUTF8StringEncoding
 
 public typealias Operation = NSOperation
@@ -80,37 +86,39 @@ public typealias CharacterSet = NSCharacterSet
 public typealias PersonNameComponents = NSPersonNameComponents
     
 extension FileManager {
+    
    static var defaultFileManager: NSFileManager {
-        return NSFileManager.default()
+        return NSFileManager.defaultManager()
     }
+    
 }
 
 extension CharacterSet {
     static var urlQueryAllowed: CharacterSet {
-        return CharacterSet.urlQueryAllowed()
+        return CharacterSet.URLQueryAllowedCharacterSet()
     }
 }
     
 extension NSURLComponents {
     var url: NSURL {
-        return URL
+        return URL!
     }
 }
     
 extension NSURLSession {
     static var shared: NSURLSession {
-        return NSURLSession.shared()
+        return NSURLSession.sharedSession()
     }
     
-    func dataTask(with request: request) -> NSURLSessionDataTask {
-        return dataTaskWithRequest(request) -> NSURLSessionDataTask
+    func dataTask(with request: URLRequest) -> URLSessionDataTask {
+        return dataTaskWithRequest(request) 
     }
     
 }
 
 extension NSURL {
     func deletingLastPathComponent() -> NSURL {
-        return deletingPathExtension!
+        return URLByDeletingPathExtension!
     }
 }
     
@@ -122,18 +130,39 @@ extension NSUUID {
     
 extension Data {
     public var base64Encoded: String {
-        return base64EncodedString(options: [])
+        return base64EncodedString([])
     }
 }
 
 extension NSURLSessionConfiguration {
     static func defaultConfiguration() -> URLSessionConfiguration {
-        return URLSessionConfiguration.default()
+        return URLSessionConfiguration.defaultSessionConfiguration()
+    }
+}
+    
+extension URLRequest {
+    private struct additionProperties {
+        static var httpBody: Data?
+    }
+    
+    var httpBody: Data? {
+        get {
+            return additionProperties.httpBody
+        }
+        set {
+            additionProperties.httpBody = newValue
+        }
     }
 }
 
-#endif
+    
+extension NSMutableSet {
+        func add(_ object: AnyObject) {
+            addObject(object)
+        }
+    }
 
+#endif
 
 
 

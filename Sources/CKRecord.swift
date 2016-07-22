@@ -65,8 +65,14 @@ public class CKRecord: NSObject {
     }
     
     public func setObject(_ object: CKRecordValue?, forKey key: String) {
-        if !changedKeysSet.contains(key) {
-            changedKeysSet.add(key)
+        #if os(Linux)
+            let containsKey = changedKeysSet.containsObject(key.bridge())
+        #else
+            let containsKey = changedKeysSet.contains(key)
+        #endif
+        
+        if !containsKey {
+            changedKeysSet.add(key.bridge())
         }
         
         switch object {
@@ -158,12 +164,7 @@ extension CKRecord {
         
         for key in keys {
             if let value = object(forKey: key) {
-                let valueDictionary: [String: AnyObject]
-                switch value {
-                default:
-                    valueDictionary = ["value": value]
-                }
-                fieldsDictionary[key] = valueDictionary.bridge()
+                fieldsDictionary[key] = value.recordFieldDictionary.bridge()
             }
         }
         
@@ -176,15 +177,7 @@ extension CKRecord {
         // Add Fields
         var fieldsDictionary: [String: AnyObject] = [:]
         for (key, value) in values {
-            let valueDictionary: [String: AnyObject]
-            
-            switch value {
-            default:
-                 valueDictionary = ["value": value]
-
-            }
-            
-            fieldsDictionary[key] = valueDictionary.bridge()
+            fieldsDictionary[key] = value.recordFieldDictionary.bridge()
         }
         
         
@@ -245,7 +238,12 @@ extension CKRecord {
                 case CKValueType.string:
                     return NSString(string: string)
                 case CKValueType.data:
-                    return NSData(base64Encoded: string)
+                    #if os(Linux)
+                        return NSData(base64Encoded: string,
+                               options: [])
+                    #else
+                        return NSData(base64Encoded: string)
+                    #endif
                 default:
                     return NSString(string: string)
                 }
@@ -256,8 +254,8 @@ extension CKRecord {
                     let numberArray =  array as! [NSNumber]
                    return NSArray(array: numberArray)
                 case "STRING_LIST":
-                    let stringArray =  array as! [String]
-                    return NSArray(array: stringArray)
+                   // let stringArray =  array.bridge() as! [String]
+                    return array.bridge()
                 case "TIMESTAMP_LIST":
                     let dateArray = (array as! [NSNumber]).map({ (dateInterval) -> NSDate in
                         return  NSDate(timeIntervalSince1970: dateInterval.doubleValue)

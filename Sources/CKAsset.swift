@@ -51,10 +51,14 @@ public class CKAsset: NSObject {
         else  {
             return nil
         }
-        
-        
-        fileURL = NSURL()
-        self.downloadBaseURL = downloadURL.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
+        #if os(Linux)
+            let downloadURLString = downloadURL.bridge().stringByAddingPercentEncodingWithAllowedCharacters(CharacterSet.urlQueryAllowed)!
+        #else
+            let downloadURLString = downloadURL.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
+
+        #endif
+        fileURL = NSURL(string: downloadURLString)!
+        self.downloadBaseURL = downloadURL
         self.size = size.uintValue
         downloaded = false
 

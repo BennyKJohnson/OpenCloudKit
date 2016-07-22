@@ -69,18 +69,20 @@ class CKWebRequest {
             
             let errorCode = CKErrorCode.errorCode(serverError: recordFetchError.serverErrorCode)!
             
-            var userInfo:[ NSObject: AnyObject] = [:]
+            var userInfo = [:] as NSErrorUserInfoType
+         
+            userInfo["redirectURL"] = recordFetchError.redirectURL
+            userInfo[NSLocalizedDescriptionKey] = recordFetchError.reason
             
-            userInfo["redirectURL".bridge()] = recordFetchError.redirectURL?.bridge()
-            userInfo[NSLocalizedDescriptionKey.bridge()] = recordFetchError.reason.bridge()
-            
-            userInfo[CKErrorRetryAfterKey.bridge()] = recordFetchError.retryAfter
-            userInfo["uuid".bridge()] = recordFetchError.uuid.bridge()
+            userInfo[CKErrorRetryAfterKey] = recordFetchError.retryAfter
+            userInfo["uuid"] = recordFetchError.uuid
 
             return NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)
             
         } else {
-            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: [:].bridge())
+            
+            let userInfo = [:] as NSErrorUserInfoType
+            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: userInfo)
         }
     }
 
@@ -122,7 +124,11 @@ class CKWebRequest {
     
     func urlRequest(with url: URL, parameters: [String: AnyObject]? = nil) -> URLRequest? {
         // Build URL
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        #if os(Linux)
+            var components = URLComponents(URL: url, resolvingAgainstBaseURL: false)
+        #else
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        #endif
         components?.queryItems = authQueryItems
         print(components?.path)
         guard let requestURL = components?.url else {
@@ -199,7 +205,7 @@ class CKWebRequest {
             urlRequest.httpBody = jsonData
             urlRequest.httpMethod = "POST"
         } else {
-            let jsonData: Data = try! JSONSerialization.data(withJSONObject: [:], options: [])
+            let jsonData: Data = try! JSONSerialization.data(withJSONObject: NSDictionary(), options: [])
             urlRequest.httpBody = jsonData
             urlRequest.httpMethod = "GET"
         }
