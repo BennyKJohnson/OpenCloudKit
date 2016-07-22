@@ -200,9 +200,10 @@ extension CKRecord {
         }
     }
     
-    static func value(forRecordField field: [String: AnyObject]) -> CKRecordValue? {
+    static func getValue(forRecordField field: [String: AnyObject]) -> CKRecordValue? {
+        #if !os(Linux)
         if  let value = field[CKRecordFieldDictionary.value],
-            let type = field[CKRecordFieldDictionary.type] as? String {
+            type = field[CKRecordFieldDictionary.type] as? String {
         
             switch value {
             case let number as NSNumber:
@@ -272,6 +273,9 @@ extension CKRecord {
         } else {
             return nil
         }
+        #else
+            return nil
+        #endif
     }
     
     convenience init?(recordDictionary: [String: AnyObject]) {
@@ -313,7 +317,7 @@ extension CKRecord {
         // Enumerate Fields
         if let fields = recordDictionary[CKRecordDictionary.fields] as? [String: [String: AnyObject]] {
             for (key, fieldValue) in fields  {
-                let value = CKRecord.value(forRecordField: fieldValue)
+                let value = CKRecord.getValue(forRecordField: fieldValue)
                 values[key] = value
             }
         }

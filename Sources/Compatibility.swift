@@ -64,6 +64,7 @@ public typealias URLRequest = NSMutableURLRequest
 public typealias DateFormatter = NSDateFormatter
 public typealias Date = NSDate
 public typealias SortDescriptor = NSSortDescriptor
+public typealias URLResponse = NSURLResponse
 public typealias URLSessionTask = NSURLSessionTask
 public typealias URLSessionDataDelegate = NSURLSessionDataDelegate
 public typealias URLSessionDownloadDelegate = NSURLSessionDownloadDelegate
@@ -114,12 +115,6 @@ extension NSURLSession {
         return dataTaskWithRequest(request) 
     }
     
-}
-
-extension NSURL {
-    func deletingLastPathComponent() -> NSURL {
-        return URLByDeletingPathExtension!
-    }
 }
     
 extension NSUUID {

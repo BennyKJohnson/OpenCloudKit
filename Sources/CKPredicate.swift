@@ -220,5 +220,5 @@ extension CKFilter: CustomDictionaryConvertible {
 }
 
 public func ==(lhs: CKFilter, rhs: CKFilter) -> Bool {
-    return lhs.fieldName == rhs.fieldName && lhs.comparator == rhs.comparator && lhs.fieldValue.isEqual(rhs.fieldValue as! AnyObject)
+    return lhs.fieldName == rhs.fieldName && lhs.comparator == rhs.comparator && lhs.fieldValue.isEqual((rhs.fieldValue as? AnyObject))
 }

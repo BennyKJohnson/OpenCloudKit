@@ -43,8 +43,12 @@ public struct CKConfig {
     public init?(contentsOfFile path: String) {
         do {
             let url = URL(string: path)!
-            let directory = try! url.deletingLastPathComponent()
-            
+            #if os(Linux)
+                let directory = url.URLByDeletingLastPathComponent!
+            #else
+                let directory = try! url.deletingLastPathComponent()
+            #endif
+                        
             let jsonData = try NSData(contentsOfFile: path, options: [])
             if let dictionary = try JSONSerialization.jsonObject(with: jsonData as Data, options: []) as? [String: AnyObject] {
                 self.init(dictionary: dictionary, workingDirectory: directory.absoluteString)

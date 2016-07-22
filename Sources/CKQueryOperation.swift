@@ -83,10 +83,12 @@ public class CKQueryOperation: CKDatabaseOperation {
                     #if os(Linux)
                         let data = NSData(base64Encoded: continuationMarker, options: [])
                     #else
-                        let data = NSData(base64Encoded: continuationMarker)!
+                        let data = NSData(base64Encoded: continuationMarker)
                     #endif
                     
-                    self.cursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
+                    if let data = data {
+                        self.cursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
+                    }
                 }
                 
                 

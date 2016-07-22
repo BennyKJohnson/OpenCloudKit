@@ -10,7 +10,6 @@ import Foundation
 
 class CKWebRequest {
 
-    
     var currentWebAuthToken: String?
     
     let containerConfig: CKContainerConfig
@@ -86,14 +85,15 @@ class CKWebRequest {
         }
     }
 
-    func perform(request: URLRequest, completetion: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
+    func perform(request: URLRequest, completionHandler: ([String: AnyObject]?, NSError?) -> Void) -> URLSessionTask? {
         
         let session = URLSession.shared
-        let task = session.dataTask(with: request) { (data, response, networkError) in
+       
+        let requestCompletionHandler:  (Data?, URLResponse?, NSError?) -> Swift.Void = { (data, response, networkError) in
             if let networkError = networkError {
                 
                 let error = self.ckError(forNetworkError: networkError)
-                completetion(nil, error)
+                completionHandler(nil, error)
                 
             } else if let data = data {
                 
@@ -106,16 +106,21 @@ class CKWebRequest {
                     if httpResponse.statusCode >= 400 {
                         // Error Occurred
                         let error = self.ckError(forServerResponseDictionary: dictionary)
-                        completetion(nil, error)
+                        completionHandler(nil, error)
                         
                     } else {
-                        completetion(dictionary, nil)
+                        completionHandler(dictionary, nil)
                     }
                 }
                 
             }
             
         }
+        #if os(Linux)
+            let task = session.dataTask(with: request)
+        #else
+            let task = session.dataTask(with: request, completionHandler: requestCompletionHandler)
+        #endif
         
         task.resume()
         
@@ -179,7 +184,7 @@ class CKWebRequest {
         urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
         urlRequest.httpBody = jsonData
         
-        return perform(request: urlRequest, completetion: completetion)
+        return perform(request: urlRequest, completionHandler: completetion)
     }
     
     
@@ -218,7 +223,7 @@ class CKWebRequest {
             }
         }
         
-        return perform(request: urlRequest, completetion: completetion)
+        return perform(request: urlRequest, completionHandler: completetion)
     }
     
     
