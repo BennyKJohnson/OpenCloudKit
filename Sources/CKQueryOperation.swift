@@ -47,36 +47,15 @@ public class CKQueryOperation: CKDatabaseOperation {
     
     override func performCKOperation() {
         
-        var parameters: [String: AnyObject] = [:]
+       
+        let queryOperationURLRequest = CKQueryURLRequest(query: query!, cursor: cursor?.data as? Data, limit: resultsLimit, requestedFields: desiredKeys, zoneID: zoneID)
         
-        let isZoneWide = false
-        if  let zoneID = zoneID where zoneID.zoneName != CKRecordZoneDefaultName {
-            // Add ZoneID Dictionary to parameters
-            
-        }
         
-        parameters["zoneWide"] = NSNumber(value: isZoneWide)
-        parameters["query"] = query?.dictionary.bridge()
-        
-        if let cursor = cursor {
+        queryOperationURLRequest.completionBlock = { (result) in
             
-            parameters["continuationMarker"] = cursor.data.base64Encoded.bridge()
-        }
-        
-        let url = "\(operationURL)/records/\(CKRecordOperation.query)"
-        print(url)
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: parameters) { (dictionary, error) in
-            
-            // Check if cancelled
-            if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.queryCompletionBlock?(nil, cancelError)
-            }
-            
-            if let error = error {
-                self.queryCompletionBlock?(nil, error)
-            } else if let dictionary = dictionary {
+            switch result {
+            case .success(let dictionary):
+                
                 // Process cursor
                 if let continuationMarker = dictionary["continuationMarker"] as? String {
                     
@@ -107,11 +86,16 @@ public class CKQueryOperation: CKDatabaseOperation {
                         }
                     }
                 }
+                
+                self.queryCompletionBlock?(self.cursor, nil)
+                
+            case .error(let error):
+                self.queryCompletionBlock?(nil, error)
             }
-            
-            self.queryCompletionBlock?(self.cursor, nil)
+        }
+        
     }
 }
 
 
-}
+

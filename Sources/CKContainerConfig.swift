@@ -27,7 +27,7 @@ public struct CKConfig {
         
         let containers = containerDictionaries.flatMap { (containerDictionary) -> CKContainerConfig? in
             var containerConfig = CKContainerConfig(dictionary: containerDictionary)
-            if let workingDirectory = workingDirectory, privateKeyFile = containerConfig?.serverToServerKeyAuth?.privateKeyFile {
+            if let workingDirectory = workingDirectory, let privateKeyFile = containerConfig?.serverToServerKeyAuth?.privateKeyFile {
                 containerConfig?.serverToServerKeyAuth?.privateKeyFile = "\(workingDirectory)/\(privateKeyFile)"
             }
             return containerConfig
@@ -94,8 +94,8 @@ public struct CKContainerConfig {
     }
     
     init?(dictionary: [String: AnyObject]) {
-        guard let containerIdentifier = dictionary["containerIdentifier"] as? String, environmentValue = dictionary["environment"] as? String,
-            environment = CKEnvironment(rawValue: environmentValue)  else {
+        guard let containerIdentifier = dictionary["containerIdentifier"] as? String, let environmentValue = dictionary["environment"] as? String,
+            let environment = CKEnvironment(rawValue: environmentValue)  else {
             return nil
         }
         
@@ -110,7 +110,7 @@ public struct CKContainerConfig {
             }
             
         } else if let serverToServerKeyAuthDictionary = dictionary["serverToServerKeyAuth"] as? [String: AnyObject] {
-            guard let keyID = serverToServerKeyAuthDictionary["keyID"] as? String, privateKeyFile = serverToServerKeyAuthDictionary["privateKeyFile"] as? String else {
+            guard let keyID = serverToServerKeyAuthDictionary["keyID"] as? String, let privateKeyFile = serverToServerKeyAuthDictionary["privateKeyFile"] as? String else {
                 return nil
             }
             

@@ -20,7 +20,7 @@ class OpenCloudKitTests: XCTestCase {
     
     func testSHA256() {
         let message = "test"
-        let data = NSData(data: message.data(using: String.Encoding.utf8)!)
+        let data = Data(data: message.data(using: String.Encoding.utf8)!)
         let resultHash = data.sha256().base64EncodedString(options: [])
         let testSHA256Hash = "n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg="
         XCTAssertEqual(resultHash, testSHA256Hash)
@@ -29,10 +29,10 @@ class OpenCloudKitTests: XCTestCase {
     func testVerifySignedData() {
         
         let evpKey = try! EVPKey(contentsOfFile: publicECKeyPath(), type: EVPKeyType.Public)
-        let data = NSData(contentsOfFile: "\(pathForTests())/Supporting/test.txt")!
+        let data = try! Data(contentsOf: URL(fileURLWithPath: "\(pathForTests())/Supporting/test.txt"))
         
         let signedBase64 = "MEUCIQCa5vSe3xRHpN4FuUeNeNNB7gHpexMN1RYal4wJCpHExAIgdi/IV/K88aeIzoM0YaWp4PkX9T1+1oZNKZQY679uqRk="
-        let signedData = NSData(base64Encoded: signedBase64, options: [])!
+        let signedData = Data(base64Encoded: signedBase64, options: [])!
         
         let context = try! MessageVerifyContext(try! MessageDigest("sha256WithRSAEncryption"), withKey: evpKey)
         try! context.update(data: data)
@@ -45,7 +45,7 @@ class OpenCloudKitTests: XCTestCase {
         
         let requestDate = "2016-07-13T03:16:51Z"
         let urlPath = "/database/1/iCloud.benjamin.CloudTest/development/public/records/query"
-        let requestBody = NSData(data: requestBodyString.data(using: String.Encoding.utf8)!)
+        let requestBody = Data(data: requestBodyString.data(using: String.Encoding.utf8)!)
         
         // Should Equal 0sdWcosXLRqAQp9TQ4LzZOTgiETnGpqlODfsnN9Cqr0=
         let requestBodyHash = requestBody.sha256().base64EncodedString(options: [])
@@ -59,7 +59,7 @@ class OpenCloudKitTests: XCTestCase {
     
     func testSignWithPrivateKey() {
         
-        let requestBody = NSData(data: requestBodyString.data(using: String.Encoding.utf8)!)
+        let requestBody = Data(data: requestBodyString.data(using: String.Encoding.utf8)!)
         let signedData = CKServerRequestAuth.sign(data: requestBody, privateKeyPath: ECKeyPath())
         XCTAssertNotNil(signedData)
         
@@ -93,7 +93,7 @@ class OpenCloudKitTests: XCTestCase {
         
         let url = URL(string: "https://api.apple-cloudkit.com/database/1/iCloud.benjamin.CloudTest/development/public/records/query")!
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpBody =  NSData(data: requestBodyString.data(using: String.Encoding.utf8)!) as Data
+        urlRequest.httpBody =  Data(data: requestBodyString.data(using: String.Encoding.utf8)!) as Data
         
         let serverKeyID = "TEST_KEY"
         let ecKeyPath = ECKeyPath()

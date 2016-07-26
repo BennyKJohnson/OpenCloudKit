@@ -77,7 +77,7 @@ struct CKPredicateReader {
                 currentIndex += 1
                 chunkIndex = currentIndex
             case ">":
-                if let longitudeValue = takeValue(begin: chunkIndex, end: currentIndex) as? NSNumber, latitude = latitude {
+                if let longitudeValue = takeValue(begin: chunkIndex, end: currentIndex) as? NSNumber, let latitude = latitude {
                     return CKLocationCoordinate2D(latitude: latitude, longitude: longitudeValue.doubleValue)
                 } else {
                     return nil
@@ -104,7 +104,7 @@ struct CKPredicateReader {
     
     func consumeWhitespace(_ input: Index) -> Index? {
         var index = input
-        while let (char, nextIndex) = source.takeCharacter(index) where char == " " {
+        while let (char, nextIndex) = source.takeCharacter(index) , char == " " {
             index = nextIndex
         }
         return index
@@ -117,7 +117,7 @@ struct CKPredicateReader {
             return nil
         }
         
-        guard let fieldName = locationFunction.parameters.first as? String, locationData = locationFunction.parameters.last as? String else {
+        guard let fieldName = locationFunction.parameters.first as? String, let locationData = locationFunction.parameters.last as? String else {
             return nil
         }
         let locationReader = CKPredicateReader(string: locationData)
@@ -287,7 +287,7 @@ struct CKPredicateReader {
     
     func parseString(_ input: Index) throws -> (String, Index)? {
         
-        var chunkIndex = input
+        let chunkIndex = input
         var currentIndex = chunkIndex
         
         var output: String = ""

@@ -59,13 +59,13 @@ public class CKRecordZone : NSObject {
 extension CKRecordZone {
     convenience init?(dictionary: [String: AnyObject]) {
         
-        guard let zoneIDDictionary = dictionary["zoneID"] as? [String: AnyObject], zoneID = CKRecordZoneID(dictionary: zoneIDDictionary) else {
+        guard let zoneIDDictionary = dictionary["zoneID"] as? [String: AnyObject], let zoneID = CKRecordZoneID(dictionary: zoneIDDictionary) else {
             return nil
         }
         
         self.init(zoneID: zoneID)
         
-        if let isAtomic = dictionary["atomic"] as? Bool where isAtomic {
+        if let isAtomic = dictionary["atomic"] as? Bool , isAtomic {
             capabilities = CKRecordZoneCapabilities.atomic
         }
     }

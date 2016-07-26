@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum CompatorValue: String {
+enum CKCompatorType: String {
     case equals = "EQUALS"
     case notEquals = "NOT_EQUALS"
     case lessThan = "LESS_THAN"
@@ -79,8 +79,8 @@ struct CKPredicate {
         return compoundPredicateComponents
     }
     
-    func filters() -> [CKFilter] {
-        var filterDictionaries: [CKFilter] = []
+    func filters() -> [CKQueryFilter] {
+        var filterDictionaries: [CKQueryFilter] = []
         let compoundPredicates = self.compoundPredicates(with: predicate.predicateFormat)
         for predicate in compoundPredicates {
             let components = self.components(for: predicate)
@@ -102,7 +102,7 @@ struct CKPredicate {
         return try! reader.parse(0)
     }
     
-    func filterPredicate(components: [String]) throws -> CKFilter? {
+    func filterPredicate(components: [String]) throws -> CKQueryFilter? {
         if components.count == 3 {
             let lhs = components[0]
             var fieldName = lhs
@@ -110,7 +110,7 @@ struct CKPredicate {
             let rhs = value(forString: components[2])
             var fieldValue = rhs
                         
-            guard  let comparator = CompatorValue(expression: comparatorValue) else {
+            guard  let comparator = CKCompatorType(expression: comparatorValue) else {
                 return nil
             }
             
@@ -123,12 +123,12 @@ struct CKPredicate {
                     fieldValue = CKLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
                     
                     if let distance = (rhs as? NSNumber)?.doubleValue {
-                        return CKFilter(fieldName: fieldName, comparator: comparator, fieldValue: fieldValue, distance: distance)
+                        return CKQueryFilter(fieldName: fieldName, comparator: comparator, fieldValue: fieldValue, distance: distance)
                     }
                 }
             }
             
-            return CKFilter(fieldName: fieldName, comparator: comparator, fieldValue: fieldValue)
+            return CKQueryFilter(fieldName: fieldName, comparator: comparator, fieldValue: fieldValue)
         } else if components.count == 1 {
             if components[0] == "TRUEPREDICATE" {
                 return nil
@@ -188,37 +188,6 @@ public struct CKPredicateFunction {
     let parameters: [AnyObject]
 }
 
-public struct CKFilter: Equatable {
-    let fieldName: String
-    let comparator: CompatorValue
-    let fieldValue: CKRecordValue
-    let distance: CKLocationDistance?
-    
-    init(fieldName: String, comparator: CompatorValue, fieldValue: CKRecordValue, distance: CKLocationDistance? = nil) {
-        self.fieldName = fieldName
-        self.comparator = comparator
-        self.fieldValue = fieldValue
-        self.distance = distance
-    }
-}
 
-extension CKFilter: CustomDictionaryConvertible {
-    
-    public var dictionary: [String: AnyObject] {
-        var filterDictionary: [String: AnyObject] = [
-        "comparator": comparator.rawValue.bridge(),
-        "fieldName": fieldName.bridge(),
-        "fieldValue": fieldValue.recordFieldDictionary.bridge()
-        ]
-        
-        if let distance = distance {
-            filterDictionary["distance"] = NSNumber(value: distance)
-        }
-        
-        return filterDictionary
-    }
-}
 
-public func ==(lhs: CKFilter, rhs: CKFilter) -> Bool {
-    return lhs.fieldName == rhs.fieldName && lhs.comparator == rhs.comparator && lhs.fieldValue.isEqual((rhs.fieldValue as? AnyObject))
-}
+

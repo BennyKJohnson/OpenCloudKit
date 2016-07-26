@@ -99,7 +99,7 @@ class CKPredicateTests: XCTestCase {
     }
     
     func testParsingDatePredicate() {
-        let date = NSDate()
+        let date = Date()
         let predicate = Predicate(format: "lastUpdated > %@", date)
         print(predicate.predicateFormat)
         let ckPredicate = CKPredicate(predicate: predicate)

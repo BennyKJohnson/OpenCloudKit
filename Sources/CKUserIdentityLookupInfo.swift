@@ -59,7 +59,7 @@ public class CKUserIdentityLookupInfo : NSObject {
     public let userRecordID: CKRecordID?
 }
 
-extension CKUserIdentityLookupInfo {
+extension CKUserIdentityLookupInfo: CKCodable {
     convenience init?(dictionary: [String: AnyObject]) {
         
         guard let emailAddress = dictionary["emailAddress"] as? String,

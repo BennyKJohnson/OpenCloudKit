@@ -8,9 +8,6 @@
 
 import Foundation
 
-
-
-
 public class CKUserIdentity : NSObject {
     
     
@@ -43,7 +40,7 @@ public class CKUserIdentity : NSObject {
     
     init?(dictionary: [String: AnyObject]) {
         
-        if let lookUpInfoDictionary = dictionary["lookupInfo"] as? [String: AnyObject], lookupInfo = CKUserIdentityLookupInfo(dictionary: lookUpInfoDictionary) {
+        if let lookUpInfoDictionary = dictionary["lookupInfo"] as? [String: AnyObject],let  lookupInfo = CKUserIdentityLookupInfo(dictionary: lookUpInfoDictionary) {
             self.lookupInfo = lookupInfo
         } else {
             self.lookupInfo = nil

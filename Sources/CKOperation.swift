@@ -129,7 +129,7 @@ public class CKDatabaseOperation : CKOperation {
 extension CKOperation {
     var databaseURL: String {
         let operationContainer = container ?? CKContainer.defaultContainer()
-        return "\(CloudKit.path)/database/\(CloudKit.version)/\(operationContainer.containerIdentifier)/\(CloudKit.shared.environment)/"
+        return "\(CKServerInfo.path)/database/\(CKServerInfo.version)/\(operationContainer.containerIdentifier)/\(CloudKit.shared.environment)/"
     }
 }
 

@@ -145,7 +145,7 @@ struct CKRecordLog {
     let deviceID: String
     
     init?(dictionary: [String: AnyObject]) {
-        guard let timestamp = (dictionary["timestamp"] as? NSNumber)?.doubleValue, userRecordName = dictionary["userRecordName"] as? String, deviceID =  dictionary["deviceID"] as? String else {
+        guard let timestamp = (dictionary["timestamp"] as? NSNumber)?.doubleValue, let userRecordName = dictionary["userRecordName"] as? String, let deviceID =  dictionary["deviceID"] as? String else {
             return nil
         }
         
@@ -203,7 +203,7 @@ extension CKRecord {
     static func getValue(forRecordField field: [String: AnyObject]) -> CKRecordValue? {
         #if !os(Linux)
         if  let value = field[CKRecordFieldDictionary.value],
-            type = field[CKRecordFieldDictionary.type] as? String {
+            let type = field[CKRecordFieldDictionary.type] as? String {
         
             switch value {
             case let number as NSNumber:
@@ -281,7 +281,7 @@ extension CKRecord {
     convenience init?(recordDictionary: [String: AnyObject]) {
         
         guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
-            recordType = recordDictionary[CKRecordDictionary.recordType] as? String
+            let recordType = recordDictionary[CKRecordDictionary.recordType] as? String
         else {
                 return nil
         }
@@ -303,13 +303,13 @@ extension CKRecord {
         }
         
         // Parse Created Dictionary
-        if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: AnyObject], created = CKRecordLog(dictionary: createdDictionary) {
+        if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: AnyObject], let created = CKRecordLog(dictionary: createdDictionary) {
             self.creatorUserRecordID = CKRecordID(recordName: created.userRecordName)
             self.creationDate = NSDate(timeIntervalSince1970: created.timestamp)
         }
         
         // Parse Modified Dictionary
-        if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: AnyObject], modified = CKRecordLog(dictionary: modifiedDictionary) {
+        if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: AnyObject], let modified = CKRecordLog(dictionary: modifiedDictionary) {
             self.lastModifiedUserRecordID = CKRecordID(recordName: modified.userRecordName)
             self.modificationDate = NSDate(timeIntervalSince1970: modified.timestamp)
         }

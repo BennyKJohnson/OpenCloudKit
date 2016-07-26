@@ -20,13 +20,13 @@ struct CKSortDescriptorDictionary {
     static let relativeLocation = "relativeLocation"
 }
 
-public class CKQuery {
+public class CKQuery: CKCodable {
     
     public var recordType: String
     
     public var predicate: Predicate
     
-    let filters: [CKFilter]
+    let filters: [CKQueryFilter]
     
     public init(recordType: String, predicate: Predicate) {
         self.recordType = recordType
@@ -34,7 +34,7 @@ public class CKQuery {
         self.filters = CKPredicate(predicate: predicate).filters()
     }
     
-    public init(recordType: String, filters: [CKFilter]) {
+    public init(recordType: String, filters: [CKQueryFilter]) {
         self.recordType = recordType
         self.filters = filters
         self.predicate = Predicate(value: true)

@@ -33,7 +33,7 @@ extension CKRecordID {
     convenience init?(recordDictionary: [String: AnyObject]) {
         
         guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
-            zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject]
+            let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject]
             else {
                 return nil
         }

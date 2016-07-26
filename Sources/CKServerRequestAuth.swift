@@ -84,7 +84,7 @@ struct CKServerRequestAuth {
     
     static func authenticateServer(forRequest request: URLRequest, serverKeyID: String, privateKeyPath: String) -> URLRequest? {
         var request = request
-        guard let requestBody = request.httpBody, path = request.url?.path, auth = CKServerRequestAuth(requestBody: requestBody, urlPath: path, privateKeyPath: privateKeyPath) else {
+        guard let requestBody = request.httpBody, let path = request.url?.path, let auth = CKServerRequestAuth(requestBody: requestBody, urlPath: path, privateKeyPath: privateKeyPath) else {
             return nil
         }
         

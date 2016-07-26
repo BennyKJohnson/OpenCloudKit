@@ -14,10 +14,6 @@ enum CKOperationType {
 
 public class CloudKit {
     
-    static let path = "https://api.apple-cloudkit.com"
-    
-    static let version = "1"
-    
     public var environment: CKEnvironment = .development
     
     public private(set) var containers: [CKContainerConfig] = []
@@ -69,7 +65,7 @@ public class CKRecordZoneID: NSObject {
 }
 
 
-extension CKRecordZoneID {
+extension CKRecordZoneID: CKCodable {
     
 
     var dictionary: [String: AnyObject] {
