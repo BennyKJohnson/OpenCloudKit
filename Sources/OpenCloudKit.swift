@@ -16,6 +16,8 @@ public class CloudKit {
     
     public var environment: CKEnvironment = .development
     
+    public var defaultAccount: CKAccount!
+    
     public private(set) var containers: [CKContainerConfig] = []
     
     public static let shared = CloudKit()
@@ -24,6 +26,18 @@ public class CloudKit {
     
     public func configure(with configuration: CKConfig) {
         self.containers = configuration.containers
+        
+        // Setup DefaultAccount
+        let container = self.containers.first!
+        if serverAuth = container.serverToServerKeyAuth {
+            // Setup Server Account
+        
+            defaultAccount = CKAccount(type: .Server, containerInfo: container.containerInfo, cloudKitAuthToken: container.serverToServerKeyAuth?.keyID)
+            
+        } else if let apiTokenAuth = container.apiTokenAuth {
+            // Setup Anoymous Account
+            defaultAccount = CKAccount(type: .Anoymous, containerInfo: container.containerInfo, cloudKitAuthToken: apiTokenAuth)
+        }
     }
     
     func containerConfig(forContainer container: CKContainer) -> CKContainerConfig? {

@@ -125,6 +125,12 @@ public struct CKContainerConfig {
     }
 }
 
+extension CKContainerConfig {
+    var containerInfo: CKContainerInfo {
+        return CKContainerInfo(containerID: containerIdentifier, environment: environment)
+    }
+}
+
 public struct CKServerToServerKeyAuth {
     // A unique identifier for the key generated using CloudKit Dashboard. To create this key, read
     public let keyID: String

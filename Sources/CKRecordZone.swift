@@ -65,7 +65,7 @@ extension CKRecordZone {
         
         self.init(zoneID: zoneID)
         
-        if let isAtomic = dictionary["atomic"] as? Bool , isAtomic {
+        if let isAtomic = dictionary["atomic"] as? Bool where isAtomic {
             capabilities = CKRecordZoneCapabilities.atomic
         }
     }

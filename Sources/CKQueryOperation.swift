@@ -49,7 +49,7 @@ public class CKQueryOperation: CKDatabaseOperation {
         
        
         let queryOperationURLRequest = CKQueryURLRequest(query: query!, cursor: cursor?.data as? Data, limit: resultsLimit, requestedFields: desiredKeys, zoneID: zoneID)
-        
+        queryOperationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         
         queryOperationURLRequest.completionBlock = { (result) in
             
