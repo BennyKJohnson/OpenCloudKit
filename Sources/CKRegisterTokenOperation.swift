@@ -63,8 +63,7 @@ public class CKRegisterTokenOperation : CKOperation {
             self.registerTokenCompletionBlock?(tokenInfo, error)
             
             // Mark operation as complete
-            self.isExecuting = false
-            self.isFinished = true
+            self.finish(error: [])
         }
     }
 }

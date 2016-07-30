@@ -8,6 +8,14 @@
 
 import Foundation
 
+enum CKOperationState: Int {
+    case initialized
+    case pending
+    case ready
+    case executing
+    case finished
+}
+
 public class CKOperation: Operation {
     
     public var container: CKContainer?
@@ -20,7 +28,20 @@ public class CKOperation: Operation {
     
     var urlSessionTask: URLSessionTask?
     
+    var request: CKURLRequest?
+    
+    var childOperations: [CKOperation] = []
+    
+    var operationID: String
+    
+    var cloudKitMetrics: CKOperationMetrics?
+    
+    weak var parentOperation: CKOperation?
+    
+    private var state: CKOperationState = .initialized
+    
     override init() {
+        operationID = NSUUID().uuidString
         super.init()
     }
     
@@ -30,23 +51,41 @@ public class CKOperation: Operation {
 
     public override func start() {
         
+        super.start()
+        
         // Check if operation is already cancelled
         if isCancelled {
-            isFinished = true
+            state = .finished
             return
         }
-        
-        // Perform CKOperation of superclass
-        performCKOperation()
+ 
         
         // Send out KVO notifications for the executing
-        isExecuting = true
+        state = .executing
 
     }
     
+    func execute() {
+        
+    }
+    
+    func addAndRun(childOperation: CKOperation) {
+        childOperations.append(childOperation)
+        childOperation.start()
+    }
+    
+    func configure(request: CKURLRequest) {
+        // Configure Request
+    }
+    
     public override func main() {
-        super.main()
-        performCKOperation()
+
+        if !isCancelled {
+            performCKOperation()
+
+        } else {
+            finish()
+        }
     }
     
     public override func cancel() {
@@ -66,6 +105,10 @@ public class CKOperation: Operation {
     
     func performCKOperation() {}
 
+    final func finish(error:[NSError] = []) {
+        state = .finished
+    }
+    
     #if os(Linux)
     
     public var isFinished: Bool {
@@ -97,26 +140,29 @@ public class CKOperation: Operation {
     
     #else
     override public var isFinished: Bool {
-        get { return _isFinished }
-        set {
-           // willChangeValue(forKey: "isFinished")
-            _isFinished = newValue
-           // didChangeValue(forKey: "isFinished")
-        }
+       return state == .finished
     }
     
     override public var isExecuting: Bool {
-        get { return _isExecuting}
-        set {
-           // willChangeValue(forKey: "isExecuting")
-            _isExecuting = isExecuting
-           // didChangeValue(forKey: "isExecuting")
-            
-        }
+        return state == .executing
     }
-    override public var isConcurrent: Bool {
+    
+    override public var isReady: Bool {
+        switch state {
+        case .initialized:
+            return true
+        case .ready:
+            return super.isReady || isCancelled
+            
+        default:
+            return false
+        } // MARK: State Management
+    }
+    /*
+    public var isConcurrent: Bool {
         get { return true }
     }
+    */
     #endif
 }
 

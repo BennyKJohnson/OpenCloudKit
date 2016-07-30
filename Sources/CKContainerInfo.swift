@@ -15,7 +15,7 @@ struct CKContainerInfo {
     let containerID: String
     
     var publicCloudDBURL: URL {
-        let baseURL = "\(CKServerInfo.path)/database/\(CKServerInfo.version)/\(containerID)/\(environment)/"
+        let baseURL = "\(CKServerInfo.path)/database/\(CKServerInfo.version)/\(containerID)/\(environment)/public"
         return URL(string: baseURL)!
     }
     

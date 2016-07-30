@@ -32,8 +32,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
         self.discoverUserIdentitiesCompletionBlock?(error)
         
         // Mark operation as complete
-        self.isExecuting = false
-        self.isFinished = true
+        self.finish(error: [])
     }
     
     override func performCKOperation() {
@@ -84,8 +83,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
             self.discoverUserIdentitiesCompletionBlock?(nil)
             
             // Mark operation as complete
-            self.isExecuting = false
-            self.isFinished = true
+            self.finish(error: [])
         
         
     }

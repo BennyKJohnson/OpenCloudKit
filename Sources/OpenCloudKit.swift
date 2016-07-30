@@ -29,14 +29,14 @@ public class CloudKit {
         
         // Setup DefaultAccount
         let container = self.containers.first!
-        if serverAuth = container.serverToServerKeyAuth {
+        if let serverAuth = container.serverToServerKeyAuth {
+            
             // Setup Server Account
-        
-            defaultAccount = CKAccount(type: .Server, containerInfo: container.containerInfo, cloudKitAuthToken: container.serverToServerKeyAuth?.keyID)
+            defaultAccount = CKServerAccount(containerInfo: container.containerInfo, keyID: serverAuth.keyID, privateKeyFile: serverAuth.privateKeyFile)
             
         } else if let apiTokenAuth = container.apiTokenAuth {
             // Setup Anoymous Account
-            defaultAccount = CKAccount(type: .Anoymous, containerInfo: container.containerInfo, cloudKitAuthToken: apiTokenAuth)
+            defaultAccount = CKAccount(type: .anoymous, containerInfo: container.containerInfo, cloudKitAuthToken: apiTokenAuth)
         }
     }
     

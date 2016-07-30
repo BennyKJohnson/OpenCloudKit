@@ -46,8 +46,7 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
         self.fetchRecordZonesCompletionBlock?(nil, error)
         
         // Mark operation as complete
-        self.isExecuting = false
-        self.isFinished = true
+        finish(error: [])
     }
     
     override func performCKOperation() {
@@ -106,8 +105,7 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
             self.fetchRecordZonesCompletionBlock?(self.recordZoneByZoneID, partialError)
             
             // Mark operation as complete
-            self.isExecuting = false
-            self.isFinished = true
+            self.finish(error: [])
             
         }
     }

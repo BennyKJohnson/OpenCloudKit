@@ -95,8 +95,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
             self.fetchRecordsCompletionBlock?(self.recordIDsToRecords, nil)
             
             // Mark operation as complete
-            self.isExecuting = false
-            self.isFinished = true
+            self.finish(error: [])
             
         }
     }

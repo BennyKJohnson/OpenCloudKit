@@ -90,10 +90,11 @@ public class CKQueryOperation: CKDatabaseOperation {
                 self.queryCompletionBlock?(self.cursor, nil)
                 
             case .error(let error):
-                self.queryCompletionBlock?(nil, error)
+                self.queryCompletionBlock?(nil, error.error)
             }
         }
         
+        queryOperationURLRequest.performRequest()
     }
 }
 

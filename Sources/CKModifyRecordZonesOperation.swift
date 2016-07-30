@@ -120,8 +120,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
             self.modifyRecordZonesCompletionBlock?(Array(self.recordZonesByZoneIDs.values), self.recordZoneIDsToDelete, partialError)
             
             // Mark operation as complete
-            self.isExecuting = false
-            self.isFinished = true
+            self.finish(error: [])
 
   
     }

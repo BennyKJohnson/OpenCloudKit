@@ -6,6 +6,13 @@
 //
 //
 
+protocol Bridgable {}
+
+extension String: Bridgable {}
+extension Int: Bridgable {}
+extension Float: Bridgable {}
+extension Double: Bridgable {}
+
 #if !os(Linux)
 import Foundation
     

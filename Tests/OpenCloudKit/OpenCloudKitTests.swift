@@ -20,8 +20,8 @@ class OpenCloudKitTests: XCTestCase {
     
     func testSHA256() {
         let message = "test"
-        let data = Data(data: message.data(using: String.Encoding.utf8)!)
-        let resultHash = data.sha256().base64EncodedString(options: [])
+        let data = message.data(using: String.Encoding.utf8)!
+        let resultHash = (data as NSData).sha256().base64EncodedString(options: [])
         let testSHA256Hash = "n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg="
         XCTAssertEqual(resultHash, testSHA256Hash)
     }
@@ -45,10 +45,10 @@ class OpenCloudKitTests: XCTestCase {
         
         let requestDate = "2016-07-13T03:16:51Z"
         let urlPath = "/database/1/iCloud.benjamin.CloudTest/development/public/records/query"
-        let requestBody = Data(data: requestBodyString.data(using: String.Encoding.utf8)!)
+        let requestBody =  requestBodyString.data(using: String.Encoding.utf8)!
         
         // Should Equal 0sdWcosXLRqAQp9TQ4LzZOTgiETnGpqlODfsnN9Cqr0=
-        let requestBodyHash = requestBody.sha256().base64EncodedString(options: [])
+        let requestBodyHash = (requestBody as NSData).sha256().base64EncodedString(options: [])
         
         let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBody, urlSubpath: urlPath)
         
@@ -59,7 +59,7 @@ class OpenCloudKitTests: XCTestCase {
     
     func testSignWithPrivateKey() {
         
-        let requestBody = Data(data: requestBodyString.data(using: String.Encoding.utf8)!)
+        let requestBody = requestBodyString.data(using: String.Encoding.utf8)!
         let signedData = CKServerRequestAuth.sign(data: requestBody, privateKeyPath: ECKeyPath())
         XCTAssertNotNil(signedData)
         
@@ -93,7 +93,7 @@ class OpenCloudKitTests: XCTestCase {
         
         let url = URL(string: "https://api.apple-cloudkit.com/database/1/iCloud.benjamin.CloudTest/development/public/records/query")!
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpBody =  Data(data: requestBodyString.data(using: String.Encoding.utf8)!) as Data
+        urlRequest.httpBody =  requestBodyString.data(using: String.Encoding.utf8)!
         
         let serverKeyID = "TEST_KEY"
         let ecKeyPath = ECKeyPath()
