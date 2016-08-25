@@ -137,7 +137,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         if let recordIDsToDelete = recordIDsToDelete {
            let deleteOperations = recordIDsToDelete.map({ (recordID) -> [String: AnyObject] in
                 let operationDictionary: [String: AnyObject] = [
-                    "operationType": "delete".bridge(),
+                    "operationType": "forceDelete".bridge(),
                     "record":(["recordName":recordID.recordName.bridge()] as [String: AnyObject]).bridge()
                 ]
                 
@@ -209,7 +209,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         #else
             request["operations"] = operationsDictionary()
         #endif
-        
+                
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             // Check if cancelled
@@ -242,7 +242,12 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: recordFetchError.reason])
                             self.perRecordCompletionBlock?(nil, error)
                         } else {
-                            fatalError("Couldn't resolve record or record fetch error dictionary")
+                            
+                            if let recordName = recordDictionary["recordName"], result = recordDictionary["deleted"] {
+                                
+                            } else {
+                                fatalError("Couldn't resolve record or record fetch error dictionary")
+                            }
                         }
                     }
                 }

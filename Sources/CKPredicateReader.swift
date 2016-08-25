@@ -237,9 +237,7 @@ struct CKPredicateReader {
                 currentIndex += source.step
                 continue
             }
-            
-            print(source.takeString(begin: chunkIndex, end: currentIndex))
-            
+                        
             switch ascii {
             case "\"":
                 currentIndex = index

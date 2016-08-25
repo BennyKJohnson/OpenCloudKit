@@ -9,7 +9,7 @@
 import Foundation
 import COpenSSL
 
-public enum MessageDigestError: ErrorProtocol {
+public enum MessageDigestError: Error {
     case unknownDigest
 }
 
@@ -32,7 +32,7 @@ public final class MessageDigest {
     }
 }
 
-public enum MessageDigestContextError: ErrorProtocol {
+public enum MessageDigestContextError: Error {
     case initializationFailed
     case updateFailed
     case signFailed

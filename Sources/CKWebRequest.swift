@@ -89,7 +89,7 @@ class CKWebRequest {
         
         let session = URLSession.shared
        
-        let requestCompletionHandler:  (Data?, URLResponse?, NSError?) -> Swift.Void = { (data, response, networkError) in
+        let requestCompletionHandler:  (Data?, URLResponse?, Error?) -> Swift.Void = { (data, response, networkError) in
             if let networkError = networkError {
                 
                 let error = self.ckError(forNetworkError: networkError)

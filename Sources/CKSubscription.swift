@@ -117,13 +117,13 @@ public struct CKQuerySubscriptionOptions : OptionSet {
 
 public class CKQuerySubscription : CKSubscription {
     
-    public convenience init(recordType: String, predicate: Predicate, options querySubscriptionOptions: CKQuerySubscriptionOptions) {
+    public convenience init(recordType: String, predicate: NSPredicate, options querySubscriptionOptions: CKQuerySubscriptionOptions) {
         
         let subscriptionID = NSUUID().uuidString
         self.init(recordType: recordType, predicate: predicate, subscriptionID: subscriptionID, options: querySubscriptionOptions)
     }
     
-    public init(recordType: String, predicate: Predicate, subscriptionID: String, options querySubscriptionOptions: CKQuerySubscriptionOptions) {
+    public init(recordType: String, predicate: NSPredicate, subscriptionID: String, options querySubscriptionOptions: CKQuerySubscriptionOptions) {
         
         self.predicate = predicate
         
@@ -140,7 +140,7 @@ public class CKQuerySubscription : CKSubscription {
     public let recordType: String
     
     /* A predicate that determines when the subscription fires. */
-    public var predicate: Predicate
+    public var predicate: NSPredicate
     
     /* Optional property.  If set, a query subscription is scoped to only record changes in the indicated zone. */
     public var zoneID: CKRecordZoneID?

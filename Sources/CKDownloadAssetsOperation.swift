@@ -107,7 +107,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
         perAssetProgressBlock?(currentAsset, progress)
     }
     
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let downloadTask = task as! URLSessionDownloadTask
         
         print(task.currentRequest?.url?.absoluteString)

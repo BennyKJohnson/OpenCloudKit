@@ -9,6 +9,8 @@
 import Foundation
 
 #if os(OSX) || os(iOS)
+public typealias Predicate = NSPredicate
+public typealias SortDescriptor = NSSortDescriptor
 
 let CKUTF8StringEncoding = String.Encoding.utf8.rawValue
     
@@ -44,7 +46,7 @@ extension NSData {
  }
  }
  
-let CKPropertyListCorruptionError = NSCocoaError.propertyListReadCorruptError
+let CKPropertyListCorruptionError = CocoaError.propertyListReadCorruptError
 
 #elseif os(Linux)
 //#if os(OSX) || os(iOS)
