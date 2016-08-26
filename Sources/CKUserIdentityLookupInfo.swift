@@ -63,15 +63,15 @@ extension CKUserIdentityLookupInfo: CKCodable {
     convenience init?(dictionary: [String: AnyObject]) {
         
         guard let emailAddress = dictionary["emailAddress"] as? String,
-        phoneNumber = dictionary["phoneNumber"] as? String,
-        userRecordName = dictionary["userRecordName"] as? String else {
+        let phoneNumber = dictionary["phoneNumber"] as? String,
+        let userRecordName = dictionary["userRecordName"] as? String else {
                 return nil
         }
         
         self.init(emailAddress: emailAddress, phoneNumber: phoneNumber, userRecordID: CKRecordID(recordName: userRecordName))
     }
     
-    var dictionary: [String: AnyObject] {
+    var dictionary: [String: Any] {
         
         var lookupInfo: [String: AnyObject] = [:]
         lookupInfo["emailAddress"] = emailAddress?.bridge()

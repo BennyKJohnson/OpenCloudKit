@@ -69,7 +69,7 @@ public class CKRecordZoneID: NSObject {
     
     
     convenience public required init?(dictionary: [String: AnyObject]) {
-        guard let zoneName = dictionary["zoneName"] as? String, ownerName = dictionary["ownerRecordName"] as? String else {
+        guard let zoneName = dictionary["zoneName"] as? String, let ownerName = dictionary["ownerRecordName"] as? String else {
             return nil
         }
         
@@ -82,9 +82,9 @@ public class CKRecordZoneID: NSObject {
 extension CKRecordZoneID: CKCodable {
     
 
-    var dictionary: [String: AnyObject] {
+    var dictionary: [String: Any] {
         
-        var zoneIDDictionary: [String: AnyObject] = [
+        var zoneIDDictionary: [String: Any] = [
         "zoneName": zoneName.bridge()
         ]
         

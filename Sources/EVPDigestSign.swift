@@ -28,7 +28,7 @@ public final class MessageDigest {
             throw MessageDigestError.unknownDigest
         }
         
-        self.messageDigest = UnsafeMutablePointer(messageDigest)
+        self.messageDigest = UnsafeMutablePointer(mutating: messageDigest)
     }
 }
 
@@ -115,8 +115,9 @@ public final class MessageVerifyContext {
     
     // Signature
     func verify(signature: NSData) -> Bool {
-        
-        let bytes = Array(UnsafeBufferPointer(start: UnsafePointer<UInt8>(signature.bytes), count: signature.length))
+       
+        let typedPointer = signature.bytes.bindMemory(to: UInt8.self, capacity: signature.length)
+        let bytes = Array(UnsafeBufferPointer(start: typedPointer, count: signature.length))
         return EVP_DigestVerifyFinal(context,bytes, bytes.count) == 1
     }
     

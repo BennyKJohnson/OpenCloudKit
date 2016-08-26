@@ -104,7 +104,7 @@ struct CKPredicateReader {
     
     func consumeWhitespace(_ input: Index) -> Index? {
         var index = input
-        while let (char, nextIndex) = source.takeCharacter(index)  where char == " " {
+        while let (char, nextIndex) = source.takeCharacter(index)  , char == " " {
             index = nextIndex
         }
         return index

@@ -32,8 +32,8 @@ public struct CKQueryFilter: Equatable {
 
 extension CKQueryFilter: CKCodable {
     
-    public var dictionary: [String: AnyObject] {
-        var filterDictionary: [String: AnyObject] = [
+    public var dictionary: [String: Any] {
+        var filterDictionary: [String: Any] = [
             "comparator": type.rawValue.bridge(),
             "fieldName": fieldName.bridge(),
             "fieldValue": fieldValue.recordFieldDictionary.bridge()

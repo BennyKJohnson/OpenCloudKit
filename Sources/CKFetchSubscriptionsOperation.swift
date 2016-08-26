@@ -39,7 +39,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         var request: [String: AnyObject] = [:]
         if let subscriptionIDs = subscriptionIDs {
-            request["subscriptions"] = subscriptionIDs.bridge()
+            request["subscriptions"] = subscriptionIDs.bridge() as NSArray
         }
         
         

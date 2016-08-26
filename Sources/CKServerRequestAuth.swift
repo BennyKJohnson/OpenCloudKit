@@ -73,7 +73,7 @@ struct CKServerRequestAuth {
             let requestData = rawPayloadString.data(using: String.Encoding(rawValue: CKUTF8StringEncoding))!
         #endif
         
-        let signedData = sign(data: requestData, privateKeyPath: privateKeyPath)
+        let signedData = sign(data: requestData as NSData, privateKeyPath: privateKeyPath)
         
         return signedData?.base64Encoded
     }
@@ -84,7 +84,7 @@ struct CKServerRequestAuth {
     
     static func authenticateServer(forRequest request: URLRequest, serverKeyID: String, privateKeyPath: String) -> URLRequest? {
         var request = request
-        guard let requestBody = request.httpBody, let path = request.url?.path, let auth = CKServerRequestAuth(requestBody: requestBody, urlPath: path, privateKeyPath: privateKeyPath) else {
+        guard let requestBody = request.httpBody, let path = request.url?.path, let auth = CKServerRequestAuth(requestBody: requestBody as NSData, urlPath: path, privateKeyPath: privateKeyPath) else {
             return nil
         }
         

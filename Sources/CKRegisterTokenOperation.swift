@@ -55,7 +55,7 @@ public class CKRegisterTokenOperation : CKOperation {
                 self.finishOnCallbackQueueWithError(error: error)
                 return
             } else if let dictionary = dictionary {
-                tokenInfo = CKTokenInfo(dictionary: dictionary)
+                tokenInfo = CKTokenInfo(dictionary: dictionary as [String : AnyObject])
             } else {
                 tokenInfo = nil
             }

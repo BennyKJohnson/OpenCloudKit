@@ -9,7 +9,7 @@
 import Foundation
 
 public protocol CustomDictionaryConvertible {
-    var dictionary: [String: AnyObject] { get }
+    var dictionary: [String: Any] { get }
 }
 
 public enum CKSubscriptionType : Int, CustomStringConvertible {
@@ -44,10 +44,10 @@ public class CKSubscription: NSObject {
         
     }
     
-     init?(dictionary: [String: AnyObject]) {
+     init?(dictionary: [String: Any]) {
         
        guard let subscriptionID = dictionary["subscriptionID"] as? String,
-        subscriptionTypeValue = dictionary["subscriptionType"] as? String else {
+        let subscriptionTypeValue = dictionary["subscriptionType"] as? String else {
             return nil
         }
         
@@ -66,7 +66,7 @@ public class CKSubscription: NSObject {
 }
 
 extension CKSubscription {
-    public var subscriptionDictionary: [String : AnyObject] {
+    public var subscriptionDictionary: [String : Any] {
         switch self {
         case let querySub as CKQuerySubscription where self.subscriptionType == .query:
             return querySub.dictionary
@@ -151,13 +151,13 @@ public class CKQuerySubscription : CKSubscription {
 
 
 extension CKQuerySubscription {
-     public var dictionary: [String: AnyObject] {
+     public var dictionary: [String: Any] {
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
        
-        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID.bridge(),
+        var subscription: [String: Any] =  ["subscriptionID": subscriptionID.bridge(),
                 "subscriptionType": subscriptionType.description.bridge(),
-                "query": query.dictionary.bridge(),
+                "query": query.dictionary.bridge() as AnyObject,
                 "firesOn": querySubscriptionOptions.firesOnArray.bridge()]
         if querySubscriptionOptions.contains(CKQuerySubscriptionOptions.firesOnce) {
             subscription["firesOnce"] = NSNumber(value: true)
@@ -193,16 +193,16 @@ public class CKRecordZoneSubscription : CKSubscription {
 
 extension CKRecordZoneSubscription {
     
-    public var dictionary: [String: AnyObject] {
-
-        var subscription: [String: AnyObject] =  ["subscriptionID": subscriptionID.bridge(),
+    public var dictionary: [String: Any] {
+        
+        var subscription: [String: Any] =  ["subscriptionID": subscriptionID.bridge(),
                                                   "subscriptionType": subscriptionType.description.bridge(),
-                                                  "zoneID": zoneID.dictionary.bridge()
+                                                  "zoneID": zoneID.dictionary.bridge() as AnyObject
                                                 ]
        
 
         if let notificationInfo = notificationInfo {
-            subscription["notificationInfo"] = notificationInfo.dictionary.bridge()
+            subscription["notificationInfo"] = notificationInfo.dictionary.bridge() as NSDictionary
         }
         
         return subscription
@@ -246,9 +246,9 @@ public class CKNotificationInfo : NSObject {
 extension CKNotificationInfo {
     
     
-    var dictionary: [String: AnyObject] {
+    var dictionary: [String: Any] {
         
-        var notificationInfo: [String: AnyObject] = [:]
+        var notificationInfo: [String: Any] = [:]
         
         notificationInfo[CKNotificationInfoDictionary.alertBodyKey] = alertBody?.bridge()
         

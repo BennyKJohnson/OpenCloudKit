@@ -111,11 +111,11 @@ public class CKRecord: NSObject {
     
  
     override public var description: String {
-        return "<\(self.dynamicType): \(unsafeAddress(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
+        return "<\(type(of: self)): ; recordType = \(recordType);recordID = \(recordID); values = \(values)>"
     }
     
     public override var debugDescription: String {
-        return"<\(self.dynamicType): \(unsafeAddress(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
+        return"<\(type(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
     }
 }
 
@@ -164,7 +164,7 @@ extension CKRecord {
         
         for key in keys {
             if let value = object(forKey: key) {
-                fieldsDictionary[key] = value.recordFieldDictionary.bridge()
+                fieldsDictionary[key] = value.recordFieldDictionary.bridge() as NSDictionary
             }
         }
         
@@ -177,12 +177,12 @@ extension CKRecord {
         // Add Fields
         var fieldsDictionary: [String: AnyObject] = [:]
         for (key, value) in values {
-            fieldsDictionary[key] = value.recordFieldDictionary.bridge()
+            fieldsDictionary[key] = value.recordFieldDictionary.bridge() as NSDictionary
         }
         
         
         let recordDictionary: [String: AnyObject] = [
-        "fields": fieldsDictionary.bridge(),
+        "fields": fieldsDictionary.bridge() as NSDictionary,
         "recordType": recordType.bridge(),
         "recordName": recordID.recordName.bridge()
         ]
@@ -348,12 +348,12 @@ extension CKAsset: CKRecordValue {}
 extension CKLocation: CKRecordValue {
     public var recordFieldDictionary: [String: AnyObject] {
         
-        return ["value": self.dictionary.bridge(), "type": "LOCATION".bridge()]
+        return ["value": self.dictionary.bridge() as AnyObject, "type": "LOCATION".bridge()]
     }
 }
 
 extension CKLocationType {
     public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary.bridge(), "type": "LOCATION".bridge()]
+        return ["value": self.dictionary.bridge() as AnyObject, "type": "LOCATION".bridge()]
     }
 }

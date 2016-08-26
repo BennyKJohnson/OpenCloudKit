@@ -51,12 +51,12 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
     
     override func performCKOperation() {
         let url: String
-        let request: [String: AnyObject]?
+        let request: [String: Any]?
         
         if let recordZoneIDs = recordZoneIDs {
             
             url = "\(databaseURL)/zones/lookup"
-            let zones =  recordZoneIDs.map({ (zoneID) -> [String: AnyObject] in
+            let zones =  recordZoneIDs.map({ (zoneID) -> [String: Any] in
                 return zoneID.dictionary
             })
             

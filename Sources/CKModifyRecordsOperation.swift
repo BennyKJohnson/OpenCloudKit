@@ -37,9 +37,10 @@ struct CKSubscriptionFetchErrorDictionary {
     let redirectURL: String?
     
     init?(dictionary: [String: AnyObject]) {
-        guard let subscriptionID = dictionary[CKSubscriptionFetchErrorDictionary.subscriptionIDKey] as? String,
-        reason = dictionary[CKSubscriptionFetchErrorDictionary.reasonKey] as? String,
-            serverErrorCode = dictionary[CKSubscriptionFetchErrorDictionary.serverErrorCodeKey] as? String else {
+        guard
+        let subscriptionID = dictionary[CKSubscriptionFetchErrorDictionary.subscriptionIDKey] as? String,
+        let reason = dictionary[CKSubscriptionFetchErrorDictionary.reasonKey] as? String,
+        let serverErrorCode = dictionary[CKSubscriptionFetchErrorDictionary.serverErrorCodeKey] as? String else {
                 return nil
         }
         
@@ -67,12 +68,12 @@ struct CKRecordFetchErrorDictionary {
     let uuid: String
     let redirectURL: String?
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         
         guard let recordName = dictionary[CKRecordFetchErrorDictionary.recordNameKey] as? String,
-        reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
-        serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String,
-        uuid = dictionary[CKRecordFetchErrorDictionary.uuidKey] as? String else {
+        let reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
+        let serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String,
+        let uuid = dictionary[CKRecordFetchErrorDictionary.uuidKey] as? String else {
                 return nil
         }
         
@@ -138,7 +139,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
            let deleteOperations = recordIDsToDelete.map({ (recordID) -> [String: AnyObject] in
                 let operationDictionary: [String: AnyObject] = [
                     "operationType": "forceDelete".bridge(),
-                    "record":(["recordName":recordID.recordName.bridge()] as [String: AnyObject]).bridge()
+                    "record":(["recordName":recordID.recordName.bridge()] as [String: AnyObject]).bridge() as AnyObject
                 ]
                 
                 return operationDictionary
@@ -177,9 +178,9 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                 }
                 
         
-                recordDictionary["fields"] = fieldsDictionary.bridge()
+                recordDictionary["fields"] = fieldsDictionary.bridge() as NSDictionary
                
-                let operationDictionary: [String: AnyObject] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge()]
+                let operationDictionary: [String: AnyObject] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge() as NSDictionary]
                 return operationDictionary
             })
             
@@ -207,7 +208,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         #if os(Linux)
             request["operations"] = operationsDictionary().bridge()
         #else
-            request["operations"] = operationsDictionary()
+            request["operations"] = operationsDictionary() as NSArray
         #endif
                 
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
@@ -243,7 +244,8 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                             self.perRecordCompletionBlock?(nil, error)
                         } else {
                             
-                            if let recordName = recordDictionary["recordName"], result = recordDictionary["deleted"] {
+                            if let recordName = recordDictionary["recordName"],
+                            let result = recordDictionary["deleted"] {
                                 
                             } else {
                                 fatalError("Couldn't resolve record or record fetch error dictionary")

@@ -9,18 +9,18 @@
 import Foundation
 
 enum CKError {
-    case network(NSError)
-    case server([String: AnyObject])
-    case parse(NSError)
+    case network(Error)
+    case server([String: Any])
+    case parse(Error)
     
     var error: NSError {
         switch  self {
         case .network(let networkError):
-            return ckError(forNetworkError: networkError)
+            return ckError(forNetworkError: networkError as NSError)
         case .server(let dictionary):
             return ckError(forServerResponseDictionary: dictionary)
         case .parse(let parseError):
-            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: parseError.userInfo)
+            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: (parseError as NSError).userInfo )
         }
     }
     
@@ -41,12 +41,12 @@ enum CKError {
         return error
     }
     
-    func ckError(forServerResponseDictionary dictionary: [String: AnyObject]) -> NSError {
+    func ckError(forServerResponseDictionary dictionary: [String: Any]) -> NSError {
         if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: dictionary) {
             
             let errorCode = CKErrorCode.errorCode(serverError: recordFetchError.serverErrorCode)!
             
-            var userInfo = [:] as NSErrorUserInfoType
+            var userInfo = [:] as [AnyHashable: Any]
             
             userInfo["redirectURL"] = recordFetchError.redirectURL
             userInfo[NSLocalizedDescriptionKey] = recordFetchError.reason
@@ -55,7 +55,6 @@ enum CKError {
             userInfo["uuid"] = recordFetchError.uuid
             
             return NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)
-            
         } else {
             
             let userInfo = [:] as NSErrorUserInfoType

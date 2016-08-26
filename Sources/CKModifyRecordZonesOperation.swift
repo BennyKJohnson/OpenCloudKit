@@ -48,7 +48,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
                 
                 let operation: [String: AnyObject] = [
                     "operationType": "create".bridge(),
-                    "zone": ["zoneID".bridge(): zone.zoneID.dictionary].bridge()
+                    "zone": ["zoneID".bridge(): zone.zoneID.dictionary].bridge() as AnyObject
                 ]
                 
                 return operation
@@ -62,7 +62,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
                 
                 let operation: [String: AnyObject] = [
                     "operationType": "delete".bridge(),
-                    "zone": ["zoneID".bridge(): zoneID.dictionary.bridge()].bridge()
+                    "zone": ["zoneID".bridge(): zoneID.dictionary.bridge()].bridge() as AnyObject
                 ]
                 
                 return operation
@@ -79,7 +79,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         let url = "\(databaseURL)/zones/modify"
         let zoneOperations = self.zoneOperations().bridge()
         
-        let request: [String: AnyObject] = ["operations": zoneOperations]
+        let request: [String: AnyObject] = ["operations": zoneOperations as AnyObject]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

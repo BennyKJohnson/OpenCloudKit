@@ -17,9 +17,9 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
     public var perAssetProgressBlock: ((CKAsset, Double) -> Swift.Void)?
     
     /* Called on success or failure for each record. */
-    public var perAssetCompletionBlock: ((CKAsset, NSError?) -> Swift.Void)?
+    public var perAssetCompletionBlock: ((CKAsset, Error?) -> Swift.Void)?
 
-    public var downloadAssetsCompletionBlock: (([CKAsset], NSError?) -> Swift.Void)?
+    public var downloadAssetsCompletionBlock: (([CKAsset], Error?) -> Swift.Void)?
     
     var downloadSession: URLSession?
     
@@ -156,7 +156,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             }
             
             // Modifiy the CKAsset file URL
-            currentAsset.fileURL = destinationURL
+            currentAsset.fileURL = destinationURL as NSURL
             
             // Call perAssetCompleteBlock
             perAssetCompletionBlock?(currentAsset, nil)

@@ -66,8 +66,8 @@ public class CKDatabase {
 extension CKDatabase {
     
     /* Records convenience methods */
-    public func fetch(withRecordID recordID: CKRecordID, completionHandler: (CKRecord?,
-        NSError?) -> Void) {
+    public func fetch(withRecordID recordID: CKRecordID, completionHandler: @escaping (CKRecord?,
+        Error?) -> Void) {
         
         let fetchRecordOperation = CKFetchRecordsOperation(recordIDs: [recordID])
         fetchRecordOperation.database = self
@@ -80,8 +80,8 @@ extension CKDatabase {
         fetchRecordOperation.start()
     }
     
-    public func save(record: CKRecord, completionHandler: (CKRecord?,
-        NSError?) -> Void) {
+    public func save(record: CKRecord, completionHandler: @escaping (CKRecord?,
+        Error?) -> Void) {
         
         let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
         operation.modifyRecordsCompletionBlock = {
@@ -93,8 +93,8 @@ extension CKDatabase {
         operation.start()
     }
     
-    public func delete(withRecordID recordID: CKRecordID, completionHandler: (CKRecordID?,
-        NSError?) -> Void) {
+    public func delete(withRecordID recordID: CKRecordID, completionHandler: @escaping (CKRecordID?,
+        Error?) -> Void) {
         
         let operation = CKModifyRecordsOperation(recordsToSave: [], recordIDsToDelete: [recordID])
         operation.modifyRecordsCompletionBlock = {
@@ -107,8 +107,8 @@ extension CKDatabase {
         
     }
     
-    public func perform(query: CKQuery, inZoneWithID zoneID: CKRecordZoneID?,completionHandler: ([CKRecord]?,
-        NSError?) -> Void) {
+    public func perform(query: CKQuery, inZoneWithID zoneID: CKRecordZoneID?,completionHandler: @escaping ([CKRecord]?,
+        Error?) -> Void) {
         
         let queryOperation = CKQueryOperation(query: query)
         queryOperation.database = self
@@ -135,7 +135,7 @@ extension CKDatabase {
     
     /* Zones convenience methods */
 
-    public func fetchAll(completionHandler: ([CKRecordZone]?, NSError?) -> Swift.Void) {
+    public func fetchAll(completionHandler: @escaping ([CKRecordZone]?, Error?) -> Swift.Void) {
         let operation = CKFetchRecordZonesOperation.fetchAllRecordZonesOperation()
         operation.fetchRecordZonesCompletionBlock = {
             (recordZoneByZoneID, error) in
@@ -149,7 +149,7 @@ extension CKDatabase {
         operation.start()
     }
     
-    public func fetch(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: (CKRecordZone?, NSError?) -> Swift.Void) {
+    public func fetch(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: @escaping (CKRecordZone?, Error?) -> Swift.Void) {
         let operation = CKFetchRecordZonesOperation(recordZoneIDs: [zoneID])
         operation.fetchRecordZonesCompletionBlock = {
             (recordZoneByZoneID, error) in
@@ -161,7 +161,7 @@ extension CKDatabase {
         operation.start()
     }
     
-    public func save(_ zone: CKRecordZone, completionHandler: (CKRecordZone?, NSError?) -> Swift.Void) {
+    public func save(_ zone: CKRecordZone, completionHandler: @escaping (CKRecordZone?, NSError?) -> Swift.Void) {
         let operation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         operation.modifyRecordZonesCompletionBlock = {
             (savedZones, deletedZones, error) in
@@ -172,7 +172,7 @@ extension CKDatabase {
         operation.start()
     }
     
-    public func delete(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: (CKRecordZoneID?, NSError?) -> Swift.Void) {
+    public func delete(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: @escaping (CKRecordZoneID?, NSError?) -> Swift.Void) {
         let operation = CKModifyRecordZonesOperation(recordZonesToSave: [], recordZoneIDsToDelete: [zoneID])
         operation.modifyRecordZonesCompletionBlock = {
             (savedZones, deletedZones, error) in
@@ -185,7 +185,7 @@ extension CKDatabase {
 
     /* Subscriptions convenience methods */
     
-    public func fetchAll(completionHandler: ([CKSubscription]?, NSError?) -> Swift.Void) {
+    public func fetchAll(completionHandler: @escaping ([CKSubscription]?, Error?) -> Swift.Void) {
         let operation = CKFetchSubscriptionsOperation.fetchAllSubscriptionsOperation()
         operation.fetchSubscriptionCompletionBlock = {
             (subscriptionsBySubscriptionID, error) in
@@ -199,7 +199,7 @@ extension CKDatabase {
         operation.start()
     }
     
-    public func fetch(withSubscriptionID subscriptionID: String, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {
+    public func fetch(withSubscriptionID subscriptionID: String, completionHandler: @escaping (CKSubscription?, Error?) -> Swift.Void) {
         let operation = CKFetchSubscriptionsOperation(subscriptionIDs: [subscriptionID])
         operation.fetchSubscriptionCompletionBlock = {
             (subscriptionsBySubscriptionID, error) in
@@ -210,7 +210,7 @@ extension CKDatabase {
         operation.start()
     }
     
-    public func save(_ subscription: CKSubscription, completionHandler: (CKSubscription?, NSError?) -> Swift.Void) {
+    public func save(_ subscription: CKSubscription, completionHandler: @escaping (CKSubscription?, Error?) -> Swift.Void) {
         let modifyOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
         modifyOperation.modifySubscriptionsCompletionBlock = {
             (subscriptions, deleted, error) in
@@ -221,7 +221,7 @@ extension CKDatabase {
         modifyOperation.start()
     }
     
-    public func delete(withSubscriptionID subscriptionID: String, completionHandler: (String?, NSError?) -> Swift.Void) {
+    public func delete(withSubscriptionID subscriptionID: String, completionHandler: @escaping (String?, Error?) -> Swift.Void) {
         let modifyOperation = CKModifySubscriptionsOperation(subscriptionsToSave: nil, subscriptionIDsToDelete: [subscriptionID])
         modifyOperation.modifySubscriptionsCompletionBlock = {
             (subscriptions, deleted, error) in

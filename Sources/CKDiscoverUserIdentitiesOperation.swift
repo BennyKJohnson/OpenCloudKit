@@ -38,11 +38,11 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
     override func performCKOperation() {
         
         let url = "\(databaseURL)/public/users/discover"
-        let lookUpInfos = userIdentityLookupInfos.map { (lookupInfo) -> [String: AnyObject] in
+        let lookUpInfos = userIdentityLookupInfos.map { (lookupInfo) -> [String: Any] in
             return lookupInfo.dictionary
         }
         
-        let request: [String: AnyObject] = ["lookupInfos": lookUpInfos.bridge()]
+        let request: [String: AnyObject] = ["lookupInfos": lookUpInfos.bridge() as AnyObject]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

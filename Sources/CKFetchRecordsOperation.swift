@@ -48,7 +48,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
             return ["recordName": recordID.recordName.bridge()]
         }
         
-        request["records"] = lookupRecords?.bridge()
+        request["records"] = lookupRecords?.bridge() as AnyObject
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

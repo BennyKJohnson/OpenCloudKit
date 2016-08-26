@@ -18,7 +18,7 @@ extension CKTokenInfo {
     
     init?(dictionary: [String: AnyObject]) {
         guard let apnsEnvironment = CKEnvironment(rawValue: dictionary["apnsEnvironment"] as? String ?? ""),
-        apnsToken = dictionary["apnsToken"] as? String, webcourierURL = dictionary["webcourierURL"] as? String else {
+        let apnsToken = dictionary["apnsToken"] as? String, let webcourierURL = dictionary["webcourierURL"] as? String else {
             return nil
         }
         

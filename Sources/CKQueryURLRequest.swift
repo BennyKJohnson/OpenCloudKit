@@ -41,13 +41,13 @@ class CKQueryURLRequest: CKURLRequest {
         var parameters: [String: AnyObject] = [:]
         
         let isZoneWide = false
-        if  let zoneID = zoneID where zoneID.zoneName != CKRecordZoneDefaultName {
+        if  let zoneID = zoneID , zoneID.zoneName != CKRecordZoneDefaultName {
             // Add ZoneID Dictionary to parameters
             
         }
         
         parameters["zoneWide"] = NSNumber(value: isZoneWide)
-        parameters["query"] = query.dictionary.bridge()
+        parameters["query"] = query.dictionary.bridge() as NSDictionary
         
         if let cursor = cursor {
             

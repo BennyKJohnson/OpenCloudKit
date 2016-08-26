@@ -46,8 +46,9 @@ public class CKAsset: NSObject {
     
     init?(dictionary: [String: AnyObject]) {
         
-        guard let downloadURL = dictionary["downloadURL"] as? String,
-        size = dictionary["size"] as? NSNumber
+        guard
+        let downloadURL = dictionary["downloadURL"] as? String,
+        let size = dictionary["size"] as? NSNumber
         else  {
             return nil
         }
@@ -66,9 +67,9 @@ public class CKAsset: NSObject {
 }
 
 extension CKAsset: CustomDictionaryConvertible {
-    public var dictionary: [String: AnyObject] {
-        var fieldDictionary: [String: AnyObject] = [:]
-        if let recordID = recordID, recordKey = recordKey {
+    public var dictionary: [String: Any] {
+        var fieldDictionary: [String: Any] = [:]
+        if let recordID = recordID, let recordKey = recordKey {
             fieldDictionary["recordName"] = recordID.recordName.bridge()
         //    fieldDictionary["recordType"] = "Items".bridge()
             fieldDictionary["fieldName"] = recordKey.bridge()

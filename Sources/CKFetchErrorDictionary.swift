@@ -30,9 +30,10 @@ struct CKFetchErrorDictionary<T: CKFetchErrorDictionaryIdentifier> {
     
     init?(dictionary: [String: AnyObject]) {
         
-        guard let identifier = T(dictionary: dictionary[T.identifierKey] as? [String: AnyObject] ?? [:]),
-            reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
-            serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String
+        guard
+            let identifier = T(dictionary: dictionary[T.identifierKey] as? [String: AnyObject] ?? [:]),
+            let reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
+            let serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String
             else {
                 return nil
         }
@@ -51,12 +52,12 @@ struct CKFetchErrorDictionary<T: CKFetchErrorDictionaryIdentifier> {
         
         let errorCode = CKErrorCode.errorCode(serverError: serverErrorCode)!
         
-        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey: reason, "serverErrorCode": serverErrorCode]
+        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey as NSObject: reason as AnyObject, "serverErrorCode" as NSObject: serverErrorCode as AnyObject]
         if let redirectURL = redirectURL {
-            userInfo[CKErrorRedirectURLKey] = redirectURL
+            userInfo[CKErrorRedirectURLKey as NSObject] = redirectURL as NSString
         }
         if let retryAfter = retryAfter {
-            userInfo[CKErrorRetryAfterKey] = retryAfter
+            userInfo[CKErrorRetryAfterKey as NSObject] = retryAfter as NSNumber
         }
         
         return NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)

@@ -121,7 +121,7 @@ public class CKLocation: NSObject {
         return "<\(coordinate.latitude),\(coordinate.longitude)> +/- \(horizontalAccuracy)m (speed \(speed) mps / course \(course))"
     }
     
-    override public func isEqual(_ object: AnyObject?) -> Bool {
+    override public func isEqual(_ object: Any?) -> Bool {
         if let location = object as? CKLocation {
             
             
@@ -140,7 +140,7 @@ extension CKLocation: CKLocationType {
 
 extension CKLocationType {
     
-    public var dictionary: [String: AnyObject] {
+    public var dictionary: [String: Any] {
         return [
         "latitude": NSNumber(value: coordinateType.latitude),
         "longitude": NSNumber(value: coordinateType.longitude),

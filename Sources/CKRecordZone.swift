@@ -65,12 +65,12 @@ extension CKRecordZone {
         
         self.init(zoneID: zoneID)
         
-        if let isAtomic = dictionary["atomic"] as? Bool where isAtomic {
+        if let isAtomic = dictionary["atomic"] as? Bool , isAtomic {
             capabilities = CKRecordZoneCapabilities.atomic
         }
     }
     
     var dictionary: [String: AnyObject] {
-        return ["zoneID": zoneID.dictionary.bridge()]
+        return ["zoneID": zoneID.dictionary.bridge() as AnyObject]
     }
 }

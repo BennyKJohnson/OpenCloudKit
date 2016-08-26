@@ -188,16 +188,24 @@ extension CKURLRequest: URLSessionDataDelegate {
         
     }
     
-    func urlSession(_ session: URLSession,
-                    task task: URLSessionTask,
-                    didCompleteWithError error: NSError?) {
-        
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
             print(error)
             // Handle Error
             completionBlock?(.error(.network(error)))
         }
     }
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 }
 

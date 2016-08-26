@@ -23,7 +23,7 @@ class CKDatabaseOperationInfo: CKOperationInfo {
 }
 
 extension CKOperationInfo: CKCodable {
-    var dictionary: [String : AnyObject] {
+    var dictionary: [String : Any] {
         return [:]
     }
 }
