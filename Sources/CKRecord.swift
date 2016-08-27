@@ -227,6 +227,8 @@ extension CKRecord {
                     // downloadURL
                     // fileChecksum
                     return CKAsset(dictionary: dictionary)
+                case "REFERENCE":
+                    return CKReference(dictionary: dictionary)
                 default:
                     fatalError("Type not supported")
                 }
@@ -344,6 +346,8 @@ extension NSDate : CKRecordValue {
 extension NSData : CKRecordValue {}
 
 extension CKAsset: CKRecordValue {}
+
+extension CKReference: CKRecordValue {}
 
 extension CKLocation: CKRecordValue {
     public var recordFieldDictionary: [String: AnyObject] {
