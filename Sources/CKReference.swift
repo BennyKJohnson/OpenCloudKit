@@ -24,6 +24,17 @@ public enum CKReferenceAction : UInt {
     }
 }
 
+extension CKReferenceAction: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .none:
+            return "NONE"
+        case .deleteSelf:
+            return "DELETE_SELF"
+        }
+    }
+}
+
 open class CKReference: NSObject {
     
     
@@ -64,6 +75,12 @@ extension CKReference {
         }
         
         self.init(recordID: recordID, action: action)
+    }
+    
+    var dictionary: [String: AnyObject] {
+        let dict: [String: AnyObject] = ["recordName": recordID.recordName as NSString, "zoneID": recordID.zoneID.dictionary as NSDictionary, "action": referenceAction.description as NSString]
+        
+        return dict
     }
     
 }

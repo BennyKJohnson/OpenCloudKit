@@ -347,7 +347,11 @@ extension NSData : CKRecordValue {}
 
 extension CKAsset: CKRecordValue {}
 
-extension CKReference: CKRecordValue {}
+extension CKReference: CKRecordValue {
+    public var recordFieldDictionary: [String: AnyObject] {
+        return ["value": self.dictionary.bridge() as AnyObject, "type": "REFERENCE".bridge()]
+    }
+}
 
 extension CKLocation: CKRecordValue {
     public var recordFieldDictionary: [String: AnyObject] {

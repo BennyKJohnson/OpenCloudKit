@@ -18,7 +18,7 @@ public struct CKQueryFilter: Equatable {
     let fieldValue: CKRecordValue
     let bounds: CKLocationBound?
     
-    init(fieldName: String, comparator: CKCompatorType, fieldValue: CKRecordValue, distance: CKLocationDistance? = nil) {
+    public init(fieldName: String, comparator: CKCompatorType, fieldValue: CKRecordValue, distance: CKLocationDistance? = nil) {
         self.fieldName = fieldName
         self.type = comparator
         self.fieldValue = fieldValue
