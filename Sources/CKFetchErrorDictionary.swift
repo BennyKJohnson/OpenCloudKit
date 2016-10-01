@@ -52,12 +52,12 @@ struct CKFetchErrorDictionary<T: CKFetchErrorDictionaryIdentifier> {
         
         let errorCode = CKErrorCode.errorCode(serverError: serverErrorCode)!
         
-        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey as NSObject: reason as AnyObject, "serverErrorCode" as NSObject: serverErrorCode as AnyObject]
+        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey: reason.bridge() as AnyObject, "serverErrorCode": serverErrorCode.bridge() as AnyObject]
         if let redirectURL = redirectURL {
-            userInfo[CKErrorRedirectURLKey as NSObject] = redirectURL as NSString
+            userInfo[CKErrorRedirectURLKey] = redirectURL.bridge()
         }
         if let retryAfter = retryAfter {
-            userInfo[CKErrorRetryAfterKey as NSObject] = retryAfter as NSNumber
+            userInfo[CKErrorRetryAfterKey] = retryAfter as NSNumber
         }
         
         return NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)

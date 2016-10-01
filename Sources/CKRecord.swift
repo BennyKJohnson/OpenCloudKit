@@ -65,11 +65,9 @@ public class CKRecord: NSObject {
     }
     
     public func setObject(_ object: CKRecordValue?, forKey key: String) {
-        #if os(Linux)
-            let containsKey = changedKeysSet.containsObject(key.bridge())
-        #else
-            let containsKey = changedKeysSet.contains(key)
-        #endif
+     
+        let containsKey = changedKeysSet.contains(key)
+      
         
         if !containsKey {
             changedKeysSet.add(key.bridge())

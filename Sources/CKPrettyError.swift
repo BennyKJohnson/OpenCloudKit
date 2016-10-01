@@ -16,11 +16,12 @@ enum CKError {
     var error: NSError {
         switch  self {
         case .network(let networkError):
-            return ckError(forNetworkError: networkError as NSError)
+            return ckError(forNetworkError: NSError(error: networkError))
         case .server(let dictionary):
             return ckError(forServerResponseDictionary: dictionary)
         case .parse(let parseError):
-            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: (parseError as NSError).userInfo )
+            let error = NSError(error: parseError)
+            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: error.userInfo )
         }
     }
     
@@ -46,7 +47,7 @@ enum CKError {
             
             let errorCode = CKErrorCode.errorCode(serverError: recordFetchError.serverErrorCode)!
             
-            var userInfo = [:] as [AnyHashable: Any]
+            var userInfo: NSErrorUserInfoType = [:]
             
             userInfo["redirectURL"] = recordFetchError.redirectURL
             userInfo[NSLocalizedDescriptionKey] = recordFetchError.reason

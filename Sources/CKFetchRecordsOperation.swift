@@ -48,7 +48,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
             return ["recordName": recordID.recordName.bridge()]
         }
         
-        request["records"] = lookupRecords?.bridge() as AnyObject
+        request["records"] = lookupRecords?.bridge() as? AnyObject
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
@@ -104,7 +104,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
     public var perRecordProgressBlock: ((CKRecordID, Double) -> Void)?
     
     /* Called on success or failure for each record. */
-    public var perRecordCompletionBlock: ((CKRecord?, CKRecordID?, NSError?) -> Void)?
+    public var perRecordCompletionBlock: ((CKRecord?, CKRecordID?, Error?) -> Void)?
     
     
     /*  This block is called when the operation completes.
@@ -112,7 +112,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
      If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
      a dictionary of recordIDs to errors keyed off of CKPartialErrorsByItemIDKey.
      */
-    public var fetchRecordsCompletionBlock: (([CKRecordID : CKRecord]?, NSError?) -> Void)?
+    public var fetchRecordsCompletionBlock: (([CKRecordID : CKRecord]?, Error?) -> Void)?
     
     
 }

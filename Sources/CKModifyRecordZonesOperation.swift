@@ -79,7 +79,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         let url = "\(databaseURL)/zones/modify"
         let zoneOperations = self.zoneOperations().bridge()
         
-        let request: [String: AnyObject] = ["operations": zoneOperations as AnyObject]
+        let request: [String: AnyObject] = ["operations": zoneOperations]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             

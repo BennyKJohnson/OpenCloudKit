@@ -16,7 +16,7 @@ public struct CKTokenInfo {
 
 extension CKTokenInfo {
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         guard let apnsEnvironment = CKEnvironment(rawValue: dictionary["apnsEnvironment"] as? String ?? ""),
         let apnsToken = dictionary["apnsToken"] as? String, let webcourierURL = dictionary["webcourierURL"] as? String else {
             return nil

@@ -73,7 +73,7 @@ class CKURLRequest: NSObject {
                 urlRequest.httpMethod = "POST"
                 urlRequest.addValue(requestContentType, forHTTPHeaderField: "Content-Type")
                 
-                let dataString = NSString(data: jsonData, encoding: CKUTF8StringEncoding)
+                let dataString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
             
                 print(dataString)
                
@@ -97,7 +97,7 @@ class CKURLRequest: NSObject {
     
     var sessionConfiguration: URLSessionConfiguration  {
         
-        var configuration = URLSessionConfiguration.default
+        let configuration = URLSessionConfiguration.default
         
         return configuration
     }
@@ -106,7 +106,7 @@ class CKURLRequest: NSObject {
         get {
             let accountInfo = accountInfoProvider ?? CloudKit.shared.defaultAccount!
         
-            let baseURL = try! accountInfo.containerInfo.publicCloudDBURL.appendingPathComponent("\(operationType)/\(path)")
+            let baseURL =  accountInfo.containerInfo.publicCloudDBURL.appendingPathComponent("\(operationType)/\(path)")
             
             var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
             switch accountInfo.accountType {
@@ -121,7 +121,7 @@ class CKURLRequest: NSObject {
                 
                 if let icloudAuthToken = accountInfo.iCloudAuthToken {
                     
-                    let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: accountInfo.iCloudAuthToken)
+                    let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: icloudAuthToken)
                     urlComponents.queryItems?.append(webAuthTokenQueryItem)
                     
                 }
@@ -177,7 +177,7 @@ extension CKURLRequest: URLSessionDataDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: (URLSession.ResponseDisposition) -> Swift.Void) {
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         print(response)
         completionHandler(.allow)
     }

@@ -130,7 +130,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
      seen all record changes, and may be invoked while the server is processing the side effects
      of those changes.
      */
-    public var modifyRecordsCompletionBlock: (([CKRecord]?, [CKRecordID]?, NSError?) -> Swift.Void)?
+    public var modifyRecordsCompletionBlock: (([CKRecord]?, [CKRecordID]?, Error?) -> Swift.Void)?
 
     func operationsDictionary() -> [[String: AnyObject]] {
         var operationsDictionaryArray: [[String: AnyObject]] = []

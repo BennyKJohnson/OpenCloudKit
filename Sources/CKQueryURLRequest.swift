@@ -51,7 +51,7 @@ class CKQueryURLRequest: CKURLRequest {
         
         if let cursor = cursor {
             
-            parameters["continuationMarker"] = cursor.base64Encoded.bridge()
+            parameters["continuationMarker"] = cursor.base64EncodedString(options: []).bridge()
         }
         accountInfoProvider = CloudKit.shared.defaultAccount
         requestProperties = parameters

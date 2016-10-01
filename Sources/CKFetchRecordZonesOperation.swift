@@ -39,9 +39,9 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
      If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
      a dictionary of zoneIDs to errors keyed off of CKPartialErrorsByItemIDKey.
      */
-    public var fetchRecordZonesCompletionBlock: (([CKRecordZoneID : CKRecordZone]?, NSError?) -> Swift.Void)?
+    public var fetchRecordZonesCompletionBlock: (([CKRecordZoneID : CKRecordZone]?, Error?) -> Swift.Void)?
     
-    override func finishOnCallbackQueueWithError(error: NSError) {
+    override func finishOnCallbackQueueWithError(error: Error) {
         
         self.fetchRecordZonesCompletionBlock?(nil, error)
         

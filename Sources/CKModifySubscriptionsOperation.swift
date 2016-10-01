@@ -25,7 +25,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
      If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
      a dictionary of subscriptionIDs to errors keyed off of CKPartialErrorsByItemIDKey.
      */
-    public var modifySubscriptionsCompletionBlock: (([CKSubscription]?, [String]?, NSError?) -> Void)?
+    public var modifySubscriptionsCompletionBlock: (([CKSubscription]?, [String]?, Error?) -> Void)?
     
     func operationsDictionary() -> [[String: AnyObject]] {
         var operations: [[String: AnyObject]] = []

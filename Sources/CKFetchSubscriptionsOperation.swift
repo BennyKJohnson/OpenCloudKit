@@ -31,7 +31,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
      If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
      a dictionary of subscriptionID to errors keyed off of CKPartialErrorsByItemIDKey.
      */
-    public var fetchSubscriptionCompletionBlock: (([String : CKSubscription]?, NSError?) -> Void)?
+    public var fetchSubscriptionCompletionBlock: (([String : CKSubscription]?, Error?) -> Void)?
     
     override func performCKOperation() {
         
@@ -39,7 +39,8 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         var request: [String: AnyObject] = [:]
         if let subscriptionIDs = subscriptionIDs {
-            request["subscriptions"] = subscriptionIDs.bridge() as NSArray
+            
+            request["subscriptions"] = subscriptionIDs.bridge()
         }
         
         

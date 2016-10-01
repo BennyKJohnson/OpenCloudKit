@@ -24,11 +24,11 @@ public class CKQuery: CKCodable {
     
     public var recordType: String
     
-    public var predicate: Predicate
+    public var predicate: NSPredicate
     
     let filters: [CKQueryFilter]
     
-    public init(recordType: String, predicate: Predicate) {
+    public init(recordType: String, predicate: NSPredicate) {
         self.recordType = recordType
         self.predicate = predicate
         self.filters = CKPredicate(predicate: predicate).filters()
@@ -37,10 +37,10 @@ public class CKQuery: CKCodable {
     public init(recordType: String, filters: [CKQueryFilter]) {
         self.recordType = recordType
         self.filters = filters
-        self.predicate = Predicate(value: true)
+        self.predicate = NSPredicate(value: true)
     }
     
-    public var sortDescriptors: [SortDescriptor] = []
+    public var sortDescriptors: [NSSortDescriptor] = []
     
     // Returns a Dictionary Representation of a Query Dictionary
     var dictionary: [String: Any] {

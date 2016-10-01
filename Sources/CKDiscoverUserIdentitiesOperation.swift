@@ -25,9 +25,9 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
     
     public var userIdentityDiscoveredBlock: ((CKUserIdentity, CKUserIdentityLookupInfo) -> Swift.Void)?
     
-    public var discoverUserIdentitiesCompletionBlock: ((NSError?) -> Swift.Void)?
+    public var discoverUserIdentitiesCompletionBlock: ((Error?) -> Swift.Void)?
     
-    override func finishOnCallbackQueueWithError(error: NSError) {
+    override func finishOnCallbackQueueWithError(error: Error) {
         
         self.discoverUserIdentitiesCompletionBlock?(error)
         

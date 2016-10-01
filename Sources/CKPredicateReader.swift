@@ -209,11 +209,9 @@ struct CKPredicateReader {
     func takeValue(begin: Index, end: Index) -> AnyObject? {
         let token = source.takeString(begin: begin, end: end)
         if !token.isEmpty {
-            #if os(Linux)
-                 let number = CKPredicateReader.numberFormatter.numberFromString(token)
-            #else
-                 let number = CKPredicateReader.numberFormatter.number(from: token)
-            #endif
+       
+            let number = CKPredicateReader.numberFormatter.number(from: token)
+            
             
             if let number = number {
                 return number
@@ -304,7 +302,7 @@ struct CKPredicateReader {
             }
         }
         
-        throw NSError(domain: NSCocoaErrorDomain, code: CKPropertyListCorruptionError.rawValue, userInfo: [
+        throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
             "NSDebugDescription" : "Invalid escape sequence at position \(currentIndex)"
             ])
     }

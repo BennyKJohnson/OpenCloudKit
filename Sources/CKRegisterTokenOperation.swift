@@ -25,11 +25,11 @@ public class CKRegisterTokenOperation : CKOperation {
         self.apnsToken = apnsToken
     }
     
-    override func finishOnCallbackQueueWithError(error: NSError) {
+    override func finishOnCallbackQueueWithError(error: Error) {
         registerTokenCompletionBlock?(nil, error)
     }
     
-    public var registerTokenCompletionBlock: ((CKTokenInfo?, NSError?) -> Void)?
+    public var registerTokenCompletionBlock: ((CKTokenInfo?, Error?) -> Void)?
     
     override func performCKOperation() {
         let url: String
@@ -55,7 +55,7 @@ public class CKRegisterTokenOperation : CKOperation {
                 self.finishOnCallbackQueueWithError(error: error)
                 return
             } else if let dictionary = dictionary {
-                tokenInfo = CKTokenInfo(dictionary: dictionary as [String : AnyObject])
+                tokenInfo = CKTokenInfo(dictionary: dictionary)
             } else {
                 tokenInfo = nil
             }

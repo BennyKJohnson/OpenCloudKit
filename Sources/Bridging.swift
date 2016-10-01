@@ -16,32 +16,31 @@ extension Int: Bridgable {}
 extension Float: Bridgable {}
 extension Double: Bridgable {}
 
-#if !os(Linux)
 import Foundation
-    
-    public extension String {
-        public func bridge() -> NSString {
-            return self as NSString
-        }
+
+public extension String {
+    public func bridge() -> NSString {
+        return NSString(string: self)
     }
+}
+
+
+
+
+#if !os(Linux)
     
+    typealias NSErrorUserInfoType = [AnyHashable: Any]
+
+
     public extension NSString {
         func bridge() -> String {
             return self as String
         }
     }
     
-    public extension Array where Element: AnyObject {
-        public func bridge() -> NSArray {
-            return self as NSArray
-        }
-    }
-    
-    //typealias Stringg = (String)
-    
     extension NSArray {
-        public func bridge() -> Array<AnyObject> {
-            return self as Array<AnyObject>
+        public func bridge() -> Array<Any> {
+            return self as! Array<Any>
         }
     }
     
@@ -52,16 +51,113 @@ import Foundation
     }
     
     extension Dictionary {
-        public func bridge() -> Dictionary {
-            return self
+        public func bridge() -> NSDictionary {
+            return self as NSDictionary
         }
     }
     
     extension Array {
-        public func bridge() -> Array {
-            return self
+        public func bridge() -> NSArray {
+            return self as NSArray
         }
     }
     
+    extension NSData {
+        public func bridge() -> Data {
+            return self as Data
+        }
+    }
+#elseif os(Linux)
+    
+    typealias NSErrorUserInfoType = [String: Any]
+
+    
+    public extension NSString {
+        func bridge() -> String {
+            return self._bridgeToSwift()
+        }
+    }
+    
+    extension NSArray {
+        public func bridge() -> Array<Any> {
+            return self._bridgeToSwift()
+        }
+    }
+    
+    extension NSDictionary {
+        public func bridge() -> [AnyHashable: Any] {
+            return self._bridgeToSwift()
+        }
+    }
+    
+    extension Dictionary {
+        public func bridge() -> NSDictionary {
+            return self._bridgeToObjectiveC()
+        }
+    }
+    
+    extension Array {
+        public func bridge() -> NSArray {
+            return self._bridgeToObjectiveC()
+        }
+    }
+    
+    extension NSData {
+        public func bridge() -> Data {
+            return self._bridgeToSwift()
+        }
+    }
+    
+
+    
 #endif
+
+extension NSError {
+    public convenience init(error: Error) {
+        
+        var userInfo: [String : Any] = [:]
+        var code: Int = 0
+        
+        // Retrieve custom userInfo information.
+        if let customUserInfoError = error as? CustomNSError {
+            userInfo = customUserInfoError.errorUserInfo
+            code = customUserInfoError.errorCode
+        }
+        
+        if let localizedError = error as? LocalizedError {
+            if let description = localizedError.errorDescription {
+                userInfo[NSLocalizedDescriptionKey] = description
+            }
+            
+            if let reason = localizedError.failureReason {
+                userInfo[NSLocalizedFailureReasonErrorKey] = reason
+            }
+            
+            if let suggestion = localizedError.recoverySuggestion {
+                userInfo[NSLocalizedRecoverySuggestionErrorKey] = suggestion
+            }
+            
+            if let helpAnchor = localizedError.helpAnchor {
+                userInfo[NSHelpAnchorErrorKey] = helpAnchor
+            }
+          
+        }
+        
+        if let recoverableError = error as? RecoverableError {
+            userInfo[NSLocalizedRecoveryOptionsErrorKey] = recoverableError.recoveryOptions
+         //   userInfo[NSRecoveryAttempterErrorKey] = recoverableError
+       
+        }
+        
+        self.init(domain: "OpenCloudKit", code: code, userInfo: userInfo)
+        
+    }
+    
+    
+    
+}
+
+
+
+
 

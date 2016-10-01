@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class CKLocationSortDescriptor: SortDescriptor {
+public class CKLocationSortDescriptor: NSSortDescriptor {
     
     public init(key: String, relativeLocation: CKLocationType) {
         self.relativeLocation = relativeLocation

@@ -45,8 +45,9 @@ class CKWebRequest {
     var serverToServerKeyAuth: CKServerToServerKeyAuth? {
         return containerConfig.serverToServerKeyAuth
     }
-    
+    /*
     func ckError(forNetworkError networkError: Error) -> NSError {
+        
         let networkError = networkError as NSError
         let userInfo = networkError.userInfo
         let errorCode: CKErrorCode
@@ -63,43 +64,43 @@ class CKWebRequest {
         let error = NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)
         return error
     }
-    
+    */
     func ckError(forServerResponseDictionary dictionary: [String: AnyObject]) -> NSError {
         if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: dictionary) {
             
             let errorCode = CKErrorCode.errorCode(serverError: recordFetchError.serverErrorCode)!
             
-            var userInfo = [:] as [AnyHashable: Any]
+            var userInfo: NSErrorUserInfoType  = [:]
          
-            userInfo["redirectURL" as NSString] = recordFetchError.redirectURL
-            userInfo[NSLocalizedDescriptionKey as NSString] = recordFetchError.reason
+            userInfo["redirectURL"] = recordFetchError.redirectURL
+            userInfo[NSLocalizedDescriptionKey] = recordFetchError.reason
             
-            userInfo[CKErrorRetryAfterKey as NSString] = recordFetchError.retryAfter
-            userInfo["uuid" as NSString] = recordFetchError.uuid
+            userInfo[CKErrorRetryAfterKey] = recordFetchError.retryAfter
+            userInfo["uuid"] = recordFetchError.uuid
 
             return NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: userInfo)
             
         } else {
             
-            let userInfo = [:] as NSErrorUserInfoType
-            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: userInfo)
+           
+            return NSError(domain: CKErrorDomain, code: CKErrorCode.InternalError.rawValue, userInfo: NSErrorUserInfoType())
         }
     }
 
-    func perform(request: URLRequest, completionHandler: @escaping ([String: Any]?, NSError?) -> Void) -> URLSessionTask? {
+    func perform(request: URLRequest, completionHandler: @escaping ([String: Any]?, Error?) -> Void) -> URLSessionTask? {
         
         let session = URLSession.shared
        
         let requestCompletionHandler:  (Data?, URLResponse?, Error?) -> Swift.Void = { (data, response, networkError) in
             if let networkError = networkError {
                 
-                let error = self.ckError(forNetworkError: networkError)
-                completionHandler(nil, error)
+              //  let error = self.ckError(forNetworkError: networkError)
+                completionHandler(nil, networkError)
                 
             } else if let data = data {
                 
                 
-                let dataString = NSString(data: data, encoding: CKUTF8StringEncoding)
+                let dataString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
                 print(dataString)
                 let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
                 
@@ -130,11 +131,8 @@ class CKWebRequest {
     
     func urlRequest(with url: URL, parameters: [String: AnyObject]? = nil) -> URLRequest? {
         // Build URL
-        #if os(Linux)
-            var components = URLComponents(URL: url, resolvingAgainstBaseURL: false)
-        #else
-            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        #endif
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+       
         components?.queryItems = authQueryItems
         print(components?.path)
         guard let requestURL = components?.url else {
@@ -168,7 +166,7 @@ class CKWebRequest {
     }
 
     
-    func request(withURL url: String, completetion: @escaping ([String: Any]?, NSError?) -> Void) -> URLSessionTask? {
+    func request(withURL url: String, completetion: @escaping ([String: Any]?, Error?) -> Void) -> URLSessionTask? {
        
         // Build URL
         var components = URLComponents(string: url)
@@ -189,7 +187,7 @@ class CKWebRequest {
     }
     
     
-    func request(withURL url: String, parameters: [String: Any]?, completetion: @escaping ([String: Any]?, NSError?) -> Void) -> URLSessionTask? {
+    func request(withURL url: String, parameters: [String: Any]?, completetion: @escaping ([String: Any]?, Error?) -> Void) -> URLSessionTask? {
         
         // Build URL
         var components = URLComponents(string: url)

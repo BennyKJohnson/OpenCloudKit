@@ -78,7 +78,7 @@ extension CKReference {
     }
     
     var dictionary: [String: AnyObject] {
-        let dict: [String: AnyObject] = ["recordName": recordID.recordName as NSString, "zoneID": recordID.zoneID.dictionary as NSDictionary, "action": referenceAction.description as NSString]
+        let dict: [String: AnyObject] = ["recordName": recordID.recordName.bridge(), "zoneID": recordID.zoneID.dictionary.bridge(), "action": referenceAction.description.bridge()]
         
         return dict
     }

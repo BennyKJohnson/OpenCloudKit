@@ -100,7 +100,7 @@ public class CKOperation: Operation {
         
     }
     
-    func finishOnCallbackQueueWithError(error: NSError) {
+    func finishOnCallbackQueueWithError(error: Error) {
     }
     
     func performCKOperation() {}
@@ -109,36 +109,7 @@ public class CKOperation: Operation {
         state = .finished
     }
     
-    #if os(Linux)
-    
-    public var isFinished: Bool {
-        get { return _isFinished }
-        set {
-        //willChangeValue(forKey: "isFinished")
-        _isFinished = newValue
-        //didChangeValue(forKey: "isFinished")
-        }
-    }
-    
-    public var isExecuting: Bool {
-        get { return _isExecuting}
-        set {
-          //  willChangeValue(forKey: "isExecuting")
-            _isExecuting = isExecuting
-          //  didChangeValue(forKey: "isExecuting")
-    
-        }
-    }
-    
-    public var isCancelled: Bool {
-        get { return cancelled }
-    }
-    
-    public var isConcurrent: Bool {
-        get { return true }
-    }
-    
-    #else
+  
     override public var isFinished: Bool {
        return state == .finished
     }
@@ -163,7 +134,6 @@ public class CKOperation: Operation {
         get { return true }
     }
     */
-    #endif
 }
 
 public class CKDatabaseOperation : CKOperation {

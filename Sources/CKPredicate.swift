@@ -66,11 +66,11 @@ struct CKPredicate {
         }
     }
     
-    let predicate: Predicate
+    let predicate: NSPredicate
     
     let numberFormatter = NumberFormatter()
     
-    init(predicate: Predicate) {
+    init(predicate: NSPredicate) {
         self.predicate = predicate
     }
     
@@ -162,12 +162,9 @@ struct CKPredicate {
     
     func value(forString string: String) -> CKRecordValue {
         
-        #if os(Linux)
-        let numberFromString = numberFormatter.numberFromString(string)
-        #else
+     
         let numberFromString = numberFormatter.number(from: string)
-        #endif
-        
+       
         if let number = numberFromString {
             return number
         } else {

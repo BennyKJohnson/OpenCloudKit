@@ -14,9 +14,9 @@ public class CKPublishAssetsOperation : CKOperation {
     
     var assets: [CKAsset] = []
     
-    public var assetPublishedBlock: ((CKAsset?, NSError?) -> Void)?
+    public var assetPublishedBlock: ((CKAsset?, Error?) -> Void)?
 
-    override func finishOnCallbackQueueWithError(error: NSError) {
+    override func finishOnCallbackQueueWithError(error: Error) {
 
     }
     

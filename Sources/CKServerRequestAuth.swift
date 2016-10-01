@@ -60,22 +60,20 @@ struct CKServerRequestAuth {
     
     static func rawPayload(withRequestDate requestDate: String, requestBody: NSData, urlSubpath: String) -> String {
         let bodyHash = requestBody.sha256()
-        let hashedBody = bodyHash.base64Encoded
+        let hashedBody = bodyHash.base64EncodedString(options: [])
         return "\(requestDate):\(hashedBody):\(urlSubpath)"
     }
     
     static func signature(requestDate: String, requestBody: NSData, urlSubpath: String, privateKeyPath: String) -> String? {
         
         let rawPayloadString = rawPayload(withRequestDate: requestDate, requestBody: requestBody, urlSubpath: urlSubpath)
-        #if os(Linux)
-            let requestData = rawPayloadString.data(using: CKUTF8StringEncoding)!
-        #else
-            let requestData = rawPayloadString.data(using: String.Encoding(rawValue: CKUTF8StringEncoding))!
-        #endif
+      
+        let requestData = rawPayloadString.data(using: String.Encoding.utf8)!
+       
         
-        let signedData = sign(data: requestData as NSData, privateKeyPath: privateKeyPath)
+        let signedData = sign(data: NSData(data: requestData), privateKeyPath: privateKeyPath)
         
-        return signedData?.base64Encoded
+        return signedData?.base64EncodedString(options: [])
     }
     
     static func authenicateServer(forRequest request: URLRequest, withServerToServerKeyAuth auth: CKServerToServerKeyAuth) -> URLRequest? {
@@ -84,7 +82,7 @@ struct CKServerRequestAuth {
     
     static func authenticateServer(forRequest request: URLRequest, serverKeyID: String, privateKeyPath: String) -> URLRequest? {
         var request = request
-        guard let requestBody = request.httpBody, let path = request.url?.path, let auth = CKServerRequestAuth(requestBody: requestBody as NSData, urlPath: path, privateKeyPath: privateKeyPath) else {
+        guard let requestBody = request.httpBody, let path = request.url?.path, let auth = CKServerRequestAuth(requestBody: NSData(data: requestBody), urlPath: path, privateKeyPath: privateKeyPath) else {
             return nil
         }
         
