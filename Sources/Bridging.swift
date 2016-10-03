@@ -6,10 +6,7 @@
 //
 //
 
-protocol Bridgable {
-}
-
-
+protocol Bridgable {}
 
 extension String: Bridgable {}
 extension Int: Bridgable {}
@@ -24,13 +21,9 @@ public extension String {
     }
 }
 
-
-
-
 #if !os(Linux)
     
     typealias NSErrorUserInfoType = [AnyHashable: Any]
-
 
     public extension NSString {
         func bridge() -> String {
@@ -62,16 +55,30 @@ public extension String {
         }
     }
     
+    extension Date {
+        public func bridge() -> NSDate {
+            return self as NSDate
+        }
+    }
+    
+    extension NSDate {
+        public func bridge() -> Date {
+            return self as Date
+        }
+    }
+    
     extension NSData {
         public func bridge() -> Data {
             return self as Data
         }
     }
+    
+    
+    
 #elseif os(Linux)
     
     typealias NSErrorUserInfoType = [String: Any]
 
-    
     public extension NSString {
         func bridge() -> String {
             return self._bridgeToSwift()
@@ -108,7 +115,17 @@ public extension String {
         }
     }
     
-
+    extension Date {
+        public func bridge() -> NSDate {
+            return self._bridgeToObjectiveC()
+        }
+    }
+    
+    extension NSDate {
+        public func bridge() -> Date {
+            return self._bridgeToSwift()
+        }
+    }
     
 #endif
 
