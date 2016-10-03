@@ -8,6 +8,11 @@
 
 import Foundation
 
+enum CKConfigError: Error {
+    case FailedInit
+    case InvalidJSON
+}
+
 public struct CKConfig {
     
     let containers: [CKContainerConfig]
@@ -40,24 +45,20 @@ public struct CKConfig {
         }
     }
     
-    public init?(contentsOfFile path: String) {
-        do {
-            let url = URL(string: path)!
+    public init(contentsOfFile path: String) throws {
+       
+            let url = URL(fileURLWithPath: path)
          
             let directory = url.deletingLastPathComponent()
             
             let jsonData = try NSData(contentsOfFile: path, options: [])
             
-            
-            
             if let dictionary = try JSONSerialization.jsonObject(with: jsonData.bridge(), options: []) as? [String: AnyObject] {
-                self.init(dictionary: dictionary, workingDirectory: directory.absoluteString)
+                self.init(dictionary: dictionary, workingDirectory: directory.absoluteString)!
             } else {
-                return nil
+                throw CKConfigError.InvalidJSON
             }
-        } catch {
-            return nil
-        }
+        
     }
 }
 
