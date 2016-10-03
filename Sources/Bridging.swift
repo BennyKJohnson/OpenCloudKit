@@ -32,7 +32,7 @@ public extension String {
     }
     
     extension NSArray {
-        public func bridge() -> Array<Any> {
+         func bridge() -> Array<Any> {
             return self as! Array<Any>
         }
     }
@@ -50,25 +50,25 @@ public extension String {
     }
     
     extension Array {
-        public func bridge() -> NSArray {
+        func bridge() -> NSArray {
             return self as NSArray
         }
     }
     
     extension Date {
-        public func bridge() -> NSDate {
+        func bridge() -> NSDate {
             return self as NSDate
         }
     }
     
     extension NSDate {
-        public func bridge() -> Date {
+        func bridge() -> Date {
             return self as Date
         }
     }
     
     extension NSData {
-        public func bridge() -> Data {
+        func bridge() -> Data {
             return self as Data
         }
     }
