@@ -44,7 +44,7 @@ public extension String {
     }
     
     extension Dictionary {
-        public func bridge() -> NSDictionary {
+        func bridge() -> NSDictionary {
             return self as NSDictionary
         }
     }
