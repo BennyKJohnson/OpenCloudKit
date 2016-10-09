@@ -9,7 +9,7 @@
 import Foundation
 import COpenSSL
 
-
+/*
 
 extension NSData {
     
@@ -29,3 +29,4 @@ extension NSData {
     }
     
 }
+*/
