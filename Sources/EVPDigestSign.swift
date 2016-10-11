@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import COpenSSL
+import CLibreSSL
 
 public enum MessageDigestError: Error {
     case unknownDigest
@@ -115,12 +115,12 @@ public final class MessageVerifyContext {
     
     // Signature
     func verify(signature: NSData) -> Bool {
-       
+        
         let typedPointer = signature.bytes.bindMemory(to: UInt8.self, capacity: signature.length)
-        let bytes = Array(UnsafeBufferPointer(start: typedPointer, count: signature.length))
-        return EVP_DigestVerifyFinal(context,bytes, bytes.count) == 1
+        var bytes = Array(UnsafeBufferPointer(start: typedPointer, count: signature.length))
+        
+        return EVP_DigestVerifyFinal(context, &bytes, bytes.count) == 1
     }
-    
 }
 
 public final class MessageDigestContext {
