@@ -75,13 +75,13 @@ class CKConfigTests: XCTestCase {
         let keyID = "KEY_ID"
         let privateKeyFile = "eckey.pem"
         let privateKeyPassPhrase = "PASSWORD"
-        let serverToServerAuthKeyDict: [String: AnyObject] = ["keyID": keyID, "privateKeyFile": privateKeyFile, "privateKeyPassPhrase": privateKeyPassPhrase]
+        let serverToServerAuthKeyDict: [String: AnyObject] = ["keyID": keyID as NSString, "privateKeyFile": privateKeyFile as NSString, "privateKeyPassPhrase": privateKeyPassPhrase as NSString]
         let serverToServerAuthKey = CKServerToServerKeyAuth(keyID: keyID, privateKeyFile: privateKeyFile, privateKeyPassPhrase: privateKeyPassPhrase)
         
         let dictionary: [String: AnyObject] = [
-            "containerIdentifier": containerID,
-            "environment": environment,
-            "serverToServerKeyAuth": serverToServerAuthKeyDict
+            "containerIdentifier": containerID as NSString,
+            "environment": environment as NSString,
+            "serverToServerKeyAuth": serverToServerAuthKeyDict.bridge()
         ]
         
         let containerConfig = CKContainerConfig(dictionary: dictionary)
@@ -99,7 +99,7 @@ class CKConfigTests: XCTestCase {
     func testInitializingConfigWithFile() {
         
         let filePath = "\(pathForTests())/Supporting/config.json"
-        let config = CKConfig(contentsOfFile: filePath)
+        let config = try? CKConfig(contentsOfFile: filePath)
         if let config = config {
             
             XCTAssertNotNil(config.containers.first)

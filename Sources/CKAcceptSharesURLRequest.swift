@@ -16,7 +16,7 @@ class CKAcceptSharesURLRequest: CKURLRequest {
     init(shortGUIDs: [CKShortGUID]) {
         super.init()
         
-        self.path = "accepts"
+        self.path = "accept"
         self.operationType = CKOperationRequestType.records
         
         var parameters: [String: AnyObject] = [:]

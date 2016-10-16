@@ -76,5 +76,13 @@ open class CKShareMetadata  {
         let rawParticipantType = dictionary["participantType"] as! String
         participantType = CKShareParticipantType(string: rawParticipantType)!
         
+        
+        let rawDatabaseScope = dictionary["databaseScope"] as! String
+        
+        if let rootRecordDictionary = dictionary["rootRecord"] as? [String: AnyObject] {
+            rootRecord = CKRecord(recordDictionary: rootRecordDictionary)
+        } 
+        
+        
     }
 }

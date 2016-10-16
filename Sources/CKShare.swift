@@ -21,6 +21,7 @@ public class CKShare : CKRecord {
     public init(rootRecord: CKRecord, share shareID: CKRecordID) {
        super.init(recordType: CKShareRecordType, recordID: shareID)
     }
+
     
     
     /*

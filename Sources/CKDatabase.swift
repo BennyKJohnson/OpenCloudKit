@@ -23,6 +23,19 @@ public enum CKDatabaseScope: Int, CustomStringConvertible {
             return "shared"
         }
     }
+    
+    public init?(string: String) {
+        switch string {
+        case "PRIVATE":
+            self = .private
+        case "SHARED":
+            self = .shared
+        case "PUBLIC":
+            self = .public
+        default:
+            return nil
+        }
+    }
 }
 
 enum CKRecordOperation: String {

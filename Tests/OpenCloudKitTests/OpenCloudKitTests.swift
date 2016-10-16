@@ -21,7 +21,7 @@ class OpenCloudKitTests: XCTestCase {
     func testSHA256() {
         let message = "test"
         let data = message.data(using: String.Encoding.utf8)!
-        let resultHash = (data as NSData).sha256().base64EncodedString(options: [])
+        let resultHash = data.sha256().base64EncodedString(options: [])
         let testSHA256Hash = "n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg="
         XCTAssertEqual(resultHash, testSHA256Hash)
     }
@@ -35,9 +35,9 @@ class OpenCloudKitTests: XCTestCase {
         let signedData = Data(base64Encoded: signedBase64, options: [])!
         
         let context = try! MessageVerifyContext(try! MessageDigest("sha256WithRSAEncryption"), withKey: evpKey)
-        try! context.update(data: data)
+        try! context.update(data: data as NSData)
         
-        XCTAssert(context.verify(signature: signedData), "Signature should verify successfully")
+        XCTAssert(context.verify(signature: signedData as NSData), "Signature should verify successfully")
         
     }
 
@@ -48,9 +48,9 @@ class OpenCloudKitTests: XCTestCase {
         let requestBody =  requestBodyString.data(using: String.Encoding.utf8)!
         
         // Should Equal 0sdWcosXLRqAQp9TQ4LzZOTgiETnGpqlODfsnN9Cqr0=
-        let requestBodyHash = (requestBody as NSData).sha256().base64EncodedString(options: [])
+        let requestBodyHash = requestBody.sha256().base64EncodedString(options: [])
         
-        let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBody, urlSubpath: urlPath)
+        let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBody as NSData, urlSubpath: urlPath)
         
         let expectedPayload = "\(requestDate):\(requestBodyHash):\(urlPath)"
         XCTAssertEqual(rawPayload, expectedPayload)
@@ -60,7 +60,7 @@ class OpenCloudKitTests: XCTestCase {
     func testSignWithPrivateKey() {
         
         let requestBody = requestBodyString.data(using: String.Encoding.utf8)!
-        let signedData = CKServerRequestAuth.sign(data: requestBody, privateKeyPath: ECKeyPath())
+        let signedData = CKServerRequestAuth.sign(data: requestBody as NSData, privateKeyPath: ECKeyPath())
         XCTAssertNotNil(signedData)
         
         //TODO: Verify the signature is correct
