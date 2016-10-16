@@ -61,7 +61,7 @@ struct CKServerRequestAuth {
     
     static func rawPayload(withRequestDate requestDate: String, requestBody: NSData, urlSubpath: String) -> String {
         
-        let bodyHash = requestBody.bridge().sha256()!
+        let bodyHash = requestBody.bridge().sha256()
         let hashedBody = bodyHash.base64EncodedString(options: [])
         return "\(requestDate):\(hashedBody):\(urlSubpath)"
     }
