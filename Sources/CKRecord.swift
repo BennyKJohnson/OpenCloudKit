@@ -24,8 +24,7 @@ extension CKRecordFieldProvider where Self: CustomDictionaryConvertible {
     }
 }
 */
-public protocol CKRecordValue : CKRecordFieldProvider, NSObjectProtocol {}
-
+public protocol CKRecordValue : CKRecordFieldProvider {}
 
 
 public class CKRecord: NSObject {
@@ -81,6 +80,15 @@ public class CKRecord: NSObject {
         }
         
         values[key] = object
+    }
+    
+    public func setObject(_ array: [CKRecordValue]?, forKey key: String) {
+        if let arrayValue = array {
+            let foundationArray = NSArray(array: arrayValue)
+            setObject(foundationArray, forKey: key)
+        } else {
+            setObject(array, forKey: key)
+        }
     }
 
     public func allKeys() -> [String] {
@@ -331,11 +339,32 @@ extension NSString : CKRecordValue {
     }
 }
 
+extension String : CKRecordValue {
+    public var recordFieldDictionary: [String : AnyObject] {
+        return ["value": self.bridge(), "type":"STRING".bridge()]
+    }
+}
+
+
 extension NSNumber : CKRecordValue {}
 
 extension NSArray : CKRecordValue {}
 
+extension Int : CKNumberValueType {}
+
+extension Double: CKNumberValueType {}
+
+extension Float: CKNumberValueType {}
+
+extension UInt: CKNumberValueType {}
+
 extension NSDate : CKRecordValue {
+    public var recordFieldDictionary: [String : AnyObject] {
+        return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
+    }
+}
+
+extension Date : CKRecordValue {
     public var recordFieldDictionary: [String : AnyObject] {
         return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
     }

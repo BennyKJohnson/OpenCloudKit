@@ -75,13 +75,13 @@ class CKConfigTests: XCTestCase {
         let keyID = "KEY_ID"
         let privateKeyFile = "eckey.pem"
         let privateKeyPassPhrase = "PASSWORD"
-        let serverToServerAuthKeyDict: [String: AnyObject] = ["keyID": keyID as NSString, "privateKeyFile": privateKeyFile as NSString, "privateKeyPassPhrase": privateKeyPassPhrase as NSString]
+        let serverToServerAuthKeyDict: [String: Any] = ["keyID": keyID, "privateKeyFile": privateKeyFile, "privateKeyPassPhrase": privateKeyPassPhrase]
         let serverToServerAuthKey = CKServerToServerKeyAuth(keyID: keyID, privateKeyFile: privateKeyFile, privateKeyPassPhrase: privateKeyPassPhrase)
         
-        let dictionary: [String: AnyObject] = [
-            "containerIdentifier": containerID as NSString,
-            "environment": environment as NSString,
-            "serverToServerKeyAuth": serverToServerAuthKeyDict.bridge()
+        let dictionary: [String: Any] = [
+            "containerIdentifier": containerID,
+            "environment": environment,
+            "serverToServerKeyAuth": serverToServerAuthKeyDict
         ]
         
         let containerConfig = CKContainerConfig(dictionary: dictionary)

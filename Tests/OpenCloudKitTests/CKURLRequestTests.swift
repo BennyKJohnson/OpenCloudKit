@@ -23,14 +23,11 @@ class CKURLRequestTests: XCTestCase {
         
         let containerConfig = CKContainerConfig(containerIdentifier: containerID, environment: environment, apiTokenAuth: apiToken)
         CloudKit.shared.configure(with: CKConfig(container: containerConfig))
-        
-        
     }
-    
     
     func testCKQueryURLRequestURL() {
         
-        let queryURLRequest = CKQueryURLRequest(query: CKQuery(recordType: "Items", predicate: NSPredicate(value: true)), cursor: nil, limit: 0, requestedFields: nil, zoneID: nil, database: CKContainer.defaultContainer().publicCloudDatabase)
+        let queryURLRequest = CKQueryURLRequest(query: CKQuery(recordType: "Items", predicate: NSPredicate(value: true)), cursor: nil, limit: 0, requestedFields: nil, zoneID: nil)
         
         
         let queryURLComponents = URLComponents(url: queryURLRequest.url, resolvingAgainstBaseURL: false)!
@@ -39,10 +36,9 @@ class CKURLRequestTests: XCTestCase {
     }
     
     func assertDatabasePath(components: URLComponents, query: String) {
-        XCTAssertEqual(components.host!, "api.apple-cloudkit.com")
+        XCTAssertEqual(components.host, "api.apple-cloudkit.com")
         XCTAssertEqual(components.path, "/database/1/\(containerID)/\(environment)/\(databaseScope)/\(query)")
         
     }
-    
     
 }

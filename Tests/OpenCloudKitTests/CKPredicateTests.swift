@@ -77,7 +77,7 @@ class CKPredicateTests: XCTestCase {
         let predicate = NSPredicate(format: "name = %@", "Benjamin")
         let ckPredicate = CKPredicate(predicate: predicate)
         
-        let expectedResult = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "Benjamin" as NSString)
+        let expectedResult = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "Benjamin")
         XCTAssertEqual(ckPredicate.filters().first!, expectedResult)
     }
     
@@ -85,7 +85,7 @@ class CKPredicateTests: XCTestCase {
         let predicate = NSPredicate(format: "year < 2005")
         let ckPredicate = CKPredicate(predicate: predicate)
         
-        let expectedResult = CKQueryFilter(fieldName: "year", comparator: .lessThan, fieldValue: 2005 as NSNumber)
+        let expectedResult = CKQueryFilter(fieldName: "year", comparator: .lessThan, fieldValue: 2005)
         XCTAssertEqual(ckPredicate.filters().first!, expectedResult)
     }
     
@@ -93,7 +93,7 @@ class CKPredicateTests: XCTestCase {
         let predicate = NSPredicate(format: "year > 2005")
         let ckPredicate = CKPredicate(predicate: predicate)
         
-        let expectedResult = CKQueryFilter(fieldName: "year", comparator: .greaterThan, fieldValue: 2005 as NSNumber)
+        let expectedResult = CKQueryFilter(fieldName: "year", comparator: .greaterThan, fieldValue: 2005)
         XCTAssertEqual(ckPredicate.filters().first!, expectedResult)
 
     }
@@ -126,9 +126,9 @@ class CKPredicateTests: XCTestCase {
     }
     
     func testFilterDictionary() {
-        let filter = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "jack" as NSString)
+        let filter = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "jack")
         let filterDictionary = filter.dictionary
-        let expectedDictionary: [String: AnyObject] = ["comparator": "EQUALS" as NSString, "fieldName": "name" as NSString, "fieldValue": "jack" as NSString]
+        let expectedDictionary: [String: AnyObject] = ["comparator": "EQUALS".bridge(), "fieldName": "name".bridge(), "fieldValue": "jack".bridge()]
         
         XCTAssertEqual(filterDictionary["comparator"] as! String, expectedDictionary["comparator"] as! String)
         XCTAssertEqual(filterDictionary["fieldName"] as! String, expectedDictionary["fieldName"] as! String)
@@ -139,7 +139,7 @@ class CKPredicateTests: XCTestCase {
     }
     
     func testFilterDictionaryWithNumber() {
-        let filter = CKQueryFilter(fieldName: "year", comparator: .lessThan, fieldValue: 2010 as NSNumber)
+        let filter = CKQueryFilter(fieldName: "year", comparator: .lessThan, fieldValue: 2010)
         let filterDictionary = filter.dictionary
 
         let recordValueDictionary = filterDictionary["fieldValue"] as! [String: AnyObject]

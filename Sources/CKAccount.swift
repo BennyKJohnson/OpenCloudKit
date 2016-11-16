@@ -28,7 +28,7 @@ public class CKAccount: CKAccountInfoProvider {
 
     var containerInfo: CKContainerInfo
     
-    public var iCloudAuthToken: String?
+    var iCloudAuthToken: String?
     
     let cloudKitAuthToken: String?
 

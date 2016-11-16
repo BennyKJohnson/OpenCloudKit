@@ -46,7 +46,7 @@ public class CKOperation: Operation {
     }
     
     var operationContainer: CKContainer {
-        return container ?? CKContainer.defaultContainer()
+        return container ?? CKContainer.default()
     }
 
     public override func start() {
@@ -144,7 +144,7 @@ public class CKDatabaseOperation : CKOperation {
 
 extension CKOperation {
     var databaseURL: String {
-        let operationContainer = container ?? CKContainer.defaultContainer()
+        let operationContainer = container ?? CKContainer.default()
         return "\(CKServerInfo.path)/database/\(CKServerInfo.version)/\(operationContainer.containerIdentifier)/\(CloudKit.shared.environment)/"
     }
 }

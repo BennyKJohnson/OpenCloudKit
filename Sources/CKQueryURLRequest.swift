@@ -24,7 +24,7 @@ class CKQueryURLRequest: CKURLRequest {
     
     var zoneID: CKRecordZoneID?
     
-    init(query: CKQuery, cursor: Data?, limit: Int, requestedFields: [String]?, zoneID: CKRecordZoneID?, database: CKDatabase) {
+    init(query: CKQuery, cursor: Data?, limit: Int, requestedFields: [String]?, zoneID: CKRecordZoneID?) {
         
         self.query = query
         self.cursor = cursor
@@ -33,9 +33,6 @@ class CKQueryURLRequest: CKURLRequest {
         self.zoneID = zoneID
         
         super.init()
-        
-        self.databaseScope = database.scope
-
         
         self.path = "query"
         self.operationType = CKOperationRequestType.records
@@ -46,7 +43,7 @@ class CKQueryURLRequest: CKURLRequest {
         let isZoneWide = false
         if  let zoneID = zoneID , zoneID.zoneName != CKRecordZoneDefaultName {
             // Add ZoneID Dictionary to parameters
-            parameters["zoneID"] = zoneID.dictionary.bridge()
+            
         }
         
         parameters["zoneWide"] = NSNumber(value: isZoneWide)

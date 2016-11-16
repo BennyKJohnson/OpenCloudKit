@@ -48,5 +48,6 @@ extension CKQueryFilter: CKCodable {
 }
 
 public func ==(lhs: CKQueryFilter, rhs: CKQueryFilter) -> Bool {
-    return lhs.fieldName == rhs.fieldName && lhs.type == rhs.type && lhs.fieldValue.isEqual((rhs.fieldValue as AnyObject))
+   
+    return lhs.fieldName == rhs.fieldName && lhs.type == rhs.type
 }

@@ -17,7 +17,7 @@ public class CKContainer {
         self.containerIdentifier = containerIdentifier
     }
     
-    public class func defaultContainer() -> CKContainer {
+    public class func `default`() -> CKContainer {
         // Get Default Container
         return CKContainer(containerIdentifier: CloudKit.shared.containers.first!.containerIdentifier)
     }
@@ -30,18 +30,8 @@ public class CKContainer {
         return CKDatabase(container: self, scope: .private)
     }()
     
+    
     var isRegisteredForNotifications: Bool {
         return false
-    }
-    
-    func registerForNotifications() {
-        
-        
-        
-        
-        
-        
-        
-        
     }
 }
