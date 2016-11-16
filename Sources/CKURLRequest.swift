@@ -75,7 +75,7 @@ class CKURLRequest: NSObject {
                 
                 let dataString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
             
-                print(dataString as Any)
+                CloudKit.debugPrint(dataString as Any)
                
                 if let serverAccount = accountInfoProvider as? CKServerAccount {
                     // Sign Request 
@@ -129,7 +129,7 @@ class CKURLRequest: NSObject {
                 
             }
                      //}
-            print(urlComponents.url!)
+            CloudKit.debugPrint(urlComponents.url!)
             return urlComponents.url!
         }
     }
@@ -168,19 +168,25 @@ extension CKURLRequest: URLSessionDataDelegate {
         // Parse JSON
         do {
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
-            print(jsonObject)
+            CloudKit.debugPrint(jsonObject)
             
             
             // Call completion block
-            let result = CKURLRequestResult.success(jsonObject)
-            completionBlock?(result)
+            if let error = CKErrorDictionary(dictionary: jsonObject) {
+                completionBlock?(.error(CKError.server(jsonObject)))
+            } else {
+                let result = CKURLRequestResult.success(jsonObject)
+                completionBlock?(result)
+            }
+        
         } catch let error as NSError {
             completionBlock?(.error(.parse(error)))
         }
     }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        print(response)
+        
+        CloudKit.debugPrint(response)
         completionHandler(.allow)
     }
     

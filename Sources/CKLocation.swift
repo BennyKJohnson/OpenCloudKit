@@ -149,7 +149,7 @@ extension CKLocationType {
         "altitude": NSNumber(value: altitude),
         "speed": NSNumber(value: speed),
         "course": NSNumber(value: course),
-        "timestamp": NSNumber(value: timestamp.timeIntervalSince1970)
+        "timestamp": NSNumber(value: UInt(timestamp.timeIntervalSince1970))
         ]
     }
 }

@@ -141,6 +141,8 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
 
         // Generate the CKOperation Web Service URL
         let request = CKModifyRecordsURLRequest(recordsToSave: recordsToSave, recordIDsToDelete: recordIDsToDelete, isAtomic: isAtomic, database: database!, savePolicy: savePolicy, zoneID: zoneID)
+        request.accountInfoProvider = CloudKit.shared.defaultAccount
+
         request.completionBlock = { (result) in
             // Check if cancelled
             if self.isCancelled {

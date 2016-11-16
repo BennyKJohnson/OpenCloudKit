@@ -24,6 +24,9 @@ public class CloudKit {
     
     public static let shared = CloudKit()
     
+    // Temporary property to allow for debugging via console
+    public var verbose: Bool = false
+    
     private init() {}
     
     public func configure(with configuration: CKConfig) {
@@ -46,6 +49,12 @@ public class CloudKit {
         return containers.filter({ (config) -> Bool in
             return config.containerIdentifier == container.containerIdentifier
         }).first
+    }
+    
+    static func debugPrint(_ items: Any...) {
+        if shared.verbose {
+            print(items)
+        }
     }
 }
 
