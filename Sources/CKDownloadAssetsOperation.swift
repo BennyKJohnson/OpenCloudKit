@@ -107,7 +107,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let downloadTask = task as! URLSessionDownloadTask
         
-        print(task.currentRequest?.url?.absoluteString)
+        print(task.currentRequest?.url?.absoluteString as Any)
         guard let currentAsset = assetsByDownloadTask[downloadTask] else {
             fatalError("Asset should belong to completed download task")
         }

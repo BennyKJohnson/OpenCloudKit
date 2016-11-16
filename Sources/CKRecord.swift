@@ -50,6 +50,8 @@ public class CKRecord: NSObject {
     
     private var changedKeysSet = NSMutableSet()
     
+    public var parent: CKReference?
+    
     public convenience init(recordType: String) {
         let UUID = NSUUID().uuidString
         self.init(recordType: recordType, recordID: CKRecordID(recordName: UUID))
@@ -115,6 +117,60 @@ public class CKRecord: NSObject {
     public override var debugDescription: String {
         return"<\(type(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
     }
+    
+    init?(recordDictionary: [String: AnyObject]) {
+        
+        guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
+            let recordType = recordDictionary[CKRecordDictionary.recordType] as? String
+            else {
+                return nil
+        }
+        
+        // Parse ZoneID Dictionary into CKRecordZoneID
+        let zoneID: CKRecordZoneID
+        if let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject] {
+            zoneID = CKRecordZoneID(dictionary: zoneIDDictionary)!
+        } else {
+            zoneID = CKRecordZoneID(zoneName: CKRecordZoneDefaultName, ownerName: "_defaultOwner")
+        }
+        
+        let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
+        // self.init(recordType: recordType, recordID: recordID)
+        self.recordType = recordType
+        self.recordID = recordID
+        
+        // Parse Record Change Tag
+        if let changeTag = recordDictionary[CKRecordDictionary.recordChangeTag] as? String {
+            recordChangeTag = changeTag
+        }
+        
+        // Parse Created Dictionary
+        if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: AnyObject], let created = CKRecordLog(dictionary: createdDictionary) {
+            self.creatorUserRecordID = CKRecordID(recordName: created.userRecordName)
+            self.creationDate = NSDate(timeIntervalSince1970: created.timestamp)
+        }
+        
+        // Parse Modified Dictionary
+        if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: AnyObject], let modified = CKRecordLog(dictionary: modifiedDictionary) {
+            self.lastModifiedUserRecordID = CKRecordID(recordName: modified.userRecordName)
+            self.modificationDate = NSDate(timeIntervalSince1970: modified.timestamp)
+        }
+        
+        // Enumerate Fields
+        if let fields = recordDictionary[CKRecordDictionary.fields] as? [String: [String: AnyObject]] {
+            for (key, fieldValue) in fields  {
+                let value = CKRecord.getValue(forRecordField: fieldValue)
+                values[key] = value
+            }
+        }
+        
+        if let parentReferenceDictionary = recordDictionary["parent"] as? [String: AnyObject], let recordName = parentReferenceDictionary["parent"] as? String {
+            
+            let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
+            let reference = CKReference(recordID: recordID, action: .none)
+            parent = reference
+        }
+    }
 }
 
 struct CKRecordDictionary {
@@ -178,12 +234,16 @@ extension CKRecord {
             fieldsDictionary[key] = value.recordFieldDictionary.bridge() as NSDictionary
         }
         
-        
-        let recordDictionary: [String: AnyObject] = [
+        var recordDictionary: [String: AnyObject] = [
         "fields": fieldsDictionary.bridge() as NSDictionary,
         "recordType": recordType.bridge(),
         "recordName": recordID.recordName.bridge()
         ]
+        
+        if let parent = parent {
+            recordDictionary["createShortGUID"] = NSNumber(value: 1)
+            recordDictionary["parent"] = ["recordName": parent.recordID.recordName.bridge()].bridge()
+        }
         
         return recordDictionary
     }
@@ -278,50 +338,7 @@ extension CKRecord {
         #endif
     }
     
-    convenience init?(recordDictionary: [String: AnyObject]) {
-        
-        guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
-            let recordType = recordDictionary[CKRecordDictionary.recordType] as? String
-        else {
-                return nil
-        }
-        
-        // Parse ZoneID Dictionary into CKRecordZoneID
-        let zoneID: CKRecordZoneID
-        if let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject] {
-            zoneID = CKRecordZoneID(dictionary: zoneIDDictionary)!
-        } else {
-            zoneID = CKRecordZoneID(zoneName: CKRecordZoneDefaultName, ownerName: "_defaultOwner")
-        }
 
-        let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
-        self.init(recordType: recordType, recordID: recordID)
-        
-        // Parse Record Change Tag
-        if let changeTag = recordDictionary[CKRecordDictionary.recordChangeTag] as? String {
-            recordChangeTag = changeTag
-        }
-        
-        // Parse Created Dictionary
-        if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: AnyObject], let created = CKRecordLog(dictionary: createdDictionary) {
-            self.creatorUserRecordID = CKRecordID(recordName: created.userRecordName)
-            self.creationDate = NSDate(timeIntervalSince1970: created.timestamp)
-        }
-        
-        // Parse Modified Dictionary
-        if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: AnyObject], let modified = CKRecordLog(dictionary: modifiedDictionary) {
-            self.lastModifiedUserRecordID = CKRecordID(recordName: modified.userRecordName)
-            self.modificationDate = NSDate(timeIntervalSince1970: modified.timestamp)
-        }
-        
-        // Enumerate Fields
-        if let fields = recordDictionary[CKRecordDictionary.fields] as? [String: [String: AnyObject]] {
-            for (key, fieldValue) in fields  {
-                let value = CKRecord.getValue(forRecordField: fieldValue)
-                values[key] = value
-            }
-        }
-    }
     
 }
 

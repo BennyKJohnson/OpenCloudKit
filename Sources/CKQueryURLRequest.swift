@@ -49,7 +49,10 @@ class CKQueryURLRequest: CKURLRequest {
             parameters["zoneID"] = zoneID.dictionary.bridge()
         }
         
-        parameters["zoneWide"] = NSNumber(value: isZoneWide)
+        if database.scope != .shared {
+            parameters["zoneWide"] = NSNumber(value: isZoneWide)
+        }
+        
         parameters["query"] = query.dictionary.bridge() as NSDictionary
         
         if let cursor = cursor {

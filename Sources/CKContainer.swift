@@ -30,18 +30,25 @@ public class CKContainer {
         return CKDatabase(container: self, scope: .private)
     }()
     
+    public lazy var sharedCloudDatabase: CKDatabase = {
+        return CKDatabase(container: self, scope: .shared)
+    }()
+    
     var isRegisteredForNotifications: Bool {
         return false
     }
     
-    func registerForNotifications() {
+    func registerForNotifications() {}
+    
+    func accountStatus(completionHandler: @escaping (CKAccountStatus, Error?) -> Void) {
         
+        guard let _ = CloudKit.shared.defaultAccount.iCloudAuthToken else {
+            completionHandler(.noAccount, nil)
+            return
+        }
         
-        
-        
-        
-        
-        
-        
+        // Verify the account is valid
+        completionHandler(.available, nil)
     }
+
 }

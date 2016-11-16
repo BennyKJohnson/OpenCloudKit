@@ -61,26 +61,26 @@ struct CKRecordFetchErrorDictionary {
     static let uuidKey = "uuid"
     static let redirectURLKey = "redirectURL"
     
-    let recordName: String
+    let recordName: String?
     let reason: String
     let serverErrorCode: String
     let retryAfter: NSNumber?
-    let uuid: String
+    let uuid: String?
     let redirectURL: String?
     
     init?(dictionary: [String: Any]) {
         
-        guard let recordName = dictionary[CKRecordFetchErrorDictionary.recordNameKey] as? String,
-        let reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
-        let serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String,
-        let uuid = dictionary[CKRecordFetchErrorDictionary.uuidKey] as? String else {
+        guard  let reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
+        let serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String  else {
                 return nil
         }
         
-        self.recordName = recordName
+        self.recordName = dictionary[CKRecordFetchErrorDictionary.recordNameKey] as? String
         self.reason = reason
         self.serverErrorCode = serverErrorCode
-        self.uuid = uuid
+        
+        self.uuid = dictionary[CKRecordFetchErrorDictionary.uuidKey] as? String
+        
         
         self.retryAfter = (dictionary[CKRecordFetchErrorDictionary.retryAfterKey] as? NSNumber)
         self.redirectURL = dictionary[CKRecordFetchErrorDictionary.redirectURLKey] as? String
@@ -113,6 +113,8 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
      This only applies to zones that support CKRecordZoneCapabilityAtomic. */
     public var isAtomic: Bool = false
     
+    public var zoneID: CKRecordZoneID?
+    
     /* Called repeatedly during transfer.
      It is possible for progress to regress when a retry is automatically triggered.
      */
@@ -132,85 +134,72 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
      */
     public var modifyRecordsCompletionBlock: (([CKRecord]?, [CKRecordID]?, Error?) -> Swift.Void)?
 
-    func operationsDictionary() -> [[String: AnyObject]] {
-        var operationsDictionaryArray: [[String: AnyObject]] = []
-        
-        if let recordIDsToDelete = recordIDsToDelete {
-           let deleteOperations = recordIDsToDelete.map({ (recordID) -> [String: AnyObject] in
-                let operationDictionary: [String: AnyObject] = [
-                    "operationType": "forceDelete".bridge(),
-                    "record":(["recordName":recordID.recordName.bridge()] as [String: AnyObject]).bridge() as AnyObject
-                ]
-                
-                return operationDictionary
-            })
-            
-            operationsDictionaryArray.append(contentsOf: deleteOperations)
-        }
-        if let recordsToSave = recordsToSave {
-            let saveOperations = recordsToSave.map({ (record) -> [String: AnyObject] in
-             
-                let operationType: String
-                let fieldsDictionary: [String: AnyObject]
-                
-                var recordDictionary: [String: AnyObject] = ["recordType": record.recordType.bridge(), "recordName": record.recordID.recordName.bridge()]
-                if let recordChangeTag = record.recordChangeTag {
-                    
-                    if savePolicy == .IfServerRecordUnchanged {
-                        operationType = "update"
-                    } else {
-                        operationType = "forceUpdate"
-                    }
-                    
-                    // Set Operation Type to Replace
-                    if savePolicy == .AllKeys {
-                        fieldsDictionary = record.fieldsDictionary(forKeys: record.allKeys())
-                    } else {
-                        fieldsDictionary = record.fieldsDictionary(forKeys: record.changedKeys())
-                    }
-                  
-                    recordDictionary["recordChangeTag"] = recordChangeTag.bridge()
-                    
-                } else {
-                    // Create new record
-                    fieldsDictionary = record.fieldsDictionary(forKeys: record.allKeys())
-                    operationType = "create"
-                }
-                
-        
-                recordDictionary["fields"] = fieldsDictionary.bridge() as NSDictionary
-               
-                let operationDictionary: [String: AnyObject] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge() as NSDictionary]
-                return operationDictionary
-            })
-            
-            operationsDictionaryArray.append(contentsOf: saveOperations)
-        }
-    
-        return operationsDictionaryArray
-    }
-    
+
     
     
     override func performCKOperation() {
 
         // Generate the CKOperation Web Service URL
-        let url = "\(operationURL)/records/\(CKRecordOperation.modify)"
-        
-        var request: [String: AnyObject] = [:]
-      
-        if database?.scope == .public {
-            request["atomic"] = NSNumber(value: false)
-        } else {
-            request["atomic"] = NSNumber(value: isAtomic)
+        let request = CKModifyRecordsURLRequest(recordsToSave: recordsToSave, recordIDsToDelete: recordIDsToDelete, isAtomic: isAtomic, database: database!, savePolicy: savePolicy, zoneID: zoneID)
+        request.completionBlock = { (result) in
+            // Check if cancelled
+            if self.isCancelled {
+                // Send Cancelled Error to CompletionBlock
+                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
+                self.modifyRecordsCompletionBlock?(nil, nil, cancelError)
+            }
+            switch result {
+            case .error(let error):
+                self.modifyRecordsCompletionBlock?(nil, nil, error.error)
+            case .success(let dictionary):
+                
+                // Process Records
+                if let recordsDictionary = dictionary["records"] as? [[String: AnyObject]] {
+                    // Parse JSON into CKRecords
+                    for recordDictionary in recordsDictionary {
+                        
+                        
+                        if let record = CKRecord(recordDictionary: recordDictionary) {
+                            // Append Record
+                            self.recordsByRecordIDs[record.recordID] = record
+                            
+                            // Call RecordCallback
+                            self.perRecordCompletionBlock?(record, nil)
+                            
+                        } else if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: recordDictionary) {
+                            
+                            // Create Error
+                            let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: recordFetchError.reason])
+                            self.perRecordCompletionBlock?(nil, error)
+                        } else {
+                            
+                            if let _ = recordDictionary["recordName"],
+                                let _ = recordDictionary["deleted"] {
+                                
+                            } else {
+                                fatalError("Couldn't resolve record or record fetch error dictionary")
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Call the final completionBlock
+            let recordIDs = Array(self.recordsByRecordIDs.keys)
+            let records = Array(self.recordsByRecordIDs.values)
+            self.modifyRecordsCompletionBlock?(records, recordIDs, nil)
+            
+            // Mark operation as complete
+            self.finish(error: [])
+            
         }
         
-        #if os(Linux)
-            request["operations"] = operationsDictionary().bridge()
-        #else
-            request["operations"] = operationsDictionary() as NSArray
-        #endif
-                
+        request.performRequest()
+
+        
+        
+        /*
+        
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             // Check if cancelled
@@ -264,7 +253,9 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
             self.finish(error: [])
             
         }
+ 
     }
-    
+    */
 
+    }
 }

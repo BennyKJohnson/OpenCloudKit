@@ -33,6 +33,12 @@ public struct CKShortGUID {
         return dict
     }
     
+    public init(value: String, shouldFetchRootRecord: Bool, rootRecordDesiredKeys: [String]? = nil) {
+        self.value = value
+        self.shouldFetchRootRecord = shouldFetchRootRecord
+        self.rootRecordDesiredKeys = rootRecordDesiredKeys
+    }
+    
 }
 
 open class CKShareMetadata  {
@@ -64,6 +70,11 @@ open class CKShareMetadata  {
     open var rootRecord: CKRecord?
     
     init?(dictionary:[String: AnyObject]) {
+        /*
+        if let dictionary = CKFetchErrorDictionary(dictionary: dictionary) {
+            return nil
+        }
+        */
         
         containerIdentifier = dictionary["containerIdentifier"] as! String
         
@@ -73,16 +84,28 @@ open class CKShareMetadata  {
         
         rootRecordID = CKRecordID(recordName: rootRecordName, zoneID: zoneID)
         
+        // Set participant type
         let rawParticipantType = dictionary["participantType"] as! String
         participantType = CKShareParticipantType(string: rawParticipantType)!
         
+        // Set participant permission 
+        if let rawParticipantPermission = dictionary["participantPermission"] as? String, let permission = CKShareParticipantPermission(string: rawParticipantPermission) {
+            participantPermission = permission
+        }
         
-        let rawDatabaseScope = dictionary["databaseScope"] as! String
+        // Set status
+        if let rawParticipantStatus = dictionary["participantStatus"] as? String, let status = CKShareParticipantAcceptanceStatus(string: rawParticipantStatus) {
+            participantStatus = status
+        }
         
+        if let ownerIdentityDictionary = dictionary["ownerIdentity"] as? [String: AnyObject] {
+            ownerIdentity = CKUserIdentity(dictionary: ownerIdentityDictionary)
+        }
+        
+        // Set root record if available
         if let rootRecordDictionary = dictionary["rootRecord"] as? [String: AnyObject] {
             rootRecord = CKRecord(recordDictionary: rootRecordDictionary)
-        } 
-        
+        }
         
     }
 }

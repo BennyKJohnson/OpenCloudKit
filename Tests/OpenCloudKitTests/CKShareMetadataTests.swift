@@ -63,7 +63,7 @@ class CKShareMetadataTests: XCTestCase {
         
         acceptShareOperation.acceptSharesCompletionBlock = {
             (error) in
-            print(error)
+            print(error as Any)
             exp.fulfill()
         }
         

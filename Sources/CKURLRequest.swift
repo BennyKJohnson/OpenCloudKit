@@ -77,7 +77,7 @@ class CKURLRequest: NSObject {
                 
                 let dataString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
             
-                print(dataString)
+                print(dataString as Any)
                
                 if let serverAccount = accountInfoProvider as? CKServerAccount {
                     // Sign Request 

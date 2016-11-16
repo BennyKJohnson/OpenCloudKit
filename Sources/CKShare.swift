@@ -8,10 +8,11 @@
 
 import Foundation
 
-let CKShareRecordType = "cloudkit.share"
+public let CKShareRecordType = "cloudkit.share"
 
 public class CKShare : CKRecord {
     
+    let shortGUID: String?
     
     /* When saving a newly created CKShare, you must save the share and its rootRecord in the same CKModifyRecordsOperation batch. */
     public convenience init(rootRecord: CKRecord) {
@@ -19,7 +20,32 @@ public class CKShare : CKRecord {
     }
     
     public init(rootRecord: CKRecord, share shareID: CKRecordID) {
+        shortGUID = nil
+
        super.init(recordType: CKShareRecordType, recordID: shareID)
+        
+    }
+    
+    public init?(dictionary: [String: AnyObject]) {
+        
+        shortGUID = dictionary["shortGUID"] as? String
+        
+        super.init(recordDictionary: dictionary)
+        
+        if let rawPublicPermission = dictionary["publicPermission"] as? String, let permission = CKShareParticipantPermission(string: rawPublicPermission) {
+            publicPermission = permission
+            
+            
+        }
+        
+        if let rawPerticipants = dictionary["participants"] as? [[String: AnyObject]] {
+            for rawParticipant in rawPerticipants {
+                if let participant = CKShareParticipant(dictionary: rawParticipant) {
+                    participants.append(participant)
+                }
+            }
+        }
+        
     }
 
     
@@ -35,7 +61,15 @@ public class CKShare : CKRecord {
     
     /* A URL that can be used to invite participants to this share. Only available after share record has been saved to the server.  This url is stable, and is tied to the rootRecord.  That is, if you share a rootRecord, delete the share, and re-share the same rootRecord via a newly created share, that newly created share's url will be identical to the prior share's url */
     public var url: URL? {
-        return nil
+        if let shortGUID = shortGUID {
+            
+            let CKShareBaseURL = URL(string: "https://www.icloud.com/share/")!
+            return CKShareBaseURL.appendingPathComponent("\(shortGUID)#\(recordID.zoneID.zoneName)")
+            
+        } else {
+            return nil
+        }
+      
     }
     
     
@@ -46,8 +80,9 @@ public class CKShare : CKRecord {
     
     /* Convenience methods for fetching special users from the participant array */
     public var owner: CKShareParticipant {
-        fatalError()
-       // return CKShareParticipant(userIdentity: CKUserIdentity(userRecordID: <#T##CKRecordID#>))
+        return participants.first { (participant) -> Bool in
+            return participant.type == .owner
+        }!
     }
     
     public var currentUserParticipant: CKShareParticipant? {
@@ -62,6 +97,19 @@ public class CKShare : CKRecord {
      */
     public func addParticipant(_ participant: CKShareParticipant) {
         
+        let existing = participants.first { (current) -> Bool in
+            return current.userIdentity == participant.userIdentity
+        }
+        
+        if let existing = existing {
+            // Update info
+            existing.acceptanceStatus = participant.acceptanceStatus
+            existing.permission = participant.permission
+            existing.type = participant.type
+            existing.userIdentity = participant.userIdentity
+        } else if publicPermission == .none {
+            participants.append(participant)
+        }
     }
     
     public func removeParticipant(_ participant: CKShareParticipant) {

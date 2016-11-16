@@ -24,7 +24,7 @@ public class CKRecordID: NSObject  {
     
     public let recordName: String
     
-    public let zoneID: CKRecordZoneID
+    public var zoneID: CKRecordZoneID
     
 }
 

@@ -1,0 +1,127 @@
+{
+      "shortGUID": {
+            "value": "0NEa3AEPXwK71VM4gHFnvh2kw",
+            "shouldFetchRootRecord": true
+      },
+      "containerIdentifier": "iCloud.au.com.benjaminjohnson.test",
+      "environment": "development",
+      "databaseScope": "PRIVATE",
+      "zoneID": {
+            "zoneName": "Central",
+            "ownerRecordName": "_8e1c7debce61157051ce0aef01e83c7d"
+      },
+      "share": {
+            "recordName": "Share-C1FBF52C-DAFE-45C4-BF3F-581532F70FCA",
+            "recordType": "cloudkit.share",
+            "fields": {
+                  "cloudkit.title": {
+                        "value": "Centre",
+                        "type": "STRING"
+                  }
+            },
+            "recordChangeTag": "e",
+            "created": {
+                  "timestamp": 1476619372869,
+                  "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                  "deviceID": "1"
+            },
+            "modified": {
+                  "timestamp": 1476619374676,
+                  "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                  "deviceID": "iPad"
+            },
+            "publicPermission": "READ_WRITE",
+            "participants": [
+                  {
+                        "userIdentity": {
+                              "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                              "nameComponents": {
+                                    "givenName": "Benjamin",
+                                    "familyName": "Johnson"
+                              },
+                              "lookupInfo": {
+                                    "emailAddress": "benjamin@gmail.com"
+                              }
+                        },
+                        "type": "OWNER",
+                        "acceptanceStatus": "ACCEPTED",
+                        "permission": "READ_WRITE"
+                  }
+            ],
+            "owner": {
+                  "userIdentity": {
+                        "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                        "nameComponents": {
+                              "givenName": "Benjamin",
+                              "familyName": "Johnson"
+                        },
+                        "lookupInfo": {
+                              "emailAddress": "benjamin@gmail.com"
+                        }
+                  },
+                  "type": "OWNER",
+                  "acceptanceStatus": "ACCEPTED",
+                  "permission": "READ_WRITE"
+            },
+            "currentUserParticipant": {
+                  "userIdentity": {
+                        "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                        "nameComponents": {
+                              "givenName": "Benjamin",
+                              "familyName": "Johnson"
+                        },
+                        "lookupInfo": {
+                              "emailAddress": "benjamin@gmail.com"
+                        }
+                  },
+                  "type": "OWNER",
+                  "acceptanceStatus": "ACCEPTED",
+                  "permission": "READ_WRITE"
+            },
+            "shortGUID": "0NEa3AEPXwK71VM4gHFnvh2kw"
+      },
+      "rootRecordName": "D06A308D-DEE2-4654-9621-76072CEB150E",
+      "rootRecord": {
+            "recordName": "D06A308D-DEE2-4654-9621-76072CEB150E",
+            "recordType": "Centre",
+            "fields": {
+                  "name": {
+                        "value": "My centre",
+                        "type": "STRING"
+                  },
+                  "pageToken": {
+                        "value": "My token",
+                        "type": "STRING"
+                  }
+            },
+            "recordChangeTag": "d",
+            "created": {
+                  "timestamp": 1476619372877,
+                  "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                  "deviceID": "1"
+            },
+            "modified": {
+                  "timestamp": 1476619372877,
+                  "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+                  "deviceID": "iPad"
+            },
+            "share": {
+                  "recordName": "Share-C1FBF52C-DAFE-45C4-BF3F-581532F70FCA"
+            },
+            "shortGUID": "0NEa3AEPXwK71VM4gHFnvh2kw"
+      },
+      "participantType": "OWNER",
+      "participantStatus": "ACCEPTED",
+      "participantPermission": "READ_WRITE",
+      "ownerIdentity": {
+            "userRecordName": "_8e1c7debce61157051ce0aef01e83c7d",
+            "nameComponents": {
+                  "givenName": "Benjamin",
+                  "familyName": "Johnson"
+            },
+            "lookupInfo": {
+                  "emailAddress": "benjaminkylejohnson@gmail.com"
+            }
+      },
+      "potentialMatchList": []
+}
