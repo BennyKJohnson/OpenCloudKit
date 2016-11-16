@@ -233,8 +233,8 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                             self.perRecordCompletionBlock?(nil, error)
                         } else {
                             
-                            if let recordName = recordDictionary["recordName"],
-                            let result = recordDictionary["deleted"] {
+                            if let _ = recordDictionary["recordName"],
+                            let _ = recordDictionary["deleted"] {
                                 
                             } else {
                                 fatalError("Couldn't resolve record or record fetch error dictionary")

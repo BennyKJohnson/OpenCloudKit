@@ -1,5 +1,5 @@
 # OpenCloudKit
-An open source framework for CloudKit written in Swift and inspired by Apple's CloudKit framework. 
+An open source framework for CloudKit written in Swift and inspired by Apple's CloudKit framework.
 OpenCloudKit is backed by CloudKit Web Services and is designed to allow easy CloudKit integration into Swift Servers whilst being familiar for developers who have experience with CloudKit on Apple's platforms.
 
 ## Features
@@ -11,25 +11,10 @@ OpenCloudKit is backed by CloudKit Web Services and is designed to allow easy Cl
 
 # Installation
 
-## Installing Dependencies 
-OpenSSL is the only dependency required by OpenCloudKit, it is required to perform the signature generation for Server-to-Server support. 
-
-### macOS
-Install `openssl` with `Homebrew`
-```sh
-brew install openssl
-brew link openssl --force # OpenSSL headers & dylib are not symlinked to /usr/local by default
-```
-
-### Linux
-Install `libssl-dev` using `apt-get`
-```sh
-apt-get install libssl-dev
-```
 ## Swift Package Manager
 Add the following to dependencies in your `Package.swift`.
 ```swift
-.Package(url: "https://github.com/BennyKJohnson/OpenCloudKit.git", majorVersion: 0, minor: 1)
+.Package(url: "https://github.com/BennyKJohnson/OpenCloudKit.git", majorVersion: 0, minor: 5)
 ```
 Or create the 'Package.swift' file for your project and add the following:
 ```swift
@@ -37,7 +22,7 @@ import PackageDescription
 
 let package = Package(
 	dependencies: [
-		.Package(url: "https://github.com/BennyKJohnson/OpenCloudKit.git", majorVersion: 0, minor: 1),
+		.Package(url: "https://github.com/BennyKJohnson/OpenCloudKit.git", majorVersion: 0, minor: 5),
 	]
 )
 ```
@@ -48,13 +33,26 @@ Configuring OpenCloudKit is similar to configuring CloudKitJS. Use the `CloudKit
 ### JSON configuration file
 You can store CloudKit configuration in a JSON file
 ```javascript
+// API Token Config
 {
-    containers: [{
-        containerIdentifier: '[insert your container ID here]',
-        apiTokenAuth: {
-            apiToken: '[insert your API token and other authentication properties here]'
-        }
-        environment: 'development'
+    "containers": [{
+        "containerIdentifier": "[insert your container ID here]",
+        "apiTokenAuth": {
+            "apiToken": "[insert your API token and other authentication properties here]"
+      },
+        "environment": "development"
+    }]
+}
+
+// Server-to-Server Config
+{
+    "containers": [{
+        "containerIdentifier": "[Container ID]",
+        "serverToServerKeyAuth": {
+            "keyID": "[Key ID]",
+            "privateKeyFile":"eckey.pem"
+      },
+        "environment": "development"
     }]
 }
 ```
@@ -74,7 +72,7 @@ CloudKit.shared.configure(with: config)
 ## Working with OpenCloudKit
 Get the database in your app’s default container
 ```swift
-let container = CKContainer.defaultContainer()
+let container = CKContainer.default()
 let database = container.publicCloudDatabase
 ```
 
@@ -82,14 +80,14 @@ let database = container.publicCloudDatabase
 ```swift
 let movieRecord = CKRecord(recordType: "Movie")
 movieRecord["title"] = "Finding Dory"
-movieRecord["directors"] = ["Andrew Stanton", "Angus MacLane"]
+movieRecord["directors"] = NSArray(array: ["Andrew Stanton", "Angus MacLane"])
 ```
 ### Saving a record
 ```swift
 database.save(record: movieRecord) { (movieRecord, error) in
     if let savedRecord = movieRecord {
         // Insert Successfully saved record code
-        
+
     } else if let error = error {
         // Insert error handling
     }

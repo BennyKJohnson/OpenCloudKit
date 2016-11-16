@@ -54,7 +54,7 @@ public struct CKConfig {
             let jsonData = try NSData(contentsOfFile: path, options: [])
             
             if let dictionary = try JSONSerialization.jsonObject(with: jsonData.bridge(), options: []) as? [String: AnyObject] {
-                self.init(dictionary: dictionary, workingDirectory: directory.absoluteString)!
+                self.init(dictionary: dictionary, workingDirectory: directory.path)!
             } else {
                 throw CKConfigError.InvalidJSON
             }
@@ -94,7 +94,7 @@ public struct CKContainerConfig {
         self.serverToServerKeyAuth = serverToServerKeyAuth
     }
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         guard let containerIdentifier = dictionary["containerIdentifier"] as? String, let environmentValue = dictionary["environment"] as? String,
             let environment = CKEnvironment(rawValue: environmentValue)  else {
             return nil

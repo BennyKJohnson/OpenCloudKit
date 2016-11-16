@@ -6,18 +6,57 @@
 //
 //
 
-protocol Bridgable {}
-
-extension String: Bridgable {}
-extension Int: Bridgable {}
-extension Float: Bridgable {}
-extension Double: Bridgable {}
-
 import Foundation
 
-public extension String {
+public protocol _OCKBridgable {
+    associatedtype ObjectType
+    func bridge() -> ObjectType
+}
+
+public protocol CKNumberValueType: CKRecordValue {}
+ extension CKNumberValueType where Self: _OCKBridgable, Self.ObjectType == NSNumber {
+    public var recordFieldDictionary: [String: AnyObject] {
+        return ["value": self.bridge()]
+    }
+}
+
+extension String: _OCKBridgable {
+    public typealias ObjectType = NSString
+    
     public func bridge() -> NSString {
         return NSString(string: self)
+    }
+}
+
+extension Int: _OCKBridgable {
+    public typealias ObjectType = NSNumber
+    
+    public func bridge() -> NSNumber {
+        return NSNumber(value: self)
+    }
+}
+
+extension UInt: _OCKBridgable {
+    public typealias ObjectType = NSNumber
+    
+    public func bridge() -> NSNumber {
+        return NSNumber(value: self)
+    }
+}
+
+extension Float: _OCKBridgable {
+    public typealias ObjectType = NSNumber
+    
+    public func bridge() -> NSNumber {
+        return NSNumber(value: self)
+    }
+}
+
+extension Double: _OCKBridgable {
+    public typealias ObjectType = NSNumber
+    
+    public func bridge() -> NSNumber {
+        return NSNumber(value: self)
     }
 }
 

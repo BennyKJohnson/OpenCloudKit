@@ -21,13 +21,13 @@ extension Bool {
 
 public struct CKShortGUID {
     
-   public let value: String
+    public let value: String
     
-   public let shouldFetchRootRecord: Bool
+    public let shouldFetchRootRecord: Bool
     
-  public  let rootRecordDesiredKeys: [String]?
+    public  let rootRecordDesiredKeys: [String]?
     
-   public var dictionary: [String: AnyObject] {
+    public var dictionary: [String: AnyObject] {
         let dict:[String: AnyObject] = ["value": value as NSString,
                                         "shouldFetchRootRecord": shouldFetchRootRecord.number]
         return dict
@@ -93,10 +93,12 @@ open class CKShareMetadata  {
             participantPermission = permission
         }
         
+
         // Set status
         if let rawParticipantStatus = dictionary["participantStatus"] as? String, let status = CKShareParticipantAcceptanceStatus(string: rawParticipantStatus) {
             participantStatus = status
         }
+
         
         if let ownerIdentityDictionary = dictionary["ownerIdentity"] as? [String: AnyObject] {
             ownerIdentity = CKUserIdentity(dictionary: ownerIdentityDictionary)

@@ -70,8 +70,6 @@ class CKURLRequest: NSObject {
                 
                 let jsonData: Data = try! JSONSerialization.data(withJSONObject: properties, options: [])
                 urlRequest.httpBody = jsonData
-                
-                
                 urlRequest.httpMethod = "POST"
                 urlRequest.addValue(requestContentType, forHTTPHeaderField: "Content-Type")
                 
@@ -104,53 +102,35 @@ class CKURLRequest: NSObject {
         return configuration
     }
     
-    func encodeAuthToken(token: String) -> String {
-        let formattedToken = token.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!.replacingOccurrences(of: "+", with: "%2B").replacingOccurrences(of: "/", with: "%2F").replacingOccurrences(of: "=", with: "%3D")
-        return formattedToken
-    }
-    
     var url: URL {
         get {
             let accountInfo = accountInfoProvider ?? CloudKit.shared.defaultAccount!
-            let databaseURL: URL = accountInfo.containerInfo.databaseURL(for: databaseScope)
+        
+            let baseURL =  accountInfo.containerInfo.publicCloudDBURL.appendingPathComponent("\(operationType)/\(path)")
             
-            let baseURL =  databaseURL.appendingPathComponent("\(operationType)/\(path)")
             var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
             switch accountInfo.accountType {
             case .server:
-                  return urlComponents.url!
+                break
             case .anoymous, .primary:
                 urlComponents.queryItems = []
-                if let cloudKitAuth = accountInfo.cloudKitAuthToken {
-                    var query = "?ckAPIToken=\(cloudKitAuth.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
+                // if let accountInfo = accountInfoProvider {
+                
+                let apiTokenItem = URLQueryItem(name: "ckAPIToken", value: accountInfo.cloudKitAuthToken)
+                urlComponents.queryItems?.append(apiTokenItem)
+                
+                if let icloudAuthToken = accountInfo.iCloudAuthToken {
                     
+                    let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: icloudAuthToken)
+                    urlComponents.queryItems?.append(webAuthTokenQueryItem)
                     
-                    // if let accountInfo = accountInfoProvider {
-                    
-                    let apiTokenItem = URLQueryItem(name: "ckAPIToken", value: accountInfo.cloudKitAuthToken)
-                    urlComponents.queryItems?.append(apiTokenItem)
-                    
-                    if let icloudAuthToken = accountInfo.iCloudAuthToken {
-                        print("Original token: \(icloudAuthToken)")
-                        
-                        query += "&ckWebAuthToken=\(encodeAuthToken(token: icloudAuthToken))"
-                        let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: icloudAuthToken)
-                        urlComponents.queryItems?.append(webAuthTokenQueryItem)
-                        
-                    }
-                    let urlString = baseURL.absoluteString + query
-                    print(urlString)
-                    
-                    let url = URL(string: urlString)!
-                    return url
-                } else {
-                    return urlComponents.url!
-
                 }
-               
+
+                
             }
                      //}
-          
+            print(urlComponents.url!)
+            return urlComponents.url!
         }
     }
     
@@ -189,6 +169,8 @@ extension CKURLRequest: URLSessionDataDelegate {
         do {
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
             print(jsonObject)
+            
+            
             // Call completion block
             let result = CKURLRequestResult.success(jsonObject)
             completionBlock?(result)

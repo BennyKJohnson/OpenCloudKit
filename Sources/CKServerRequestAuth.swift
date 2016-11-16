@@ -51,11 +51,22 @@ struct CKServerRequestAuth {
             let digestContext =  try! MessageDigestContext(ecsda)
             
             try digestContext.update(data)
-            return try digestContext.sign(privateKeyURL: privateKeyPath)
+            
+               return try digestContext.sign(privateKeyURL: privateKeyPath)
+           
             
         } catch {
-            print(error)
-            return nil
+            if let messageError = error as? MessageDigestContextError {
+                switch messageError {
+                case .privateKeyNotFound:
+                    fatalError("Private Key at \(privateKeyPath) not found")
+                default:
+                    fatalError("Error occured while signing \(error)")
+                }
+            } else {
+                print(error)
+                return nil
+            }
         }
     }
     

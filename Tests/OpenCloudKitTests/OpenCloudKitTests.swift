@@ -18,10 +18,12 @@ class OpenCloudKitTests: XCTestCase {
         return "\(pathForTests())/Supporting/eckey.pub"
     }
     
+
+    
     func testSHA256() {
         let message = "test"
         let data = message.data(using: String.Encoding.utf8)!
-        let resultHash = data.sha256().base64EncodedString(options: [])
+        let resultHash = (data as Data).sha256().base64EncodedString(options: [])
         let testSHA256Hash = "n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg="
         XCTAssertEqual(resultHash, testSHA256Hash)
     }
@@ -48,7 +50,7 @@ class OpenCloudKitTests: XCTestCase {
         let requestBody =  requestBodyString.data(using: String.Encoding.utf8)!
         
         // Should Equal 0sdWcosXLRqAQp9TQ4LzZOTgiETnGpqlODfsnN9Cqr0=
-        let requestBodyHash = requestBody.sha256().base64EncodedString(options: [])
+        let requestBodyHash = (requestBody as Data).sha256().base64EncodedString(options: [])
         
         let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBody as NSData, urlSubpath: urlPath)
         

@@ -48,7 +48,7 @@ public class CKQueryOperation: CKDatabaseOperation {
     override func performCKOperation() {
         
        
-        let queryOperationURLRequest = CKQueryURLRequest(query: query!, cursor: cursor?.data.bridge(), limit: resultsLimit, requestedFields: desiredKeys, zoneID: zoneID, database: database!)
+        let queryOperationURLRequest = CKQueryURLRequest(query: query!, cursor: cursor?.data.bridge(), limit: resultsLimit, requestedFields: desiredKeys, zoneID: zoneID)
         queryOperationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         
         queryOperationURLRequest.completionBlock = { (result) in
