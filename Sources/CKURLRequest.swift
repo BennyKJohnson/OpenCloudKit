@@ -106,7 +106,7 @@ class CKURLRequest: NSObject {
         get {
             let accountInfo = accountInfoProvider ?? CloudKit.shared.defaultAccount!
         
-            let baseURL =  accountInfo.containerInfo.publicCloudDBURL.appendingPathComponent("\(operationType)/\(path)")
+            let baseURL =  accountInfo.containerInfo.publicCloudDBURL(databaseScope: databaseScope).appendingPathComponent("\(operationType)/\(path)")
             
             var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
             switch accountInfo.accountType {
@@ -128,7 +128,9 @@ class CKURLRequest: NSObject {
 
                 
             }
-                     //}
+            
+            // Perform Encoding
+            urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of:"+", with: "%2B")
             CloudKit.debugPrint(urlComponents.url!)
             return urlComponents.url!
         }
