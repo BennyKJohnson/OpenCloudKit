@@ -267,7 +267,6 @@ extension CKRecord {
     }
     
     static func getValue(forRecordField field: [String: Any]) -> CKRecordValue? {
-        #if !os(Linux)
         if  let value = field[CKRecordFieldDictionary.value],
             let type = field[CKRecordFieldDictionary.type] as? String {
         
@@ -279,6 +278,10 @@ extension CKRecord {
                 default:
                     return number
                 }
+            case let intValue as Int:
+                return NSNumber(value: intValue)
+            case let doubleValue as Int:
+                return NSNumber(value: doubleValue)
                 
             case let dictionary as [String: Any]:
                 switch type {
@@ -341,9 +344,6 @@ extension CKRecord {
         } else {
             return nil
         }
-        #else
-            return nil
-        #endif
     }
     
 
