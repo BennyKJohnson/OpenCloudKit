@@ -148,7 +148,7 @@ struct CKPredicate {
         }
     }
     
-    func value(forCastParameters parameters: [AnyObject]) -> CKRecordValue? {
+    func value(forCastParameters parameters: [Any]) -> CKRecordValue? {
         let type = parameters.last as! String
         switch type {
         case "NSDate":
@@ -182,7 +182,7 @@ struct CKPredicate {
 
 public struct CKPredicateFunction {
     let name: String
-    let parameters: [AnyObject]
+    let parameters: [Any]
 }
 
 

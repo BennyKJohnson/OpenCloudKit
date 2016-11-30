@@ -79,7 +79,7 @@ public class CKRecordZoneID: NSObject {
     public let ownerName: String
     
     
-    convenience public required init?(dictionary: [String: AnyObject]) {
+    convenience public required init?(dictionary: [String: Any]) {
         guard let zoneName = dictionary["zoneName"] as? String, let ownerName = dictionary["ownerRecordName"] as? String else {
             return nil
         }

@@ -26,7 +26,7 @@ public class CKShare : CKRecord {
         
     }
     
-    public init?(dictionary: [String: AnyObject]) {
+    public init?(dictionary: [String: Any]) {
         
         shortGUID = dictionary["shortGUID"] as? String
         
@@ -38,7 +38,7 @@ public class CKShare : CKRecord {
             
         }
         
-        if let rawPerticipants = dictionary["participants"] as? [[String: AnyObject]] {
+        if let rawPerticipants = dictionary["participants"] as? [[String: Any]] {
             for rawParticipant in rawPerticipants {
                 if let participant = CKShareParticipant(dictionary: rawParticipant) {
                     participants.append(participant)

@@ -157,7 +157,7 @@ extension CKQuerySubscription {
        
         var subscription: [String: Any] =  ["subscriptionID": subscriptionID.bridge(),
                 "subscriptionType": subscriptionType.description.bridge(),
-                "query": query.dictionary.bridge() as AnyObject,
+                "query": query.dictionary.bridge() as Any,
                 "firesOn": querySubscriptionOptions.firesOnArray.bridge()]
         if querySubscriptionOptions.contains(CKQuerySubscriptionOptions.firesOnce) {
             subscription["firesOnce"] = NSNumber(value: true)
@@ -197,7 +197,7 @@ extension CKRecordZoneSubscription {
         
         var subscription: [String: Any] =  ["subscriptionID": subscriptionID.bridge(),
                                                   "subscriptionType": subscriptionType.description.bridge(),
-                                                  "zoneID": zoneID.dictionary.bridge() as AnyObject
+                                                  "zoneID": zoneID.dictionary.bridge() as Any
                                                 ]
        
 

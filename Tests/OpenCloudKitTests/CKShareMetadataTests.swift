@@ -29,8 +29,8 @@ class CKShareMetadataTests: XCTestCase {
         return try! Data(contentsOf: jsonURL())
     }
     
-    func json() -> [String: AnyObject] {
-        return try! JSONSerialization.jsonObject(with: jsonData(), options: []) as! [String: AnyObject]
+    func json() -> [String: Any] {
+        return try! JSONSerialization.jsonObject(with: jsonData(), options: []) as! [String: Any]
     }
     
     override func setUp() {

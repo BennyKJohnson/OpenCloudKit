@@ -36,7 +36,7 @@ struct CKSubscriptionFetchErrorDictionary {
     
     let redirectURL: String?
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         guard
         let subscriptionID = dictionary[CKSubscriptionFetchErrorDictionary.subscriptionIDKey] as? String,
         let reason = dictionary[CKSubscriptionFetchErrorDictionary.reasonKey] as? String,
@@ -156,7 +156,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
             case .success(let dictionary):
                 
                 // Process Records
-                if let recordsDictionary = dictionary["records"] as? [[String: AnyObject]] {
+                if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for recordDictionary in recordsDictionary {
                         
@@ -216,7 +216,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                 
             } else if let dictionary = dictionary {
                 // Process Records
-                if let recordsDictionary = dictionary["records"] as? [[String: AnyObject]] {
+                if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for recordDictionary in recordsDictionary {
                         

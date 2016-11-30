@@ -12,7 +12,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
     
     var isFetchCurrentUserOperation = false
     
-    var recordErrors: [String: AnyObject] = [:]
+    var recordErrors: [String: Any] = [:]
     
     var shouldFetchAssetContent: Bool = false
     
@@ -43,8 +43,8 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         // Generate the CKOperation Web Service URL
         let url = "\(operationURL)/records/\(CKRecordOperation.lookup)"
         
-        var request: [String: AnyObject] = [:]
-        let lookupRecords = recordIDs?.map { (recordID) -> [String: AnyObject] in
+        var request: [String: Any] = [:]
+        let lookupRecords = recordIDs?.map { (recordID) -> [String: Any] in
             return ["recordName": recordID.recordName.bridge()]
         }
         
@@ -63,7 +63,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
                 self.fetchRecordsCompletionBlock?(nil, error)
             } else if let dictionary = dictionary {
                 // Process Records
-                if let recordsDictionary = dictionary["records"] as? [[String: AnyObject]] {
+                if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for (index,recordDictionary) in recordsDictionary.enumerated() {
                         

@@ -38,7 +38,7 @@ public class CKAcceptSharesOperation: CKOperation {
             case .success(let dictionary):
                 
                 // Process Records
-                if let resultsDictionary = dictionary["results"] as? [[String: AnyObject]] {
+                if let resultsDictionary = dictionary["results"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for resultDictionary in resultsDictionary {
                         if let shareMetadata = CKShareMetadata(dictionary: resultDictionary) {

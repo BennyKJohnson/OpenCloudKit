@@ -25,8 +25,8 @@ public struct CKConfig {
         self.containers = [container]
     }
     
-    init?(dictionary: [String: AnyObject], workingDirectory: String?) {
-        guard let containerDictionaries = dictionary["containers"] as? [[String: AnyObject]] else {
+    init?(dictionary: [String: Any], workingDirectory: String?) {
+        guard let containerDictionaries = dictionary["containers"] as? [[String: Any]] else {
             return nil
         }
         
@@ -53,7 +53,7 @@ public struct CKConfig {
             
             let jsonData = try NSData(contentsOfFile: path, options: [])
             
-            if let dictionary = try JSONSerialization.jsonObject(with: jsonData.bridge(), options: []) as? [String: AnyObject] {
+            if let dictionary = try JSONSerialization.jsonObject(with: jsonData.bridge(), options: []) as? [String: Any] {
                 self.init(dictionary: dictionary, workingDirectory: directory.path)!
             } else {
                 throw CKConfigError.InvalidJSON
@@ -102,7 +102,7 @@ public struct CKContainerConfig {
         
         let apnsEnvironment = CKEnvironment(rawValue: dictionary["apnsEnvironment"] as? String ?? "")
         
-        if let apiTokenAuthDictionary = dictionary["apiTokenAuth"] as? [String: AnyObject] {
+        if let apiTokenAuthDictionary = dictionary["apiTokenAuth"] as? [String: Any] {
             
             if let apiToken = apiTokenAuthDictionary["apiToken"] as? String {
                 self.init(containerIdentifier: containerIdentifier, environment: environment, apiTokenAuth: apiToken, apnsEnvironment: apnsEnvironment)
@@ -110,7 +110,7 @@ public struct CKContainerConfig {
                 return nil
             }
             
-        } else if let serverToServerKeyAuthDictionary = dictionary["serverToServerKeyAuth"] as? [String: AnyObject] {
+        } else if let serverToServerKeyAuthDictionary = dictionary["serverToServerKeyAuth"] as? [String: Any] {
             guard let keyID = serverToServerKeyAuthDictionary["keyID"] as? String, let privateKeyFile = serverToServerKeyAuthDictionary["privateKeyFile"] as? String else {
                 return nil
             }

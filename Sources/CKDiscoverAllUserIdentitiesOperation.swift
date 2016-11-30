@@ -47,7 +47,7 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
                 return
             } else if let dictionary = dictionary {
                 // Process Records
-                if let userDictionaries = dictionary["users"] as? [[String: AnyObject]] {
+                if let userDictionaries = dictionary["users"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for userDictionary in userDictionaries {
                         

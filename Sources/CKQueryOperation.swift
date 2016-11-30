@@ -73,7 +73,7 @@ public class CKQueryOperation: CKDatabaseOperation {
                 
                 
                 // Process Records
-                if let recordsDictionary = dictionary["records"] as? [[String: AnyObject]] {
+                if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for recordDictionary in recordsDictionary {
                         

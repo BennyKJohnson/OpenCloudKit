@@ -30,10 +30,10 @@ public class CKRecordID: NSObject  {
 
 extension CKRecordID {
     
-    convenience init?(recordDictionary: [String: AnyObject]) {
+    convenience init?(recordDictionary: [String: Any]) {
         
         guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
-            let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject]
+            let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: Any]
             else {
                 return nil
         }

@@ -128,11 +128,11 @@ class CKPredicateTests: XCTestCase {
     func testFilterDictionary() {
         let filter = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "jack")
         let filterDictionary = filter.dictionary
-        let expectedDictionary: [String: AnyObject] = ["comparator": "EQUALS".bridge(), "fieldName": "name".bridge(), "fieldValue": "jack".bridge()]
+        let expectedDictionary: [String: Any] = ["comparator": "EQUALS".bridge(), "fieldName": "name".bridge(), "fieldValue": "jack".bridge()]
         
         XCTAssertEqual(filterDictionary["comparator"] as! String, expectedDictionary["comparator"] as! String)
         XCTAssertEqual(filterDictionary["fieldName"] as! String, expectedDictionary["fieldName"] as! String)
-        let recordValueDictionary = filterDictionary["fieldValue"] as! [String: AnyObject]
+        let recordValueDictionary = filterDictionary["fieldValue"] as! [String: Any]
         
         XCTAssertEqual(recordValueDictionary["value"] as! String, "jack")
         XCTAssertEqual(recordValueDictionary["type"] as! String, "STRING")
@@ -142,7 +142,7 @@ class CKPredicateTests: XCTestCase {
         let filter = CKQueryFilter(fieldName: "year", comparator: .lessThan, fieldValue: 2010)
         let filterDictionary = filter.dictionary
 
-        let recordValueDictionary = filterDictionary["fieldValue"] as! [String: AnyObject]
+        let recordValueDictionary = filterDictionary["fieldValue"] as! [String: Any]
         
         XCTAssertEqual(recordValueDictionary["value"] as! NSNumber, NSNumber(value: 2010))
     }
@@ -154,9 +154,9 @@ class CKPredicateTests: XCTestCase {
         XCTAssertEqual(filterDictionary["comparator"] as! String, "LESS_THAN")
         XCTAssertEqual(filterDictionary["distance"] as! NSNumber, 1000)
 
-        let recordValueDictionary = filterDictionary["fieldValue"] as! [String: AnyObject]
+        let recordValueDictionary = filterDictionary["fieldValue"] as! [String: Any]
         
-        XCTAssertNotNil(recordValueDictionary["value"] as? [String: AnyObject])
+        XCTAssertNotNil(recordValueDictionary["value"] as? [String: Any])
         XCTAssertEqual(recordValueDictionary["type"] as! String, "LOCATION")
     }
 

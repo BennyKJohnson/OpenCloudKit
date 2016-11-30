@@ -38,9 +38,9 @@ public class CKUserIdentity : NSObject {
     }
     
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         
-        if let lookUpInfoDictionary = dictionary["lookupInfo"] as? [String: AnyObject],let  lookupInfo = CKUserIdentityLookupInfo(dictionary: lookUpInfoDictionary) {
+        if let lookUpInfoDictionary = dictionary["lookupInfo"] as? [String: Any],let  lookupInfo = CKUserIdentityLookupInfo(dictionary: lookUpInfoDictionary) {
             self.lookupInfo = lookupInfo
         } else {
             self.lookupInfo = nil
@@ -52,7 +52,7 @@ public class CKUserIdentity : NSObject {
             self.userRecordID = nil
         }
         
-        if let nameComponentsDictionary = dictionary["nameComponents"] as? [String: AnyObject] {
+        if let nameComponentsDictionary = dictionary["nameComponents"] as? [String: Any] {
             if #available(OSX 10.11, *) {
                 self.nameComponents = CKPersonNameComponents(dictionary: nameComponentsDictionary)
             } else {
@@ -75,7 +75,7 @@ public class CKUserIdentity : NSObject {
 }
 /*
 extension PersonNameComponents {
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         self.init()
         
         namePrefix = dictionary["namePrefix"] as? String

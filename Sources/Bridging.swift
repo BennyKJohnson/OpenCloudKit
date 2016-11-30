@@ -15,7 +15,7 @@ public protocol _OCKBridgable {
 
 public protocol CKNumberValueType: CKRecordValue {}
  extension CKNumberValueType where Self: _OCKBridgable, Self.ObjectType == NSNumber {
-    public var recordFieldDictionary: [String: AnyObject] {
+    public var recordFieldDictionary: [String: Any] {
         return ["value": self.bridge()]
     }
 }
@@ -77,7 +77,7 @@ extension Double: _OCKBridgable {
     }
     
     extension NSDictionary {
-        public func bridge() -> [NSObject: AnyObject] {
+        public func bridge() -> [NSObject: Any] {
             return self as [NSObject: AnyObject]
         }
     }

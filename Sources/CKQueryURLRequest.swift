@@ -16,7 +16,7 @@ class CKQueryURLRequest: CKURLRequest {
     
     let query: CKQuery
     
-    var queryResponses: [[String: AnyObject]] = []
+    var queryResponses: [[String: Any]] = []
     
     var requestedFields: [String]?
     
@@ -38,7 +38,7 @@ class CKQueryURLRequest: CKURLRequest {
         self.operationType = CKOperationRequestType.records
         
         // Setup Body Properties
-        var parameters: [String: AnyObject] = [:]
+        var parameters: [String: Any] = [:]
         
         let isZoneWide = false
         if  let zoneID = zoneID , zoneID.zoneName != CKRecordZoneDefaultName {

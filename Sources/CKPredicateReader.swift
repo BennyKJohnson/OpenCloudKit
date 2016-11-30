@@ -129,13 +129,13 @@ struct CKPredicateReader {
         
     }
     
-    func parseFunction(_ input: Index) throws -> (String, parameters: [AnyObject]) {
+    func parseFunction(_ input: Index) throws -> (String, parameters: [Any]) {
         
         var chunkIndex = input
         var currentIndex = chunkIndex
         
         var functionName: String = ""
-        var parameters: [AnyObject] = []
+        var parameters: [Any] = []
         var inBracket: Int = 0
         
         while source.hasNext(currentIndex) {
@@ -206,7 +206,7 @@ struct CKPredicateReader {
         return (functionName, parameters)
     }
     
-    func takeValue(begin: Index, end: Index) -> AnyObject? {
+    func takeValue(begin: Index, end: Index) -> Any? {
         let token = source.takeString(begin: begin, end: end)
         if !token.isEmpty {
        

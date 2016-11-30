@@ -104,9 +104,9 @@ open class CKShareParticipant  {
         self.userIdentity = userIdentity
     }
     
-    convenience init?(dictionary: [String: AnyObject]) {
+    convenience init?(dictionary: [String: Any]) {
         
-        guard let userIdentityDictionary = dictionary["userIdentity"] as? [String: AnyObject], let identity = CKUserIdentity(dictionary: userIdentityDictionary) else {
+        guard let userIdentityDictionary = dictionary["userIdentity"] as? [String: Any], let identity = CKUserIdentity(dictionary: userIdentityDictionary) else {
             return nil
         }
         

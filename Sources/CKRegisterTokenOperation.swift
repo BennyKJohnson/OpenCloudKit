@@ -33,7 +33,7 @@ public class CKRegisterTokenOperation : CKOperation {
     
     override func performCKOperation() {
         let url: String
-        var request: [String: AnyObject] = ["apnsEnvironment": apnsEnvironment.rawValue.bridge()]
+        var request: [String: Any] = ["apnsEnvironment": apnsEnvironment.rawValue.bridge()]
         if let apnsToken = apnsToken {
             url = "\(databaseURL)/tokens/register"
             request["apnsToken"] = apnsToken.bridge()

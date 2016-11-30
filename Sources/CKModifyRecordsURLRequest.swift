@@ -39,7 +39,7 @@ class CKModifyRecordsURLRequest: CKURLRequest {
         self.operationType = CKOperationRequestType.records
         
         // Setup Body Properties
-        var parameters: [String: AnyObject] = [:]
+        var parameters: [String: Any] = [:]
 
         if database.scope == .public {
             parameters["atomic"] = NSNumber(value: false)
@@ -61,14 +61,14 @@ class CKModifyRecordsURLRequest: CKURLRequest {
     }
     
     
-    func operationsDictionary() -> [[String: AnyObject]] {
-        var operationsDictionaryArray: [[String: AnyObject]] = []
+    func operationsDictionary() -> [[String: Any]] {
+        var operationsDictionaryArray: [[String: Any]] = []
         
         if let recordIDsToDelete = recordIDsToDelete {
-            let deleteOperations = recordIDsToDelete.map({ (recordID) -> [String: AnyObject] in
-                let operationDictionary: [String: AnyObject] = [
+            let deleteOperations = recordIDsToDelete.map({ (recordID) -> [String: Any] in
+                let operationDictionary: [String: Any] = [
                     "operationType": "forceDelete".bridge(),
-                    "record":(["recordName":recordID.recordName.bridge()] as [String: AnyObject]).bridge() as AnyObject
+                    "record":(["recordName":recordID.recordName.bridge()] as [String: Any]).bridge() as Any
                 ]
                 
                 return operationDictionary
@@ -77,13 +77,13 @@ class CKModifyRecordsURLRequest: CKURLRequest {
             operationsDictionaryArray.append(contentsOf: deleteOperations)
         }
         if let recordsToSave = recordsToSave {
-            let saveOperations = recordsToSave.map({ (record) -> [String: AnyObject] in
+            let saveOperations = recordsToSave.map({ (record) -> [String: Any] in
                 
                 let operationType: String
-                let fieldsDictionary: [String: AnyObject]
+                let fieldsDictionary: [String: Any]
                 
                 //record.dictionary
-                var recordDictionary: [String: AnyObject] = ["recordType": record.recordType.bridge(), "recordName": record.recordID.recordName.bridge()]
+                var recordDictionary: [String: Any] = ["recordType": record.recordType.bridge(), "recordName": record.recordID.recordName.bridge()]
                 if let recordChangeTag = record.recordChangeTag {
                     
                     if savePolicy == .IfServerRecordUnchanged {
@@ -114,7 +114,7 @@ class CKModifyRecordsURLRequest: CKURLRequest {
                         recordDictionary["parent"] = ["recordName": parent.recordID.recordName.bridge()].bridge()
                 }
                 
-                let operationDictionary: [String: AnyObject] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge() as NSDictionary]
+                let operationDictionary: [String: Any] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge() as NSDictionary]
                 return operationDictionary
             })
             

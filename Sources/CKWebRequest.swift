@@ -65,7 +65,7 @@ class CKWebRequest {
         return error
     }
     */
-    func ckError(forServerResponseDictionary dictionary: [String: AnyObject]) -> NSError {
+    func ckError(forServerResponseDictionary dictionary: [String: Any]) -> NSError {
         if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: dictionary) {
             
             let errorCode = CKErrorCode.errorCode(serverError: recordFetchError.serverErrorCode)!
@@ -102,7 +102,7 @@ class CKWebRequest {
                 
                 let dataString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
                 print(dataString as Any)
-                let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
+                let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
                 
                 if let httpResponse = response as? HTTPURLResponse {
                     if httpResponse.statusCode >= 400 {
@@ -129,7 +129,7 @@ class CKWebRequest {
         return task
     }
     
-    func urlRequest(with url: URL, parameters: [String: AnyObject]? = nil) -> URLRequest? {
+    func urlRequest(with url: URL, parameters: [String: Any]? = nil) -> URLRequest? {
         // Build URL
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
        

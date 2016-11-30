@@ -28,7 +28,7 @@ public protocol CKPersonNameComponentsType {
     /* Name substituted for the purposes of familiarity, e.g. "Johnny"*/
     var nickname: String? { get set }
     
-    init?(dictionary: [String: AnyObject])
+    init?(dictionary: [String: Any])
 }
 
 public struct CKPersonNameComponents {
@@ -57,7 +57,7 @@ public struct CKPersonNameComponents {
 }
 
 extension CKPersonNameComponents: CKPersonNameComponentsType {
-    public init?(dictionary: [String: AnyObject]) {
+    public init?(dictionary: [String: Any]) {
   
         namePrefix = dictionary["namePrefix"] as? String
         givenName = dictionary["givenName"] as? String
@@ -72,7 +72,7 @@ extension CKPersonNameComponents: CKPersonNameComponentsType {
 /*
 @available(OSX 10.11, *)
 extension PersonNameComponents: CKPersonNameComponentsType {
-    public convenience init?(dictionary: [String: AnyObject]) {
+    public convenience init?(dictionary: [String: Any]) {
         self.init()
         
         namePrefix = dictionary["namePrefix"] as? String

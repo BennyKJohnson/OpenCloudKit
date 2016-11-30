@@ -44,7 +44,7 @@ public class CKAsset: NSObject {
         self.fileURL = fileURL
     }
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         
         guard
         let downloadURL = dictionary["downloadURL"] as? String,

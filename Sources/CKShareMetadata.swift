@@ -27,8 +27,8 @@ public struct CKShortGUID {
     
     public  let rootRecordDesiredKeys: [String]?
     
-    public var dictionary: [String: AnyObject] {
-        let dict:[String: AnyObject] = ["value": value.bridge(),
+    public var dictionary: [String: Any] {
+        let dict:[String: Any] = ["value": value.bridge(),
                                         "shouldFetchRootRecord": shouldFetchRootRecord.number]
         return dict
     }
@@ -69,7 +69,7 @@ open class CKShareMetadata  {
     /* This is only present if the share metadata was returned from a CKFetchShareMetadataOperation with shouldFetchRootRecord set to YES */
     open var rootRecord: CKRecord?
     
-    init?(dictionary:[String: AnyObject]) {
+    init?(dictionary:[String: Any]) {
         /*
         if let dictionary = CKFetchErrorDictionary(dictionary: dictionary) {
             return nil
@@ -80,7 +80,7 @@ open class CKShareMetadata  {
         
         let rootRecordName = dictionary["rootRecordName"] as! String
         
-        let zoneID = CKRecordZoneID(dictionary: dictionary["zoneID"] as! [String:AnyObject])!
+        let zoneID = CKRecordZoneID(dictionary: dictionary["zoneID"] as! [String:Any])!
         
         rootRecordID = CKRecordID(recordName: rootRecordName, zoneID: zoneID)
         
@@ -100,12 +100,12 @@ open class CKShareMetadata  {
         }
 
         
-        if let ownerIdentityDictionary = dictionary["ownerIdentity"] as? [String: AnyObject] {
+        if let ownerIdentityDictionary = dictionary["ownerIdentity"] as? [String: Any] {
             ownerIdentity = CKUserIdentity(dictionary: ownerIdentityDictionary)
         }
         
         // Set root record if available
-        if let rootRecordDictionary = dictionary["rootRecord"] as? [String: AnyObject] {
+        if let rootRecordDictionary = dictionary["rootRecord"] as? [String: Any] {
             rootRecord = CKRecord(recordDictionary: rootRecordDictionary)
         }
         

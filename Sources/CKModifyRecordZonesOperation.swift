@@ -40,15 +40,15 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
      */
     public var modifyRecordZonesCompletionBlock: (([CKRecordZone]?, [CKRecordZoneID]?, NSError?) -> Swift.Void)?
     
-    func zoneOperations() -> [[String: AnyObject]] {
+    func zoneOperations() -> [[String: Any]] {
         
-        var operationDictionaries: [[String: AnyObject]] = []
+        var operationDictionaries: [[String: Any]] = []
         if let recordZonesToSave = recordZonesToSave {
-            let saveOperations = recordZonesToSave.map({ (zone) -> [String: AnyObject] in
+            let saveOperations = recordZonesToSave.map({ (zone) -> [String: Any] in
                 
-                let operation: [String: AnyObject] = [
+                let operation: [String: Any] = [
                     "operationType": "create".bridge(),
-                    "zone": ["zoneID".bridge(): zone.zoneID.dictionary].bridge() as AnyObject
+                    "zone": ["zoneID".bridge(): zone.zoneID.dictionary].bridge() as Any
                 ]
                 
                 return operation
@@ -58,11 +58,11 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         }
         
         if let recordZoneIDsToDelete = recordZoneIDsToDelete {
-            let deleteOperations = recordZoneIDsToDelete.map({ (zoneID) -> [String: AnyObject] in
+            let deleteOperations = recordZoneIDsToDelete.map({ (zoneID) -> [String: Any] in
                 
-                let operation: [String: AnyObject] = [
+                let operation: [String: Any] = [
                     "operationType": "delete".bridge(),
-                    "zone": ["zoneID".bridge(): zoneID.dictionary.bridge()].bridge() as AnyObject
+                    "zone": ["zoneID".bridge(): zoneID.dictionary.bridge()].bridge() as Any
                 ]
                 
                 return operation
@@ -79,7 +79,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         let url = "\(databaseURL)/zones/modify"
         let zoneOperations = self.zoneOperations().bridge()
         
-        let request: [String: AnyObject] = ["operations": zoneOperations]
+        let request: [String: Any] = ["operations": zoneOperations]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
@@ -94,7 +94,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
                 return
             } else if let dictionary = dictionary {
                 // Process Records
-                if let zoneDictionaries = dictionary["zones"] as? [[String: AnyObject]] {
+                if let zoneDictionaries = dictionary["zones"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for zoneDictionary in zoneDictionaries {
                         

@@ -42,7 +42,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
             return lookupInfo.dictionary
         }
         
-        let request: [String: AnyObject] = ["lookupInfos": lookUpInfos.bridge() as AnyObject]
+        let request: [String: Any] = ["lookupInfos": lookUpInfos.bridge() as Any]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
@@ -58,7 +58,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
                 return
             } else if let dictionary = dictionary {
                 // Process Records
-                if let userDictionaries = dictionary["users"] as? [[String: AnyObject]] {
+                if let userDictionaries = dictionary["users"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for userDictionary in userDictionaries {
                         

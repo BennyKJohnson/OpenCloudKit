@@ -10,16 +10,16 @@ import Foundation
 
 public let CKRecordTypeUserRecord: String = "Users"
 public protocol CKRecordFieldProvider {
-    var recordFieldDictionary: [String: AnyObject] { get }
+    var recordFieldDictionary: [String: Any] { get }
 }
-extension CKRecordFieldProvider where Self: AnyObject {
-    public var recordFieldDictionary: [String: AnyObject] {
+extension CKRecordFieldProvider where Self: Any {
+    public var recordFieldDictionary: [String: Any] {
         return ["value": self]
     }
 }
 /*
 extension CKRecordFieldProvider where Self: CustomDictionaryConvertible {
-    public var recordFieldDictionary: [String: AnyObject] {
+    public var recordFieldDictionary: [String: Any] {
         return ["value": self.dictionary]
     }
 }
@@ -126,7 +126,7 @@ public class CKRecord: NSObject {
         return"<\(type(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
     }
     
-    init?(recordDictionary: [String: AnyObject]) {
+    init?(recordDictionary: [String: Any]) {
         
         guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
             let recordType = recordDictionary[CKRecordDictionary.recordType] as? String
@@ -136,7 +136,7 @@ public class CKRecord: NSObject {
         
         // Parse ZoneID Dictionary into CKRecordZoneID
         let zoneID: CKRecordZoneID
-        if let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: AnyObject] {
+        if let zoneIDDictionary = recordDictionary[CKRecordDictionary.zoneID] as? [String: Any] {
             zoneID = CKRecordZoneID(dictionary: zoneIDDictionary)!
         } else {
             zoneID = CKRecordZoneID(zoneName: CKRecordZoneDefaultName, ownerName: "_defaultOwner")
@@ -153,26 +153,26 @@ public class CKRecord: NSObject {
         }
         
         // Parse Created Dictionary
-        if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: AnyObject], let created = CKRecordLog(dictionary: createdDictionary) {
+        if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: Any], let created = CKRecordLog(dictionary: createdDictionary) {
             self.creatorUserRecordID = CKRecordID(recordName: created.userRecordName)
             self.creationDate = NSDate(timeIntervalSince1970: created.timestamp)
         }
         
         // Parse Modified Dictionary
-        if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: AnyObject], let modified = CKRecordLog(dictionary: modifiedDictionary) {
+        if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: Any], let modified = CKRecordLog(dictionary: modifiedDictionary) {
             self.lastModifiedUserRecordID = CKRecordID(recordName: modified.userRecordName)
             self.modificationDate = NSDate(timeIntervalSince1970: modified.timestamp)
         }
         
         // Enumerate Fields
-        if let fields = recordDictionary[CKRecordDictionary.fields] as? [String: [String: AnyObject]] {
+        if let fields = recordDictionary[CKRecordDictionary.fields] as? [String: [String: Any]] {
             for (key, fieldValue) in fields  {
                 let value = CKRecord.getValue(forRecordField: fieldValue)
                 values[key] = value
             }
         }
         
-        if let parentReferenceDictionary = recordDictionary["parent"] as? [String: AnyObject], let recordName = parentReferenceDictionary["parent"] as? String {
+        if let parentReferenceDictionary = recordDictionary["parent"] as? [String: Any], let recordName = parentReferenceDictionary["parent"] as? String {
             
             let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
             let reference = CKReference(recordID: recordID, action: .none)
@@ -206,7 +206,7 @@ struct CKRecordLog {
     let userRecordName: String
     let deviceID: String
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         guard let timestamp = (dictionary["timestamp"] as? NSNumber)?.doubleValue, let userRecordName = dictionary["userRecordName"] as? String, let deviceID =  dictionary["deviceID"] as? String else {
             return nil
         }
@@ -220,9 +220,9 @@ struct CKRecordLog {
 
 extension CKRecord {
     
-    func fieldsDictionary(forKeys keys: [String]) -> [String: AnyObject] {
+    func fieldsDictionary(forKeys keys: [String]) -> [String: Any] {
         
-        var fieldsDictionary: [String: AnyObject] = [:]
+        var fieldsDictionary: [String: Any] = [:]
         
         for key in keys {
             if let value = object(forKey: key) {
@@ -234,15 +234,15 @@ extension CKRecord {
         
     }
     
-    var dictionary: [String: AnyObject] {
+    var dictionary: [String: Any] {
         
         // Add Fields
-        var fieldsDictionary: [String: AnyObject] = [:]
+        var fieldsDictionary: [String: Any] = [:]
         for (key, value) in values {
             fieldsDictionary[key] = value.recordFieldDictionary.bridge() as NSDictionary
         }
         
-        var recordDictionary: [String: AnyObject] = [
+        var recordDictionary: [String: Any] = [
         "fields": fieldsDictionary.bridge() as NSDictionary,
         "recordType": recordType.bridge(),
         "recordName": recordID.recordName.bridge()
@@ -256,7 +256,7 @@ extension CKRecord {
         return recordDictionary
     }
     
-    static func recordValue(forValue value: AnyObject) -> CKRecordValue {
+    static func recordValue(forValue value: Any) -> CKRecordValue {
         switch value {
         case let number as NSNumber:
            return number
@@ -266,7 +266,7 @@ extension CKRecord {
         }
     }
     
-    static func getValue(forRecordField field: [String: AnyObject]) -> CKRecordValue? {
+    static func getValue(forRecordField field: [String: Any]) -> CKRecordValue? {
         #if !os(Linux)
         if  let value = field[CKRecordFieldDictionary.value],
             let type = field[CKRecordFieldDictionary.type] as? String {
@@ -280,7 +280,7 @@ extension CKRecord {
                     return number
                 }
                 
-            case let dictionary as [String: AnyObject]:
+            case let dictionary as [String: Any]:
                 switch type {
                 
                 case "LOCATION":
@@ -317,7 +317,7 @@ extension CKRecord {
                     return NSString(string: string)
                 }
                 
-            case let array as [AnyObject]:
+            case let array as [Any]:
                 switch type {
                 case "INT64_LIST":
                     let numberArray =  array as! [NSNumber]
@@ -351,13 +351,13 @@ extension CKRecord {
 }
 
 extension NSString : CKRecordValue {
-    public var recordFieldDictionary: [String : AnyObject] {
+    public var recordFieldDictionary: [String : Any] {
         return ["value": self, "type":"STRING".bridge()]
     }
 }
 
 extension String : CKRecordValue {
-    public var recordFieldDictionary: [String : AnyObject] {
+    public var recordFieldDictionary: [String : Any] {
         return ["value": self.bridge(), "type":"STRING".bridge()]
     }
 }
@@ -376,13 +376,13 @@ extension Float: CKNumberValueType {}
 extension UInt: CKNumberValueType {}
 
 extension NSDate : CKRecordValue {
-    public var recordFieldDictionary: [String : AnyObject] {
+    public var recordFieldDictionary: [String : Any] {
         return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
     }
 }
 
 extension Date : CKRecordValue {
-    public var recordFieldDictionary: [String : AnyObject] {
+    public var recordFieldDictionary: [String : Any] {
         return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
     }
 }
@@ -392,20 +392,20 @@ extension NSData : CKRecordValue {}
 extension CKAsset: CKRecordValue {}
 
 extension CKReference: CKRecordValue {
-    public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary.bridge() as AnyObject, "type": "REFERENCE".bridge()]
+    public var recordFieldDictionary: [String: Any] {
+        return ["value": self.dictionary.bridge() as Any, "type": "REFERENCE".bridge()]
     }
 }
 
 extension CKLocation: CKRecordValue {
-    public var recordFieldDictionary: [String: AnyObject] {
+    public var recordFieldDictionary: [String: Any] {
         
-        return ["value": self.dictionary.bridge() as AnyObject, "type": "LOCATION".bridge()]
+        return ["value": self.dictionary.bridge() as Any, "type": "LOCATION".bridge()]
     }
 }
 
 extension CKLocationType {
-    public var recordFieldDictionary: [String: AnyObject] {
-        return ["value": self.dictionary.bridge() as AnyObject, "type": "LOCATION".bridge()]
+    public var recordFieldDictionary: [String: Any] {
+        return ["value": self.dictionary.bridge() as Any, "type": "LOCATION".bridge()]
     }
 }

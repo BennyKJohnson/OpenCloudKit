@@ -19,7 +19,7 @@ class CKAcceptSharesURLRequest: CKURLRequest {
         self.path = "accept"
         self.operationType = CKOperationRequestType.records
         
-        var parameters: [String: AnyObject] = [:]
+        var parameters: [String: Any] = [:]
         
         parameters["shortGUIDs"] = shortGUIDs.map({ (guid) -> NSDictionary in
             return guid.dictionary.bridge()

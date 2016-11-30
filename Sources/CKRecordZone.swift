@@ -57,9 +57,9 @@ public class CKRecordZone : NSObject {
 }
 
 extension CKRecordZone {
-    convenience init?(dictionary: [String: AnyObject]) {
+    convenience init?(dictionary: [String: Any]) {
         
-        guard let zoneIDDictionary = dictionary["zoneID"] as? [String: AnyObject], let zoneID = CKRecordZoneID(dictionary: zoneIDDictionary) else {
+        guard let zoneIDDictionary = dictionary["zoneID"] as? [String: Any], let zoneID = CKRecordZoneID(dictionary: zoneIDDictionary) else {
             return nil
         }
         
@@ -70,7 +70,7 @@ extension CKRecordZone {
         }
     }
     
-    var dictionary: [String: AnyObject] {
-        return ["zoneID": zoneID.dictionary.bridge() as AnyObject]
+    var dictionary: [String: Any] {
+        return ["zoneID": zoneID.dictionary.bridge() as Any]
     }
 }

@@ -37,7 +37,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         let url = "\(operationURL)/subscriptions/lookup"
         
-        var request: [String: AnyObject] = [:]
+        var request: [String: Any] = [:]
         if let subscriptionIDs = subscriptionIDs {
             
             request["subscriptions"] = subscriptionIDs.bridge()
@@ -51,7 +51,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
                 
             } else if let dictionary = dictionary {
                 
-                if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: AnyObject]] {
+                if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     var subscriptionsIDToSubscriptions: [String: CKSubscription] = [:]
                     var subscriptionErrorIDs: [String: NSError] = [:]

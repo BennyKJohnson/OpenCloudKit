@@ -25,7 +25,7 @@ enum CKURLRequestError {
 }
 
 enum CKURLRequestResult {
-    case success([String: AnyObject])
+    case success([String: Any])
     case error(CKError)
 }
 
@@ -49,7 +49,7 @@ class CKURLRequest: NSObject {
     
     var requestContentType: String = "application/json; charset=utf-8"
     
-    var requestProperties:[String: AnyObject]?
+    var requestProperties:[String: Any]?
     
     var urlSessionTask: URLSessionDataTask?
     
@@ -179,10 +179,13 @@ extension CKURLRequest: URLSessionDataDelegate {
         
         // Parse JSON
         do {
-            let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
-            CloudKit.debugPrint(jsonObject)
-            
-            
+            let rawJSONObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+            var jsonObject: [String: Any] = [:]
+            for key in rawJSONObject.keys {
+                jsonObject[key.bridge()] = rawJSONObject[key]
+            }
+                CloudKit.debugPrint(jsonObject)
+
             // Call completion block
             if let error = CKErrorDictionary(dictionary: jsonObject) {
                 completionBlock?(.error(CKError.server(jsonObject)))

@@ -56,7 +56,7 @@ open class CKReference: NSObject {
 
 extension CKReference {
     
-    convenience init?(dictionary: [String: AnyObject]) {
+    convenience init?(dictionary: [String: Any]) {
         
       guard
         let recordName = dictionary["recordName"] as? String,
@@ -67,7 +67,7 @@ extension CKReference {
         }
         
         let recordID: CKRecordID
-        if let zoneDictionary = dictionary["zoneID"] as? [String: AnyObject],
+        if let zoneDictionary = dictionary["zoneID"] as? [String: Any],
             let zoneID = CKRecordZoneID(dictionary: zoneDictionary) {
             recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
         } else {
@@ -77,8 +77,8 @@ extension CKReference {
         self.init(recordID: recordID, action: action)
     }
     
-    var dictionary: [String: AnyObject] {
-        let dict: [String: AnyObject] = ["recordName": recordID.recordName.bridge(), "zoneID": recordID.zoneID.dictionary.bridge(), "action": referenceAction.description.bridge()]
+    var dictionary: [String: Any] {
+        let dict: [String: Any] = ["recordName": recordID.recordName.bridge(), "zoneID": recordID.zoneID.dictionary.bridge(), "action": referenceAction.description.bridge()]
         
         return dict
     }

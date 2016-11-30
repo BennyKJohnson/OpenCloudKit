@@ -27,16 +27,16 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
      */
     public var modifySubscriptionsCompletionBlock: (([CKSubscription]?, [String]?, Error?) -> Void)?
     
-    func operationsDictionary() -> [[String: AnyObject]] {
-        var operations: [[String: AnyObject]] = []
+    func operationsDictionary() -> [[String: Any]] {
+        var operations: [[String: Any]] = []
         
         if let subscriptionsToSave = subscriptionsToSave {
             
             for subscription in subscriptionsToSave {
                 
-                let operation: [String: AnyObject] = [
+                let operation: [String: Any] = [
                     "operationType": "create".bridge(),
-                    "subscription": subscription.subscriptionDictionary.bridge() as AnyObject
+                    "subscription": subscription.subscriptionDictionary.bridge() as Any
                 ]
                 
                 operations.append(operation)
@@ -46,9 +46,9 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         if let subscriptionIDsToDelete = subscriptionIDsToDelete {
             for subscriptionID in subscriptionIDsToDelete {
                 
-                let operation: [String: AnyObject] = [
+                let operation: [String: Any] = [
                     "operationType": "create".bridge(),
-                    "subscription": (["subscriptionID": subscriptionID.bridge()] as [String: AnyObject]).bridge() as AnyObject
+                    "subscription": (["subscriptionID": subscriptionID.bridge()] as [String: Any]).bridge() as Any
                 ]
                 
                 operations.append(operation)
@@ -62,7 +62,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         
         let url = "\(operationURL)/subscriptions/modify"
         
-        let request: [String: AnyObject] = ["operations": operationsDictionary().bridge() as AnyObject]
+        let request: [String: Any] = ["operations": operationsDictionary().bridge() as Any]
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
             if let error = networkError {
@@ -70,7 +70,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                 
             } else if let dictionary = dictionary {
                 
-                if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: AnyObject]] {
+                if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     var subscriptions: [CKSubscription] = []
                     var deletedSubscriptionIDs: [String] = []

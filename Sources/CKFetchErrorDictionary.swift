@@ -9,7 +9,7 @@
 import Foundation
 
 protocol CKFetchErrorDictionaryIdentifier {
-    init?(dictionary: [String: AnyObject])
+    init?(dictionary: [String: Any])
     
     static var identifierKey: String { get }
 }
@@ -29,7 +29,7 @@ struct CKErrorDictionary {
     let redirectURL: String?
     let uuid: String
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         
         guard
             let uuid = dictionary["uuid"] as? String,
@@ -53,7 +53,7 @@ struct CKErrorDictionary {
         
         let errorCode = CKErrorCode.errorCode(serverError: serverErrorCode)!
         
-        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey: reason.bridge() as AnyObject, "serverErrorCode": serverErrorCode.bridge() as AnyObject]
+        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey: reason.bridge() as Any, "serverErrorCode": serverErrorCode.bridge() as Any]
         if let redirectURL = redirectURL {
             userInfo[CKErrorRedirectURLKey] = redirectURL.bridge()
         }
@@ -74,10 +74,10 @@ struct CKFetchErrorDictionary<T: CKFetchErrorDictionaryIdentifier> {
     let retryAfter: NSNumber?
     let redirectURL: String?
     
-    init?(dictionary: [String: AnyObject]) {
+    init?(dictionary: [String: Any]) {
         
         guard
-            let identifier = T(dictionary: dictionary[T.identifierKey] as? [String: AnyObject] ?? [:]),
+            let identifier = T(dictionary: dictionary[T.identifierKey] as? [String: Any] ?? [:]),
             let reason = dictionary[CKRecordFetchErrorDictionary.reasonKey] as? String,
             let serverErrorCode = dictionary[CKRecordFetchErrorDictionary.serverErrorCodeKey] as? String
             else {
@@ -98,7 +98,7 @@ struct CKFetchErrorDictionary<T: CKFetchErrorDictionaryIdentifier> {
         
         let errorCode = CKErrorCode.errorCode(serverError: serverErrorCode)!
         
-        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey: reason.bridge() as AnyObject, "serverErrorCode": serverErrorCode.bridge() as AnyObject]
+        var userInfo: NSErrorUserInfoType = [NSLocalizedDescriptionKey: reason.bridge() as Any, "serverErrorCode": serverErrorCode.bridge() as Any]
         if let redirectURL = redirectURL {
             userInfo[CKErrorRedirectURLKey] = redirectURL.bridge()
         }

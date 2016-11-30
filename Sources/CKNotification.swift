@@ -27,7 +27,7 @@ public class CKNotification : NSObject {
         super.init()
     }
     
-    public convenience init(fromRemoteNotificationDictionary notificationDictionary: [String : AnyObject]) {
+    public convenience init(fromRemoteNotificationDictionary notificationDictionary: [String : Any]) {
         
         self.init(notificationType: CKNotificationType.database)
         

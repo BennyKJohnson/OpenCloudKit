@@ -79,7 +79,7 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
                 return
             } else if let dictionary = dictionary {
                 // Process Records
-                if let zoneDictionaries = dictionary["zones"] as? [[String: AnyObject]] {
+                if let zoneDictionaries = dictionary["zones"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
                     for zoneDictionary in zoneDictionaries {
                         

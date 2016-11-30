@@ -9,47 +9,47 @@
 import Foundation
 /*
 protocol CKDictionaryValue {
-    func toObject() -> AnyObject?
+    func toObject() -> Any?
 }
 
 extension String: CKDictionaryValue {
-    func toObject() -> AnyObject? {
+    func toObject() -> Any? {
         return self.bridge()
     }
 }
 
 extension Int: CKDictionaryValue {
-    func toObject() -> AnyObject? {
+    func toObject() -> Any? {
         return NSNumber(value: self)
     }
 }
 extension Double: CKDictionaryValue {
-    func toObject() -> AnyObject? {
+    func toObject() -> Any? {
         return NSNumber(value: self)
     }
 }
 
 extension Float: CKDictionaryValue {
-    func toObject() -> AnyObject? {
+    func toObject() -> Any? {
         return NSNumber(value: self)
     }
 }
 
 extension Bool: CKDictionaryValue {
-    func toObject() -> AnyObject? {
+    func toObject() -> Any? {
         return NSNumber(value: self)
     }
 }
 
 extension Array: CKDictionaryValue {
-    func toObject() -> AnyObject? {
-        return self.bridge() as? AnyObject
+    func toObject() -> Any? {
+        return self.bridge() as? Any
     }
 }
 
 extension Dictionary where Key: StringLiteralConvertible, Value: CKDictionaryValue {
-    func toObject() -> AnyObject? {
-        var dictionary: [String: AnyObject] = [:]
+    func toObject() -> Any? {
+        var dictionary: [String: Any] = [:]
         
         for (key, value) in dictionary {
             dictionary[key] = value.toObject()

@@ -60,7 +60,7 @@ public class CKUserIdentityLookupInfo : NSObject {
 }
 
 extension CKUserIdentityLookupInfo: CKCodable {
-    convenience init?(dictionary: [String: AnyObject]) {
+    convenience init?(dictionary: [String: Any]) {
         
         guard let emailAddress = dictionary["emailAddress"] as? String,
         let phoneNumber = dictionary["phoneNumber"] as? String,
@@ -73,7 +73,7 @@ extension CKUserIdentityLookupInfo: CKCodable {
     
     var dictionary: [String: Any] {
         
-        var lookupInfo: [String: AnyObject] = [:]
+        var lookupInfo: [String: Any] = [:]
         lookupInfo["emailAddress"] = emailAddress?.bridge()
         lookupInfo["phoneNumber"] = phoneNumber?.bridge()
         lookupInfo["userRecordName"] = userRecordID?.recordName.bridge()
