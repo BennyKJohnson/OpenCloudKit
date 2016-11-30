@@ -266,22 +266,30 @@ extension CKRecord {
         }
     }
     
+    static func process(number: NSNumber, type: String) -> CKRecordValue {
+        switch(type) {
+        case "TIMESTAMP":
+            return NSDate(timeIntervalSince1970: number.doubleValue)
+        default:
+            return number
+        }
+    }
+    
     static func getValue(forRecordField field: [String: Any]) -> CKRecordValue? {
         if  let value = field[CKRecordFieldDictionary.value],
             let type = field[CKRecordFieldDictionary.type] as? String {
         
             switch value {
             case let number as NSNumber:
-                switch(type) {
-                case "TIMESTAMP":
-                    return NSDate(timeIntervalSince1970: number.doubleValue)
-                default:
-                    return number
-                }
+                return process(number: number, type: type)
+                
             case let intValue as Int:
-                return NSNumber(value: intValue)
-            case let doubleValue as Int:
-                return NSNumber(value: doubleValue)
+                let number = NSNumber(value: intValue)
+                return process(number: number, type: type)
+                
+            case let doubleValue as Double:
+                let number = NSNumber(value: doubleValue)
+                return process(number: number, type: type)
                 
             case let dictionary as [String: Any]:
                 switch type {
@@ -308,7 +316,7 @@ extension CKRecord {
             case let string as String:
                 switch type {
                 case CKValueType.string:
-                    return NSString(string: string)
+                    return string
                 case CKValueType.data:
                     #if os(Linux)
                         return NSData(base64Encoded: string,
@@ -317,7 +325,7 @@ extension CKRecord {
                         return NSData(base64Encoded: string)
                     #endif
                 default:
-                    return NSString(string: string)
+                    return string
                 }
                 
             case let array as [Any]:

@@ -122,7 +122,7 @@ class CKURLRequest: NSObject {
               //  urlComponents.queryItems = []
                 // if let accountInfo = accountInfoProvider {
                 
-                let apiTokenItem = URLQueryItem(name: "ckAPIToken", value: accountInfo.cloudKitAuthToken)
+              //  let apiTokenItem = URLQueryItem(name: "ckAPIToken", value: accountInfo.cloudKitAuthToken)
                // urlComponents.queryItems?.append(apiTokenItem)
                 
                 baseURL += "?ckAPIToken=\(accountInfo.cloudKitAuthToken ?? "")"
@@ -187,7 +187,7 @@ extension CKURLRequest: URLSessionDataDelegate {
                 CloudKit.debugPrint(jsonObject)
 
             // Call completion block
-            if let error = CKErrorDictionary(dictionary: jsonObject) {
+            if let _ = CKErrorDictionary(dictionary: jsonObject) {
                 completionBlock?(.error(CKError.server(jsonObject)))
             } else {
                 let result = CKURLRequestResult.success(jsonObject)
