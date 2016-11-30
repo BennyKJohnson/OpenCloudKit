@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Jay
 
 enum CKOperationRequestType: String {
     case records
@@ -68,7 +69,12 @@ class CKURLRequest: NSObject {
 
             if let properties = requestProperties {
                 
-                let jsonData: Data = try! JSONSerialization.data(withJSONObject: properties, options: [])
+                // While JSON Parsing doesn't support Swift Types on Linux, Use Jay
+                //let jsonData: Data = try! JSONSerialization.data(withJSONObject: properties, options: [])
+
+                let data = try! Jay(formatting: .prettified).dataFromJson(any: properties) // [UInt8]
+                let jsonData = Data(bytes: data)
+                
                 urlRequest.httpBody = jsonData
                 urlRequest.httpMethod = "POST"
                 urlRequest.addValue(requestContentType, forHTTPHeaderField: "Content-Type")
@@ -106,23 +112,27 @@ class CKURLRequest: NSObject {
         get {
             let accountInfo = accountInfoProvider ?? CloudKit.shared.defaultAccount!
         
-            let baseURL =  accountInfo.containerInfo.publicCloudDBURL(databaseScope: databaseScope).appendingPathComponent("\(operationType)/\(path)")
+            var baseURL =  accountInfo.containerInfo.publicCloudDBURL(databaseScope: databaseScope).appendingPathComponent("\(operationType)/\(path)").absoluteString
             
-            var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
+          //  var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
             switch accountInfo.accountType {
             case .server:
                 break
             case .anoymous, .primary:
-                urlComponents.queryItems = []
+              //  urlComponents.queryItems = []
                 // if let accountInfo = accountInfoProvider {
                 
                 let apiTokenItem = URLQueryItem(name: "ckAPIToken", value: accountInfo.cloudKitAuthToken)
-                urlComponents.queryItems?.append(apiTokenItem)
+               // urlComponents.queryItems?.append(apiTokenItem)
+                
+                baseURL += "?ckAPIToken=\(accountInfo.cloudKitAuthToken ?? "")"
                 
                 if let icloudAuthToken = accountInfo.iCloudAuthToken {
                     
-                    let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: icloudAuthToken)
-                    urlComponents.queryItems?.append(webAuthTokenQueryItem)
+                    //let webAuthTokenQueryItem = URLQueryItem(name: "ckWebAuthToken", value: icloudAuthToken)
+                   // urlComponents.queryItems?.append(webAuthTokenQueryItem)
+                    let encodedWebAuthToken = icloudAuthToken.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!.replacingOccurrences(of: "+", with: "%2B")
+                    baseURL += "&ckWebAuthToken=\(encodedWebAuthToken)"
                     
                 }
 
@@ -130,9 +140,9 @@ class CKURLRequest: NSObject {
             }
             
             // Perform Encoding
-            urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of:"+", with: "%2B")
-            CloudKit.debugPrint(urlComponents.url!)
-            return urlComponents.url!
+           // urlComponents.percentEncodedQuery = urlComponents.percentEncodedQuery?.replacingOccurrences(of:"+", with: "%2B")
+            //CloudKit.debugPrint(urlComponents.url!)
+            return URL(string: baseURL)!
         }
     }
     
