@@ -179,12 +179,9 @@ extension CKURLRequest: URLSessionDataDelegate {
         
         // Parse JSON
         do {
-            let rawJSONObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-            var jsonObject: [String: Any] = [:]
-            for key in rawJSONObject.keys {
-                jsonObject[key.bridge()] = rawJSONObject[key]
-            }
-                CloudKit.debugPrint(jsonObject)
+            let jsonNObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+            
+            CloudKit.debugPrint(jsonObject)
 
             // Call completion block
             if let _ = CKErrorDictionary(dictionary: jsonObject) {
