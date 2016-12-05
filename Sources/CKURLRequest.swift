@@ -179,7 +179,7 @@ extension CKURLRequest: URLSessionDataDelegate {
         
         // Parse JSON
         do {
-            let jsonNObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+            let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
             
             CloudKit.debugPrint(jsonObject)
 
