@@ -198,7 +198,6 @@ extension CKURLRequest: URLSessionDataDelegate {
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
-        CloudKit.debugPrint(response)
         completionHandler(.allow)
     }
     
