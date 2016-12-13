@@ -69,11 +69,7 @@ class CKURLRequest: NSObject {
 
             if let properties = requestProperties {
                 
-                // While JSON Parsing doesn't support Swift Types on Linux, Use Jay
-                let jsonData: Data = try! JSONSerialization.data(withJSONObject: properties, options: [])
-
-               // let data = try! Jay(formatting: .prettified).dataFromJson(any: properties) // [UInt8]
-               // let jsonData = Data(bytes: data)
+                let jsonData: Data = try! JSONSerialization.data(withJSONObject: properties.bridge(), options: [])
                 
                 urlRequest.httpBody = jsonData
                 urlRequest.httpMethod = "POST"
