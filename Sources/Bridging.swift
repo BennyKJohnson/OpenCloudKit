@@ -60,6 +60,22 @@ extension Double: _OCKBridgable {
     }
 }
 
+extension Dictionary {
+    func bridge() -> NSDictionary {
+        var newDictionary: [NSString: Any] = [:]
+       
+        for (key,value) in self {
+            if let stringKey = key as? String {
+                newDictionary[stringKey.bridge()] = value
+            } else if let nsstringKey = key as? NSString {
+                newDictionary[nsstringKey] = value
+            }
+        }
+        return newDictionary._bridgeToObjectiveC()
+    }
+}
+
+
 #if !os(Linux)
     
     typealias NSErrorUserInfoType = [AnyHashable: Any]
@@ -79,12 +95,6 @@ extension Double: _OCKBridgable {
     extension NSDictionary {
         public func bridge() -> [NSObject: Any] {
             return self as [NSObject: AnyObject]
-        }
-    }
-    
-    extension Dictionary {
-        func bridge() -> NSDictionary {
-            return self as NSDictionary
         }
     }
     
@@ -136,12 +146,7 @@ extension Double: _OCKBridgable {
         }
     }
     
-    extension Dictionary {
-        func bridge() -> NSDictionary {
-            return self._bridgeToObjectiveC()
-        }
-    }
-    
+
     extension Array {
         public func bridge() -> NSArray {
             return self._bridgeToObjectiveC()

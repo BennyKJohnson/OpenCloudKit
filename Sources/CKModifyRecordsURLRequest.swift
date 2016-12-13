@@ -56,6 +56,7 @@ class CKModifyRecordsURLRequest: CKURLRequest {
         if let zoneID = zoneID {
             parameters["zoneID"] = zoneID.dictionary.bridge()
         }
+
         
         requestProperties = parameters
     }
@@ -114,7 +115,11 @@ class CKModifyRecordsURLRequest: CKURLRequest {
                         recordDictionary["parent"] = ["recordName": parent.recordID.recordName.bridge()].bridge()
                 }
                 
+                
                 let operationDictionary: [String: Any] = ["operationType": operationType.bridge(), "record": recordDictionary.bridge() as NSDictionary]
+                
+           
+                
                 return operationDictionary
             })
             

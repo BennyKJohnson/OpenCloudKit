@@ -230,6 +230,9 @@ extension CKRecord {
             }
         }
         
+        print(fieldsDictionary)
+
+        
         return fieldsDictionary
         
     }
