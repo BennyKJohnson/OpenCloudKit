@@ -33,6 +33,8 @@ public class CKQueryOperation: CKDatabaseOperation {
     
     public var cursor: CKQueryCursor?
     
+    public var resultsCursor: CKQueryCursor?
+    
     var isFinishing: Bool = false
     
     public var zoneID: CKRecordZoneID?
@@ -45,9 +47,23 @@ public class CKQueryOperation: CKDatabaseOperation {
 
     public var queryCompletionBlock: ((CKQueryCursor?, NSError?) -> Swift.Void)?
     
+    override func CKOperationShouldRun() throws {
+        // "Warn: There's no point in running a query if there are no progress or completion blocks set. Bailing early."
+        
+        if(query == nil && cursor == nil){
+            throw CKPrettyError(code: CKErrorCode.InvalidArguments, format: "either a query or query cursor must be provided for %@", self)
+        }
+    }
+    
+    override func finishOnCallbackQueue(error: Error?) {
+        // log "Operation %@ has completed. Query cursor is %@.%@%@"
+        self.queryCompletionBlock?(self.resultsCursor, error as NSError?)
+        
+        super.finishOnCallbackQueue(error: error)
+    }
+    
     override func performCKOperation() {
         
-       
         let queryOperationURLRequest = CKQueryURLRequest(query: query!, cursor: cursor?.data.bridge(), limit: resultsLimit, requestedFields: desiredKeys, zoneID: zoneID)
         queryOperationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         queryOperationURLRequest.databaseScope = database?.scope ?? .public
@@ -67,7 +83,7 @@ public class CKQueryOperation: CKDatabaseOperation {
                     #endif
                     
                     if let data = data {
-                        self.cursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
+                        self.resultsCursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
                     }
                 }
                 
@@ -82,16 +98,16 @@ public class CKQueryOperation: CKDatabaseOperation {
                             self.recordFetchedBlock?(record)
                         } else {
                             // Create Error
+                            // Invalid state to be in, this operation normally doesnt provide partial errors
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server"])
-                            self.queryCompletionBlock?(nil, error)
+                            self.finish(error: error)
+                            return
                         }
                     }
                 }
-                
-                self.queryCompletionBlock?(self.cursor, nil)
-                
+                self.finish(error: nil)
             case .error(let error):
-                self.queryCompletionBlock?(nil, error.error)
+                self.finish(error: error.error)
             }
         }
         

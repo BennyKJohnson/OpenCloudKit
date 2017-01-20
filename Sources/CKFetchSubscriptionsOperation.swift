@@ -10,6 +10,10 @@ import Foundation
 
 public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
     
+    public var subscriptionErrors : [String : NSError] = [:]
+    
+    public var subscriptionsIDToSubscriptions: [String: CKSubscription] = [:]
+    
     public override required init() {
         super.init()
     }
@@ -33,6 +37,20 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
      */
     public var fetchSubscriptionCompletionBlock: (([String : CKSubscription]?, Error?) -> Void)?
     
+    override func finishOnCallbackQueue(error: Error?) {
+        var error = error
+        if(error == nil){
+            if (subscriptionErrors.count > 0) {
+                error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo:
+                    [NSLocalizedDescriptionKey: "Partial Error",
+                     CKPartialErrorsByItemIDKey: subscriptionErrors])
+            }
+        }
+        self.fetchSubscriptionCompletionBlock?(subscriptionsIDToSubscriptions, error)
+        
+        super.finishOnCallbackQueue(error: error)
+    }
+    
     override func performCKOperation() {
         
         let url = "\(operationURL)/subscriptions/lookup"
@@ -47,44 +65,30 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
             if let error = networkError {
                 
-                self.fetchSubscriptionCompletionBlock?(nil, error)
+                self.finish(error: error)
                 
             } else if let dictionary = dictionary {
                 
                 if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
-                    var subscriptionsIDToSubscriptions: [String: CKSubscription] = [:]
-                    var subscriptionErrorIDs: [String: NSError] = [:]
-                    
                     for subscriptionDictionary in subscriptionsDictionary {
                         
                         if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
                             // Append Record
-                            subscriptionsIDToSubscriptions[subscription.subscriptionID] = subscription
+                            self.subscriptionsIDToSubscriptions[subscription.subscriptionID] = subscription
                             
                         }  else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
                            
                             let errorCode = CKErrorCode.errorCode(serverError: subscriptionFetchError.serverErrorCode)!
                             let error = NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
                             
-                            subscriptionErrorIDs[subscriptionFetchError.subscriptionID] = error
+                            self.subscriptionErrors[subscriptionFetchError.subscriptionID] = error
                             
                         } else {
                             fatalError("Couldn't resolve record or record fetch error dictionary")
                         }
                     }
-                    
-                    let partialError: NSError?
-                    if subscriptionErrorIDs.isEmpty {
-                        partialError = nil
-                    } else {
-                        
-                        partialError = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo:
-                            [NSLocalizedDescriptionKey: "Partial Error",
-                             CKPartialErrorsByItemIDKey: subscriptionErrorIDs])
-                    }
-                    
-                    self.fetchSubscriptionCompletionBlock?(subscriptionsIDToSubscriptions, partialError)
+                    self.finish(error: nil)
                 }
             }
         }

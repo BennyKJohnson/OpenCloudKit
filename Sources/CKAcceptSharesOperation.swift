@@ -26,6 +26,12 @@ public class CKAcceptSharesOperation: CKOperation {
         self.shortGUIDs = shortGUIDs
     }
     
+    override func finishOnCallbackQueue(error: Error?) {
+        self.acceptSharesCompletionBlock?(error)
+        
+        super.finishOnCallbackQueue(error: error)
+    }
+    
     override func performCKOperation() {
         
         let operationURLRequest = CKAcceptSharesURLRequest(shortGUIDs: shortGUIDs)
@@ -48,10 +54,10 @@ public class CKAcceptSharesOperation: CKOperation {
                     }
                 }
                 
-                self.acceptSharesCompletionBlock?(nil)
+                self.finish(error: nil)
                 
             case .error(let error):
-                self.acceptSharesCompletionBlock?(error.error)
+                self.finish(error: error.error)
             }
         }
         

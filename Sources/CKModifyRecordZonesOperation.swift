@@ -38,7 +38,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
      seen all record changes, and may be invoked while the server is processing the side effects
      of those changes.
      */
-    public var modifyRecordZonesCompletionBlock: (([CKRecordZone]?, [CKRecordZoneID]?, NSError?) -> Swift.Void)?
+    public var modifyRecordZonesCompletionBlock: (([CKRecordZone]?, [CKRecordZoneID]?, Error?) -> Swift.Void)?
     
     func zoneOperations() -> [[String: Any]] {
         
@@ -74,6 +74,20 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         return operationDictionaries
     }
     
+    override func finishOnCallbackQueue(error: Error?) {
+        var error = error
+        if(error == nil){
+            if self.recordZoneErrors.count > 0 {
+                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [CKPartialErrorsByItemIDKey: recordZoneErrors], format: "Failed to modify some zones")
+            }
+        }
+        
+        // Call the final completionBlock
+        self.modifyRecordZonesCompletionBlock?(Array(self.recordZonesByZoneIDs.values), self.recordZoneIDsToDelete, error)
+        
+        super.finishOnCallbackQueue(error: error)
+    }
+    
     override func performCKOperation() {
         
         let url = "\(databaseURL)/zones/modify"
@@ -86,11 +100,11 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
             if self.isCancelled {
                 // Send Cancelled Error to CompletionBlock
                 let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.finishOnCallbackQueueWithError(error: cancelError)
+                self.finishOnCallbackQueue(error: cancelError)
             }
             
             if let error = error {
-                self.finishOnCallbackQueueWithError(error: error)
+                self.finish(error: error)
                 return
             } else if let dictionary = dictionary {
                 // Process Records
@@ -109,18 +123,10 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
                 }
             }
             
-            let partialError: NSError?
-            if self.recordZoneErrors.count > 0 {
-                partialError = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [CKPartialErrorsByItemIDKey: self.recordZoneErrors])
-            } else {
-                partialError = nil
-            }
-            
-            // Call the final completionBlock
-            self.modifyRecordZonesCompletionBlock?(Array(self.recordZonesByZoneIDs.values), self.recordZoneIDsToDelete, partialError)
+
             
             // Mark operation as complete
-            self.finish(error: [])
+            self.finish(error: nil)
 
   
     }

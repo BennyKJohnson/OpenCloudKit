@@ -16,17 +16,13 @@ public class CKPublishAssetsOperation : CKOperation {
     
     public var assetPublishedBlock: ((CKAsset?, Error?) -> Void)?
 
-    override func finishOnCallbackQueueWithError(error: Error) {
+    override func finishOnCallbackQueue(error: Error?) {
 
     }
     
     
     override func performCKOperation() {
        
-        
-   
-        
-        
     }
     
     init(assets: [CKAsset]) {

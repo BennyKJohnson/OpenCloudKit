@@ -27,12 +27,12 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
     
     public var discoverUserIdentitiesCompletionBlock: ((Error?) -> Swift.Void)?
     
-    override func finishOnCallbackQueueWithError(error: Error) {
+    override func finishOnCallbackQueue(error: Error?) {
         
         self.discoverUserIdentitiesCompletionBlock?(error)
         
-        // Mark operation as complete
-        self.finish(error: [])
+        super.finishOnCallbackQueue(error: error)
+        
     }
     
     override func performCKOperation() {
@@ -47,14 +47,15 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             // Check if cancelled
-            if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.finishOnCallbackQueueWithError(error: cancelError)
-            }
+            // (should no longer be needed)
+//            if self.isCancelled {
+//                // Send Cancelled Error to CompletionBlock
+//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
+//                self.finishOnCallbackQueue(error: cancelError)
+//            }
             
             if let error = error {
-                self.finishOnCallbackQueueWithError(error: error)
+                self.finish(error: error)
                 return
             } else if let dictionary = dictionary {
                 // Process Records
@@ -72,20 +73,14 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
                             // Create Error
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server"])
                             // Call RecordCallback
-                            self.finishOnCallbackQueueWithError(error: error)
+                            self.finish(error: error)
                             return
                         }
                     }
                 }
             }
-            
-            // Call the final completionBlock
-            self.discoverUserIdentitiesCompletionBlock?(nil)
-            
             // Mark operation as complete
-            self.finish(error: [])
-        
-        
+            self.finish(error: nil)
+        }
     }
-}
 }

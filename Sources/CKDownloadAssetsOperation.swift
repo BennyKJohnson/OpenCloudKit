@@ -21,6 +21,8 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
 
     public var downloadAssetsCompletionBlock: (([CKAsset], Error?) -> Swift.Void)?
     
+    public var downloadedAssets: [CKAsset] = []
+    
     var downloadSession: URLSession?
     
     public init(assetsToDownload: [CKAsset]) {
@@ -62,13 +64,26 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
     }
     
     override public func cancel() {
+        super.cancel()
+        
         downloadSession?.invalidateAndCancel()
     }
     
     override func performCKOperation() {
         prepareForDownload()
         
-       download()
+        download()
+    }
+    
+    override func finishOnCallbackQueue(error: Error?) {
+        
+        if(error == nil){
+            // todo create partial error from assetErrors array, see modify records
+        }
+        
+        downloadAssetsCompletionBlock?(assetsToDownload, error)
+        
+        super.finishOnCallbackQueue(error: error)
     }
 }
 
@@ -114,14 +129,17 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
         
         if let error = error {
             perAssetCompletionBlock?(currentAsset, error)
+            
+            // todo add to assetErrors array
         }
         
         assetsByDownloadTask[downloadTask] = nil
         
+        self.downloadedAssets.append(currentAsset)
+        
         // If all task complete
         if assetsByDownloadTask.count == 0 {
-            // Call Completion Block
-            downloadAssetsCompletionBlock?(assetsToDownload, nil)
+            finish(error: nil)
         }
     }
     
