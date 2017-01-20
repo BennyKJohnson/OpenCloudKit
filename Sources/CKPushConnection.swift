@@ -7,29 +7,55 @@
 //
 
 import Foundation
-/*
+
 class CKPushConnection: NSObject, URLSessionDataDelegate {
 
     var longPollingTask: URLSessionDataTask?
     
-    func establishConnection(with url: URL) {
+    var callBack: ((CKNotification) -> Void)?
+    
+    init(url: URL) {
+        
+        super.init()
         
         let urlRequest = URLRequest(url: url)
-      
-        longPollingTask = URLSession.shared.dataTask(with: urlRequest)
+        
+        let configuration = URLSessionConfiguration.default
+        
+        configuration.timeoutIntervalForRequest = Double.greatestFiniteMagnitude
+        
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        
+        longPollingTask = session.dataTask(with: urlRequest)
         
         longPollingTask?.resume()
+        
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         
-        // Create Notification
-        
+        // Serialize JSON
+        do {
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                print(json)
+                // Create Notification
+                if let notification = CKNotification.notification(fromRemoteNotificationDictionary: json) {
+                    callBack?(notification)
+                }
+                /*
+                if let notification = CKNotification(fromRemoteNotificationDictionary: json) {
+                    callBack?(notification)
+                }
+ */
+            }
+        } catch {
+            
+        }
         
         
     }
     
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: NSError?) {
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
             print(error)
         }
@@ -40,4 +66,3 @@ class CKPushConnection: NSObject, URLSessionDataDelegate {
     
   
 }
-*/

@@ -27,48 +27,14 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
      */
     public var modifySubscriptionsCompletionBlock: (([CKSubscription]?, [String]?, Error?) -> Void)?
     
-    func operationsDictionary() -> [[String: Any]] {
-        var operations: [[String: Any]] = []
-        
-        if let subscriptionsToSave = subscriptionsToSave {
-            
-            for subscription in subscriptionsToSave {
-                
-                let operation: [String: Any] = [
-                    "operationType": "create".bridge(),
-                    "subscription": subscription.subscriptionDictionary.bridge() as Any
-                ]
-                
-                operations.append(operation)
-            }
-        }
-        
-        if let subscriptionIDsToDelete = subscriptionIDsToDelete {
-            for subscriptionID in subscriptionIDsToDelete {
-                
-                let operation: [String: Any] = [
-                    "operationType": "create".bridge(),
-                    "subscription": (["subscriptionID": subscriptionID.bridge()] as [String: Any]).bridge() as Any
-                ]
-                
-                operations.append(operation)
-            }
-        }
-        
-        return operations
-    }
-    
+  
     override func performCKOperation() {
         
-        let url = "\(operationURL)/subscriptions/modify"
-        
-        let request: [String: Any] = ["operations": operationsDictionary().bridge() as Any]
-        
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
-            if let error = networkError {
-                self.modifySubscriptionsCompletionBlock?(nil, nil, error)
-                
-            } else if let dictionary = dictionary {
+        let subscriptionURLRequest = CKModifySubscriptionsURLRequest(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete)
+        subscriptionURLRequest.completionBlock = {
+            (result) in
+            switch result {
+            case .success(let dictionary):
                 
                 if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
@@ -80,17 +46,17 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                         if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
                             // Append Record
                             subscriptions.append(subscription)
-                           
+                            
                         } else if let subscriptionID = subscriptionDictionary["subscriptionID"] as? String {
                             deletedSubscriptionIDs.append(subscriptionID)
-                
+                            
                         } else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
                             
                             // Create Error
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
-                           
+                            
                             self.modifySubscriptionsCompletionBlock?(nil, nil, error)
-
+                            
                         } else {
                             fatalError("Couldn't resolve record or record fetch error dictionary")
                         }
@@ -98,10 +64,15 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                     
                     self.modifySubscriptionsCompletionBlock?(subscriptions, deletedSubscriptionIDs, nil)
                 }
+                
+                
+            case .error(let error):
+                self.modifySubscriptionsCompletionBlock?(nil, nil, error.error)
+
             }
+            self.finish()
         }
         
-        urlSessionTask?.resume()
-        
+        subscriptionURLRequest.performRequest()
     }
 }

@@ -35,6 +35,14 @@ class CKURLRequestTests: XCTestCase {
         XCTAssertEqual(queryURLComponents.path, "/database/1/\(containerID)/\(environment)/\(databaseScope)/records/query")
     }
     
+    func testCKModifySubscriptionsURLRequestURL() {
+        
+        let subscriptionURLRequest = CKModifySubscriptionsURLRequest(subscriptionsToSave: nil, subscriptionIDsToDelete: nil)
+        
+        let urlComponents = URLComponents(url: subscriptionURLRequest.url, resolvingAgainstBaseURL: false)!
+        XCTAssertEqual(urlComponents.path, "/database/1/\(containerID)/\(environment)/\(databaseScope)/subscriptions/modify")
+    }
+    
     func assertDatabasePath(components: URLComponents, query: String) {
         XCTAssertEqual(components.host, "api.apple-cloudkit.com")
         XCTAssertEqual(components.path, "/database/1/\(containerID)/\(environment)/\(databaseScope)/\(query)")

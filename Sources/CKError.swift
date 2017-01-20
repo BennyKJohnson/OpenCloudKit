@@ -39,6 +39,11 @@ enum CKErrorCode : Int {
     case ZoneNotFound
     case LimitExceeded
     case UserDeletedZone
+    case TooManyParticipants
+    case AlreadyShared
+    case ReferenceViolation
+    case ManagedAccountRestricted
+    case ParticipantMayNeedVerification
     
 }
 
@@ -76,6 +81,79 @@ extension CKErrorCode {
             return CKErrorCode.ZoneNotFound
         default:
             fatalError("Unknown  Server Error: \(serverError)")
+        }
+    }
+}
+
+extension CKErrorCode: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .InternalError:
+            return "Internal Error"
+        case .PartialFailure:
+            return "Partial Failure"
+        case .NetworkUnavailable:
+            return "Network Unavailable"
+        case .NetworkFailure:
+            return "Network Failure"
+        case .BadContainer:
+            return "Bad Container"
+        case .ServiceUnavailable:
+            return "Service Unavailable"
+        case .RequestRateLimited:
+            return "Request Rate Limited"
+        case .MissingEntitlement:
+            return "Missing Entitlement"
+        case .NotAuthenticated:
+            return "Not Authenticated"
+        case .PermissionFailure:
+            return "Permission Failure"
+        case .UnknownItem:
+            return "Unknown Item"
+        case .InvalidArguments:
+            return "Invalid Arguments"
+        case .ResultsTruncated:
+            return "Results Truncated"
+        case .ServerRecordChanged:
+            return "Server Record Changed"
+        case .ServerRejectedRequest:
+            return "Server Rejected Request"
+        case .AssetFileNotFound:
+            return "Asset File Not Found"
+        case .AssetFileModified:
+            return "Asset File Modified"
+        case .IncompatibleVersion:
+            return "Incompatible Version"
+        case .ConstraintViolation:
+            return "Constraint Violation"
+        case .OperationCancelled:
+            return "Operation Cancelled"
+        case .ChangeTokenExpired:
+            return "Change Token Expired"
+        case .BatchRequestFailed:
+            return "Batch Request Failed"
+        case .ZoneBusy:
+            return "Zone Busy"
+        case .BadDatabase:
+            return "Invalid Database For Operation"
+        case .QuotaExceeded:
+            return "Quota Exceeded"
+        case .ZoneNotFound:
+            return "Zone Not Found"
+        case .LimitExceeded:
+            return "Limit Exceeded"
+        case .UserDeletedZone:
+            return "User Deleted Zone"
+        case .TooManyParticipants:
+            return "Too Many Participants"
+        case .AlreadyShared:
+            return "Already Shared"
+        case .ReferenceViolation:
+            return "Reference Violation"
+        case .ManagedAccountRestricted:
+            return "Managed Account Restricted"
+        case .ParticipantMayNeedVerification:
+            return "Participant May Need Verification"
         }
     }
 

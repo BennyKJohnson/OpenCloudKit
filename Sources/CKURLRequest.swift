@@ -39,7 +39,7 @@ class CKURLRequest: NSObject {
 
     var dateRequestWentOut: Date?
     
-    var httpMethod: String = "GET"
+    var httpMethod: String = "POST"
     
     var isFinished: Bool = false
     
@@ -56,7 +56,7 @@ class CKURLRequest: NSObject {
     var allowsAnonymousAccount = false
     
     var operationType: CKOperationRequestType = .records
-    
+   
     var metricsDelegate: CKURLRequestMetricsDelegate?
     
     var metrics: CKOperationMetrics?
@@ -72,7 +72,7 @@ class CKURLRequest: NSObject {
                 let jsonData: Data = try! JSONSerialization.data(withJSONObject: properties.bridge(), options: [])
                 
                 urlRequest.httpBody = jsonData
-                urlRequest.httpMethod = "POST"
+                urlRequest.httpMethod = httpMethod
                 urlRequest.addValue(requestContentType, forHTTPHeaderField: "Content-Type")
                 
                 let dataString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
@@ -104,11 +104,32 @@ class CKURLRequest: NSObject {
         return configuration
     }
     
+    var requiresTokenRegistration: Bool {
+        return false
+    }
+    
+    var serverType: CKServerType {
+        return CKServerType.database
+    }
+    
     var url: URL {
         get {
             let accountInfo = accountInfoProvider ?? CloudKit.shared.defaultAccount!
-        
-            var baseURL =  accountInfo.containerInfo.publicCloudDBURL(databaseScope: databaseScope).appendingPathComponent("\(operationType)/\(path)").absoluteString
+            var baseURL: String
+            switch serverType {
+            case .database:
+                baseURL =  accountInfo.containerInfo.publicCloudDBURL(databaseScope: databaseScope).appendingPathComponent("\(operationType)/\(path)").absoluteString
+            case .device:
+                let account = accountInfo as! CKAccount
+                baseURL = account.baseURL(forServerType: serverType)
+                    .appendingPathComponent(accountInfo.containerInfo.containerID)
+                    .appendingPathComponent("\(accountInfo.containerInfo.environment)")
+                    .appendingPathComponent("\(operationType)/\(path)").absoluteString
+                
+            default:
+                fatalError("Type not supported")
+            }
+            
             
           //  var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
             switch accountInfo.accountType {
@@ -155,13 +176,14 @@ class CKURLRequest: NSObject {
         isCancelled = true
     }
     
-    func requestDidParseNodeFailure() {
-        
+    func requestDidParseNodeFailure() {}
+    
+    func requestDidParseObject() {}
+    
+    var requestOperationClasses:[CKRequest.Type] {
+        return []
     }
     
-    func requestDidParseObject() {
-        
-    }
 }
 
 extension CKURLRequest: URLSessionDataDelegate {
@@ -210,17 +232,6 @@ extension CKURLRequest: URLSessionDataDelegate {
             completionBlock?(.error(.network(error)))
         }
     }
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
 }
 

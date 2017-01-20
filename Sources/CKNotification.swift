@@ -19,18 +19,107 @@ public enum CKNotificationType : Int {
     case database
 }
 
+let CKNotificationAPSAlertBodyKey = "body"
+let CKNotificationCKKey = "ck"
+let CKNotificiationAPSAlertLaunchImageKey = "launch-image"
+let CKNotificationAPSAlertBadgeKey = "badge"
+let CKNotificationQueryNotificationKey = "qry"
+let CKNotificationZoneNotificationKey = "fet"
+let CKNotificationDatabaseNotificationKey = "met"
+let CKNotificationContainerIDKey = "cid"
+
+
 public class CKNotification : NSObject {
-    
-    
-    init(notificationType: CKNotificationType) {
-        self.notificationType = notificationType
-        super.init()
+
+    class func notification(fromRemoteNotificationDictionary notificationDictionary: [AnyHashable : Any]) -> CKNotification? {
+        
+        if let cloudKitDictionary = notificationDictionary[CKNotificationCKKey] as? [String: Any] {
+            
+            if cloudKitDictionary[CKNotificationQueryNotificationKey] as? [String: Any] != nil {
+                return CKQueryNotification(fromRemoteNotificationDictionary: notificationDictionary)
+            } else if cloudKitDictionary[CKNotificationZoneNotificationKey] as? [String: Any] != nil {
+                return CKRecordZoneNotification(fromRemoteNotificationDictionary: notificationDictionary)
+            } else if cloudKitDictionary[CKNotificationDatabaseNotificationKey] as? [String: Any] != nil {
+                return CKDatabaseNotification(fromRemoteNotificationDictionary: notificationDictionary)
+            }
+        }
+        
+        return nil
     }
     
-    public convenience init(fromRemoteNotificationDictionary notificationDictionary: [String : Any]) {
+  
+    
+    init(fromRemoteNotificationDictionary notificationDictionary: [AnyHashable : Any])
+    {
+        super.init()
+
+        notificationType = .database
+
+        // Check that this notification is a CloudKit notification, if not return nil
+        if let ckDictionary = notificationDictionary[CKNotificationCKKey] as? [String: Any] {
+            
+            // Get the container ID from dictionary
+            if let containerID = ckDictionary[CKNotificationContainerIDKey] as? String {
+                containerIdentifier = containerID
+            }
+            
+            // Get the notification ID from dictionary
+            if let nID = ckDictionary["nid"] as? String {
+                let id = CKNotificationID(notificationUUID: nID)
+                notificationID = id
+            }
+            
+            // Set isPruned from dictionary
+            if ckDictionary["p"] != nil  {
+                isPruned = true
+            }
+            
+        }
         
-        self.init(notificationType: CKNotificationType.database)
-        
+        if let apsDictionary = notificationDictionary["aps"] as? [String: Any] {
+            if let alertDictionary = apsDictionary["alert"] as? [String: Any] {
+                
+                // Set body
+                if let body = alertDictionary[CKNotificationAPSAlertBodyKey] as? String {
+                    alertBody = body
+                }
+                
+                // Set Alert Localization Key
+                if let locKey = alertDictionary["loc-key"] as? String {
+                    alertLocalizationKey = locKey
+                }
+                
+                // Set Alert LocalizationArgs
+                if let locArgs = alertDictionary["loc-args"] as? [String] {
+                    self.alertLocalizationArgs = locArgs
+                }
+                
+                // Set Action Localization Key
+                if let actionLocKey = alertDictionary["action-loc-key"] as? String {
+                    alertActionLocalizationKey = actionLocKey
+                }
+                
+                // Set Launch Image
+                if let launchImage = alertDictionary[CKNotificiationAPSAlertLaunchImageKey] as? String {
+                    alertLaunchImage = launchImage
+                }
+                
+                // Set Badge
+                if let badgeVale = alertDictionary[CKNotificationAPSAlertBadgeKey] as? NSNumber {
+                    badge = badgeVale
+                }
+                
+                // Set Sound Name
+                if let sound = alertDictionary["sound"] as? String {
+                    soundName = sound
+                }
+                
+                // Set Category
+                if let cat = alertDictionary["category"] as? String {
+                    category = cat
+                }
+            }
+        }
     }
     
     public var notificationType: CKNotificationType = .database
@@ -42,7 +131,7 @@ public class CKNotification : NSObject {
      CKNotification's worth of info in one push.  In those cases, isPruned returns YES.  The order in which we'll
      drop properties is defined in each CKNotification subclass below.
      The CKNotification can be obtained in full via a CKFetchNotificationChangesOperation */
-    public let isPruned: Bool = false
+    public var isPruned: Bool = false
     
     /* These keys are parsed out of the 'aps' payload from a remote notification dictionary.
      On tvOS, alerts, badges, sounds, and categories are not handled in push notifications. */

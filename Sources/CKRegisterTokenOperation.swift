@@ -8,62 +8,45 @@
 
 import Foundation
 
-public class CKRegisterTokenOperation : CKOperation {
+class CKRegisterTokenOperation : CKOperation {
     
-    public let apnsEnvironment: CKEnvironment
+    let apnsEnvironment: CKEnvironment
     
-    public var apnsToken: String?
+    let apnsToken: Data
     
-    public init(apnsEnvironment: CKEnvironment) {
+    init(apnsEnvironment:CKEnvironment, apnsToken: Data) {
+        
         self.apnsEnvironment = apnsEnvironment
-        super.init()
-    }
-    
-    public init(apnsEnvironment:CKEnvironment, apnsToken: String) {
-        self.apnsEnvironment = apnsEnvironment
-        super.init()
+        
         self.apnsToken = apnsToken
+
+        super.init()
+        
     }
     
     override func finishOnCallbackQueueWithError(error: Error) {
-        registerTokenCompletionBlock?(nil, error)
+        registerTokenCompletionBlock?(nil,error)
     }
     
-    public var registerTokenCompletionBlock: ((CKTokenInfo?, Error?) -> Void)?
+    public var registerTokenCompletionBlock: ((CKPushTokenInfo?, Error?) -> Void)?
     
     override func performCKOperation() {
-        let url: String
-        var request: [String: Any] = ["apnsEnvironment": apnsEnvironment.rawValue.bridge()]
-        if let apnsToken = apnsToken {
-            url = "\(databaseURL)/tokens/register"
-            request["apnsToken"] = apnsToken.bridge()
-        } else {
-            url = "\(databaseURL)/tokens/create"
+        
+        let request = CKTokenRegistrationURLRequest(token: apnsToken, apnsEnvironment: "\(apnsEnvironment)")
+        request.completionBlock = { (result) in
+            switch result {
+            case .success(let dictionary):
+                let tokenInfo = CKPushTokenInfo(dictionaryRepresentation: dictionary)
+                
+                print(dictionary)
+                self.registerTokenCompletionBlock?(tokenInfo, nil)
+            case .error(let error):
+                self.registerTokenCompletionBlock?(nil, error.error)
+            }
+            
+            self.finish()
         }
         
-        print(url)
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
-            
-            if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.finishOnCallbackQueueWithError(error: cancelError)
-            }
-            let tokenInfo: CKTokenInfo?
-            if let error = error {
-                tokenInfo = nil
-                self.finishOnCallbackQueueWithError(error: error)
-                return
-            } else if let dictionary = dictionary {
-                tokenInfo = CKTokenInfo(dictionary: dictionary)
-            } else {
-                tokenInfo = nil
-            }
-            
-            self.registerTokenCompletionBlock?(tokenInfo, error)
-            
-            // Mark operation as complete
-            self.finish(error: [])
-        }
+        request.performRequest()
     }
 }

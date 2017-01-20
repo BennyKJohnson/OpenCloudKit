@@ -45,6 +45,23 @@ public class CKAccount: CKAccountInfoProvider {
         self.cloudKitAuthToken = cloudKitAuthToken
     }
     
+    func baseURL(forServerType serverType: CKServerType) -> URL {
+        var baseURL = URL(string: CKServerInfo.path)!
+        switch serverType {
+        case .database:
+            baseURL.appendPathComponent("database")
+        case .device:
+            baseURL.appendPathComponent("device")
+        default:
+            baseURL.appendPathComponent("database")
+        }
+        
+        // Append version
+        
+        return         baseURL.appendingPathComponent("\(CKServerInfo.version)")
+
+    }
+    
 }
 
 public class CKServerAccount: CKAccount {
