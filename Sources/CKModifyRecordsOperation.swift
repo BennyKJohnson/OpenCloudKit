@@ -142,7 +142,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         // Generate the CKOperation Web Service URL
         let request = CKModifyRecordsURLRequest(recordsToSave: recordsToSave, recordIDsToDelete: recordIDsToDelete, isAtomic: isAtomic, database: database!, savePolicy: savePolicy, zoneID: zoneID)
         request.accountInfoProvider = CloudKit.shared.defaultAccount
-
+        let partialErrorsByItemID = NSMutableDictionary()
         request.completionBlock = { (result) in
             // Check if cancelled
             if self.isCancelled {
@@ -172,6 +172,9 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                             
                             // Create Error
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: recordFetchError.reason])
+                            let recordName = recordDictionary["recordName"]
+                            // todo: the key should be a recordID
+                            partialErrorsByItemID.setObject(error, forKey: recordName as! NSCopying)
                             self.perRecordCompletionBlock?(nil, error)
                         } else {
                             
@@ -186,10 +189,18 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                 }
             }
             
-            // Call the final completionBlock
+            
             let recordIDs = Array(self.recordsByRecordIDs.keys)
             let records = Array(self.recordsByRecordIDs.values)
-            self.modifyRecordsCompletionBlock?(records, recordIDs, nil)
+            
+            // report any partial errors
+            var error : NSError?
+            if(partialErrorsByItemID.count > 0){
+                error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Partial Failure", CKPartialErrorsByItemIDKey: partialErrorsByItemID])
+            }
+                                   
+            // Call the final completionBlock                       
+            self.modifyRecordsCompletionBlock?(records, recordIDs, error)
             
             // Mark operation as complete
             self.finish(error: [])
