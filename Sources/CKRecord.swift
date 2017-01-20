@@ -388,13 +388,13 @@ extension UInt: CKNumberValueType {}
 
 extension NSDate : CKRecordValue {
     public var recordFieldDictionary: [String : Any] {
-        return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
+        return ["value": NSNumber(value: UInt64(self.timeIntervalSince1970 * 1000)), "type":"TIMESTAMP".bridge()]
     }
 }
 
 extension Date : CKRecordValue {
     public var recordFieldDictionary: [String : Any] {
-        return ["value": NSNumber(value: self.timeIntervalSince1970), "type":"TIMESTAMP".bridge()]
+        return ["value": NSNumber(value: UInt64(self.timeIntervalSince1970 * 1000)), "type":"TIMESTAMP".bridge()]
     }
 }
 
