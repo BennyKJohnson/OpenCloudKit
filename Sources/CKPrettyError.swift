@@ -65,3 +65,42 @@ enum CKError {
     }
 }
 
+class CKPrettyError: NSError {
+    convenience init(code: CKErrorCode, format: String, _ args: CVarArg...){
+        let description = String(format: format, arguments: args)
+        self.init(code, userInfo: nil, error: nil, path: nil, URL: nil, description: description)
+    }
+    
+    convenience init(code: CKErrorCode, userInfo: NSErrorUserInfoType, format: String, _ args: CVarArg...){
+        let description = String(format: format, arguments: args)
+        self.init(code, userInfo: userInfo, error: nil, path: nil, URL: nil, description: description)
+    }
+    
+    init(_ code: CKErrorCode, userInfo: NSErrorUserInfoType?, error: Error?, path: String?, URL: URL?, description: String?){
+        var userInfo = userInfo
+        
+        if(description != nil){
+            if(userInfo == nil){
+                userInfo = NSErrorUserInfoType()
+            }
+            userInfo?[NSLocalizedDescriptionKey] = description;
+            userInfo?["CKErrorDescription"] = description;
+        }
+        
+        super.init(domain: CKErrorDomain, code: code.rawValue, userInfo: userInfo)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    
+    //override var description: String{
+        //<CKError 0x618000240c60: "Operation Cancelled" (20); "Operation <TestOperation: 0x7f876f405ea0; operationID=1644E6818C660C6E, stateFlags=executing|cancelled, qos=Utility> was cancelled before it started">
+    //}
+    
+    override public var description: String {
+        // \(withUnsafePointer(to: self))
+        return "<CKError: \"\(CKErrorCode(rawValue: self.code)?.description)\" (\(self.code)); \(self.userInfo)";
+    }
+}

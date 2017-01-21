@@ -20,6 +20,10 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
     public var subscriptionsToSave: [CKSubscription]?
     public var subscriptionIDsToDelete: [String]?
     
+    var subscriptions: [CKSubscription] = []
+    var deletedSubscriptionIDs: [String] = []
+    var subscriptionErrors: [String: NSError] = [:] // todo needs filled up with the errors
+    
     /*  This block is called when the operation completes.
      The [NSOperation completionBlock] will also be called if both are set.
      If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
@@ -27,7 +31,18 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
      */
     public var modifySubscriptionsCompletionBlock: (([CKSubscription]?, [String]?, Error?) -> Void)?
     
-  
+    override func finishOnCallbackQueue(error: Error?) {
+        var error = error
+        if(error == nil){
+            if subscriptionErrors.count > 0 {
+                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [CKPartialErrorsByItemIDKey : subscriptionErrors], format: "Errors modifying subscriptions")
+            }
+        }
+        self.modifySubscriptionsCompletionBlock?(subscriptions, deletedSubscriptionIDs, error)
+        
+        super.finishOnCallbackQueue(error: error)
+    }
+    
     override func performCKOperation() {
         
         let subscriptionURLRequest = CKModifySubscriptionsURLRequest(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete)
@@ -38,39 +53,35 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                 
                 if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]] {
                     // Parse JSON into CKRecords
-                    var subscriptions: [CKSubscription] = []
-                    var deletedSubscriptionIDs: [String] = []
+                    
                     
                     for subscriptionDictionary in subscriptionsDictionary {
                         
                         if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
                             // Append Record
-                            subscriptions.append(subscription)
+                            self.subscriptions.append(subscription)
                             
                         } else if let subscriptionID = subscriptionDictionary["subscriptionID"] as? String {
-                            deletedSubscriptionIDs.append(subscriptionID)
+                            self.deletedSubscriptionIDs.append(subscriptionID)
                             
                         } else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
                             
                             // Create Error
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
                             
-                            self.modifySubscriptionsCompletionBlock?(nil, nil, error)
+                            // todo add to errors
+                            //subscriptionErrors["id"] = error
                             
                         } else {
                             fatalError("Couldn't resolve record or record fetch error dictionary")
                         }
                     }
-                    
-                    self.modifySubscriptionsCompletionBlock?(subscriptions, deletedSubscriptionIDs, nil)
                 }
                 
-                
+                self.finish(error: nil)
             case .error(let error):
-                self.modifySubscriptionsCompletionBlock?(nil, nil, error.error)
-
+                self.finish(error: error.error)
             }
-            self.finish()
         }
         
         subscriptionURLRequest.performRequest()

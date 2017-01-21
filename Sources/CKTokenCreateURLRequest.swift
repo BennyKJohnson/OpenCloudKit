@@ -62,8 +62,16 @@ class CKTokenCreateOperation: CKOperation {
     
     var createTokenCompletionBlock: ((CKPushTokenInfo?, Error?) -> ())?
     
+    var info : CKPushTokenInfo?
+    
     var bodyDictionaryRepresentation: [String: Any] {
         return ["apnsEnvironment": "\(apnsEnvironment)"]
+    }
+    
+    override func finishOnCallbackQueue(error: Error?) {
+        createTokenCompletionBlock?(info, error)
+        
+        super.finishOnCallbackQueue(error: error)
     }
     
     override func performCKOperation() {
@@ -72,24 +80,17 @@ class CKTokenCreateOperation: CKOperation {
         request.accountInfoProvider = CloudKit.shared.defaultAccount
         request.requestProperties = bodyDictionaryRepresentation
         
-        request.completionBlock = {
-            (result) in
+        request.completionBlock = { result in
             
             switch result {
             case .success(let dictionary):
-               
-                
-                let info = CKPushTokenInfo(dictionaryRepresentation: dictionary)!
-                
-                self.createTokenCompletionBlock?(info, nil)
-                
+                self.info = CKPushTokenInfo(dictionaryRepresentation: dictionary)!
+                self.finish(error:nil)
                 
             case .error(let error):
-                self.createTokenCompletionBlock?(nil, error.error)
+                self.finish(error:error.error)
             }
-            
         }
-        
         request.performRequest()
         
     }

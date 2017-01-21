@@ -12,7 +12,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
     
     var isFetchCurrentUserOperation = false
     
-    var recordErrors: [String: Any] = [:]
+    var recordErrors: [String: Any] = [:] // todo use this for partial errors
     
     var shouldFetchAssetContent: Bool = false
     
@@ -38,6 +38,15 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         self.recordIDs = recordIDs
     }
     
+    override func finishOnCallbackQueue(error: Error?) {
+        if(error == nil){
+            // todo build partial error using recordErrors
+        }
+        self.fetchRecordsCompletionBlock?(self.recordIDsToRecords, error)
+        
+        super.finishOnCallbackQueue(error: error)
+    }
+    
     override func performCKOperation() {
         
         // Generate the CKOperation Web Service URL
@@ -53,14 +62,15 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             // Check if cancelled
-            if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.fetchRecordsCompletionBlock?(nil, cancelError)
-            }
+            // (Should no longer be needed)
+//            if self.isCancelled {
+//                // Send Cancelled Error to CompletionBlock
+//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
+//                self.fetchRecordsCompletionBlock?(nil, cancelError)
+//            }
             
             if let error = error {
-                self.fetchRecordsCompletionBlock?(nil, error)
+                self.finish(error: error)
             } else if let dictionary = dictionary {
                 // Process Records
                 if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
@@ -84,18 +94,16 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
                             // Call RecordCallback
                             self.perRecordCompletionBlock?(nil, nil, error)
                             
+                            // todo add to recordErrors array
+                            
                         }
                         
                         
                     }
                 }
             }
-            
-            // Call the final completionBlock
-            self.fetchRecordsCompletionBlock?(self.recordIDsToRecords, nil)
-            
             // Mark operation as complete
-            self.finish(error: [])
+            self.finish(error: nil)
             
         }
     }

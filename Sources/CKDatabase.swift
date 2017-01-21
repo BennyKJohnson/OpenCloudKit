@@ -174,7 +174,7 @@ extension CKDatabase {
         schedule(operation: operation)
     }
     
-    public func save(_ zone: CKRecordZone, completionHandler: @escaping (CKRecordZone?, NSError?) -> Swift.Void) {
+    public func save(_ zone: CKRecordZone, completionHandler: @escaping (CKRecordZone?, Error?) -> Swift.Void) {
         let operation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         operation.modifyRecordZonesCompletionBlock = {
             (savedZones, deletedZones, error) in
@@ -185,7 +185,7 @@ extension CKDatabase {
         schedule(operation: operation)
     }
     
-    public func delete(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: @escaping (CKRecordZoneID?, NSError?) -> Swift.Void) {
+    public func delete(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: @escaping (CKRecordZoneID?, Error?) -> Swift.Void) {
         let operation = CKModifyRecordZonesOperation(recordZonesToSave: [], recordZoneIDsToDelete: [zoneID])
         operation.modifyRecordZonesCompletionBlock = {
             (savedZones, deletedZones, error) in
