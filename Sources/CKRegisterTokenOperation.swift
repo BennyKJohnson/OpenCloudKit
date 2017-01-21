@@ -14,6 +14,8 @@ class CKRegisterTokenOperation : CKOperation {
     
     let apnsToken: Data
     
+    var tokenInfo: CKPushTokenInfo?
+    
     init(apnsEnvironment:CKEnvironment, apnsToken: Data) {
         
         self.apnsEnvironment = apnsEnvironment
@@ -24,8 +26,10 @@ class CKRegisterTokenOperation : CKOperation {
         
     }
     
-    override func finishOnCallbackQueueWithError(error: Error) {
-        registerTokenCompletionBlock?(nil,error)
+    override func finishOnCallbackQueue(error: Error?) {
+        registerTokenCompletionBlock?(tokenInfo, error)
+        
+        super.finishOnCallbackQueue(error: error)
     }
     
     public var registerTokenCompletionBlock: ((CKPushTokenInfo?, Error?) -> Void)?
@@ -36,15 +40,14 @@ class CKRegisterTokenOperation : CKOperation {
         request.completionBlock = { (result) in
             switch result {
             case .success(let dictionary):
-                let tokenInfo = CKPushTokenInfo(dictionaryRepresentation: dictionary)
-                
+                self.tokenInfo = CKPushTokenInfo(dictionaryRepresentation: dictionary)
                 print(dictionary)
-                self.registerTokenCompletionBlock?(tokenInfo, nil)
+                self.finish(error: nil)
             case .error(let error):
-                self.registerTokenCompletionBlock?(nil, error.error)
+                self.finish(error: error.error)
             }
             
-            self.finish()
+            
         }
         
         request.performRequest()

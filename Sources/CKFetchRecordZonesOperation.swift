@@ -41,12 +41,17 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
      */
     public var fetchRecordZonesCompletionBlock: (([CKRecordZoneID : CKRecordZone]?, Error?) -> Swift.Void)?
     
-    override func finishOnCallbackQueueWithError(error: Error) {
+    override func finishOnCallbackQueue(error: Error?) {
+        var error = error
+        if(error == nil){
+            if self.recordZoneErrors.count > 0 {
+                error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [CKPartialErrorsByItemIDKey: self.recordZoneErrors])
+            }
+        }
+        // Call the final completionBlock
+        self.fetchRecordZonesCompletionBlock?(self.recordZoneByZoneID, error)
         
-        self.fetchRecordZonesCompletionBlock?(nil, error)
-        
-        // Mark operation as complete
-        finish(error: [])
+        super.finishOnCallbackQueue(error: error)
     }
     
     override func performCKOperation() {
@@ -67,15 +72,16 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
         }
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
-            
-            if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.finishOnCallbackQueueWithError(error: cancelError)
-            }
+
+// shouldnt be needed
+//            if self.isCancelled {
+//                // Send Cancelled Error to CompletionBlock
+//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
+//                self.finishOnCallbackQueue(error: cancelError)
+//            }
             
             if let error = error {
-                self.finishOnCallbackQueueWithError(error: error)
+                self.finish(error: error)
                 return
             } else if let dictionary = dictionary {
                 // Process Records
@@ -94,18 +100,8 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
                 }
             }
             
-            let partialError: NSError?
-            if self.recordZoneErrors.count > 0 {
-                partialError = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [CKPartialErrorsByItemIDKey: self.recordZoneErrors])
-            } else {
-                partialError = nil
-            }
-            
-            // Call the final completionBlock
-            self.fetchRecordZonesCompletionBlock?(self.recordZoneByZoneID, partialError)
-            
             // Mark operation as complete
-            self.finish(error: [])
+            self.finish(error: nil)
             
         }
     }

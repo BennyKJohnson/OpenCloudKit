@@ -180,9 +180,9 @@ class CKURLRequest: NSObject {
     
     func requestDidParseObject() {}
     
-    var requestOperationClasses:[CKRequest.Type] {
-        return []
-    }
+//    var requestOperationClasses:[CKRequest.Type] {
+//        return []
+//    }
     
 }
 

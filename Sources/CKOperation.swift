@@ -8,23 +8,15 @@
 
 import Foundation
 
-enum CKOperationState: Int {
-    case initialized
-    case pending
-    case ready
-    case executing
-    case finished
-}
-
 public class CKOperation: Operation {
     
     public var container: CKContainer?
 
     public var requestUUIDs: [String] = []
     
-    var _isFinished: Bool = false
+    private var _finished: Bool = false
     
-    var _isExecuting: Bool = false
+    private var _executing: Bool = false
     
     var urlSessionTask: URLSessionTask?
     
@@ -38,8 +30,10 @@ public class CKOperation: Operation {
     
     weak var parentOperation: CKOperation?
     
-    private var state: CKOperationState = .initialized
+    private var error: Error?
     
+    private let callbackQueue: DispatchQueue = DispatchQueue(label: "queuename")
+
     override init() {
         operationID = NSUUID().uuidString
         super.init()
@@ -49,24 +43,34 @@ public class CKOperation: Operation {
         return container ?? CKContainer.default()
     }
 
-    public override func start() {
-        
-        super.start()
+    open override func start() {
         
         // Check if operation is already cancelled
-        if isCancelled {
-            state = .finished
+        if isCancelled && isFinished {
+            NSLog("Not starting already cancelled operation %@", self)
             return
         }
  
+        if(isExecuting || isFinished){
+            // NSException not available on Linux, fatalError is the alternative.
+            // NSException.raise(NSExceptionName.invalidArgumentException, format: "You can't restart an executing or finished CKOperation: %@", arguments:getVaList([self]))
+            fatalError("You can't restart an executing or finished CKOperation")
+        }
         
         // Send out KVO notifications for the executing
-        state = .executing
+        isExecuting = true
 
-    }
-    
-    func execute() {
+        if(isCancelled){
+            
+            // Must move the operation to the finished state if it is cancelled before it started.
+            let error = CKPrettyError(code: CKErrorCode.OperationCancelled, format: "Operation %@ was cancelled before it started", self)
+            
+            finish(error: error)
+            
+            return;
+        }
         
+        main()
     }
     
     func addAndRun(childOperation: CKOperation) {
@@ -78,21 +82,30 @@ public class CKOperation: Operation {
         // Configure Request
     }
     
-    public override func main() {
+    open override func main() {
 
         if !isCancelled {
-            performCKOperation()
-
-        } else {
-            finish()
+            do {
+                try CKOperationShouldRun()
+                performCKOperation()
+            } catch let error as Error {
+                finish(error: error)
+            }
         }
     }
     
-    public override func cancel() {
+    func CKOperationShouldRun() throws {
+        // default implementation does nothing.
+    }
+    
+    open override func cancel() {
         // Calling Super will update the isCancelled and send KVO notifications
         super.cancel()
         
-        // Not sure why cancel is overridden
+        let error = CKPrettyError.init(code: CKErrorCode.OperationCancelled, format: "Operation %@ was cancelled", self)
+        
+        finish(error: error)
+        
         urlSessionTask?.cancel()
     }
 
@@ -100,40 +113,67 @@ public class CKOperation: Operation {
         
     }
     
-    func finishOnCallbackQueueWithError(error: Error) {
+    func finishInternalOnCallbackQueue(error: Error?){
+        var error = error
+        if(!isExecuting){
+            return
+        }
+        if(error == nil){
+            if(isCancelled){
+                error = CKPrettyError(code: CKErrorCode.OperationCancelled, format: "Operation %@ was cancelled", self)
+            }
+        }
+        // not sure why this is retained yet
+        if(self.error == nil){
+            self.error = error;
+        }
+        if(!isFinished){
+            finishOnCallbackQueue(error: error)
+            return
+        }
+        NSLog("The operation operation %@ didn't start or is already finished", self)
     }
     
-    func performCKOperation() {}
+    // overrides require super
+    func finishOnCallbackQueue(error: Error?) {
+        assert(!isFinished, "Operation was already marked as finished")
+        isExecuting = false
+        isFinished = true
+    }
+    
+    func performCKOperation() {
+        // default implementation does nothing
+    }
 
-    final func finish(error:[NSError] = []) {
-        state = .finished
+    func finish(error: Error?) {
+        callbackQueue.async {
+            self.finishInternalOnCallbackQueue(error: error)
+        }
     }
     
-  
-    override public var isFinished: Bool {
-       return state == .finished
+    override public var isFinished : Bool {
+        get { return _finished }
+        set {
+            guard _finished != newValue else { return }
+            willChangeValue(forKey: "isFinished")
+            _finished = newValue
+            didChangeValue(forKey: "isFinished")
+        }
     }
     
-    override public var isExecuting: Bool {
-        return state == .executing
+    override public var isExecuting : Bool {
+        get { return _executing }
+        set {
+            guard _executing != newValue else { return }
+            willChangeValue(forKey: "isExecuting")
+            _executing = newValue
+            didChangeValue(forKey: "isExecuting")
+        }
     }
     
-    override public var isReady: Bool {
-        switch state {
-        case .initialized:
-            return true
-        case .ready:
-            return super.isReady || isCancelled
-            
-        default:
-            return false
-        } // MARK: State Management
-    }
-    /*
-    public var isConcurrent: Bool {
+    override public var isAsynchronous: Bool {
         get { return true }
     }
-    */
 }
 
 public class CKDatabaseOperation : CKOperation {

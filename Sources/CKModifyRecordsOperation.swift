@@ -107,7 +107,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
     
     public var recordIDsToDelete: [CKRecordID]?
     
-    var recordsByRecordIDs: [CKRecordID: CKRecord] = [:]
+    //var recordsByRecordIDs: [CKRecordID: CKRecord] = [:] // not sure what this is for yet
     
     /* Determines whether the batch should fail atomically or not. YES by default.
      This only applies to zones that support CKRecordZoneCapabilityAtomic. */
@@ -123,6 +123,11 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
     /* Called on success or failure for each record. */
     public var perRecordCompletionBlock: ((CKRecord?, NSError?) -> Swift.Void)?
     
+    private var recordErrors: [CKRecordID: Error] = [:]
+    
+    private var savedRecords: [CKRecord]?
+    
+    private var deletedRecordIDs: [CKRecordID]?
     
     /*  This block is called when the operation completes.
      The [NSOperation completionBlock] will also be called if both are set.
@@ -134,15 +139,46 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
      */
     public var modifyRecordsCompletionBlock: (([CKRecord]?, [CKRecordID]?, Error?) -> Swift.Void)?
 
+    override func finishOnCallbackQueue(error: Error?) {
+        var error = error
+        if(error == nil){
+            // report any partial errors
 
+            if(recordErrors.count > 0){
+                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [NSLocalizedDescriptionKey: "Partial Failure", CKPartialErrorsByItemIDKey: recordErrors], format: "Failed to modify some records")
+            }
+        }
+        
+        // Call the final completionBlock
+        self.modifyRecordsCompletionBlock?(savedRecords, deletedRecordIDs, error)
+        
+        self.modifyRecordsCompletionBlock = nil
+        self.perRecordProgressBlock = nil
+        self.perRecordCompletionBlock = nil
+        
+        super.finishOnCallbackQueue(error: error)
+    }
     
+    override func CKOperationShouldRun() throws {
+        
+        // todo validate recordsToSave
+        
+        // "An added share is being saved without its rootRecord (%@)"
+        
+        // "You can't save and delete the same record (%@) in a single operation"
+        
+        // "You can't delete the same record (%@) twice in a single operation"
+        
+        // "Unexpected recordID in property recordIDsToDelete passed to %@: %@"
+        
+    }
     
     override func performCKOperation() {
 
         // Generate the CKOperation Web Service URL
         let request = CKModifyRecordsURLRequest(recordsToSave: recordsToSave, recordIDsToDelete: recordIDsToDelete, isAtomic: isAtomic, database: database!, savePolicy: savePolicy, zoneID: zoneID)
         request.accountInfoProvider = CloudKit.shared.defaultAccount
-        let partialErrorsByItemID = NSMutableDictionary()
+        
         request.completionBlock = { (result) in
             // Check if cancelled
             if self.isCancelled {
@@ -157,29 +193,39 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                 
                 // Process Records
                 if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
+                    
+                    self.savedRecords = [CKRecord]()
+                    self.deletedRecordIDs = [CKRecordID]()
                     // Parse JSON into CKRecords
                     for recordDictionary in recordsDictionary {
                         
-                        
                         if let record = CKRecord(recordDictionary: recordDictionary) {
                             // Append Record
-                            self.recordsByRecordIDs[record.recordID] = record
+                            //self.recordsByRecordIDs[record.recordID] = record
                             
                             // Call RecordCallback
                             self.perRecordCompletionBlock?(record, nil)
+                            
+                            self.savedRecords?.append(record)
                             
                         } else if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: recordDictionary) {
                             
                             // Create Error
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: recordFetchError.reason])
-                            let recordName = recordDictionary["recordName"]
-                            // todo: the key should be a recordID
-                            partialErrorsByItemID.setObject(error, forKey: recordName as! NSCopying)
+                            let recordName = recordDictionary["recordName"] as! String
+                            let recordID = CKRecordID(recordName: recordName) // todo: get zone from dictionary
+                            
+                            self.recordErrors[recordID] = error
                             self.perRecordCompletionBlock?(nil, error)
                         } else {
                             
                             if let _ = recordDictionary["recordName"],
                                 let _ = recordDictionary["deleted"] {
+                                
+                                let recordName = recordDictionary["recordName"] as! String
+                                let recordID = CKRecordID(recordName: recordName) // todo: get zone from dictionary
+                                self.deletedRecordIDs?.append(recordID)
+                                
                                 
                             } else {
                                 fatalError("Couldn't resolve record or record fetch error dictionary")
@@ -189,21 +235,8 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                 }
             }
             
-            
-            let recordIDs = Array(self.recordsByRecordIDs.keys)
-            let records = Array(self.recordsByRecordIDs.values)
-            
-            // report any partial errors
-            var error : NSError?
-            if(partialErrorsByItemID.count > 0){
-                error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Partial Failure", CKPartialErrorsByItemIDKey: partialErrorsByItemID])
-            }
-                                   
-            // Call the final completionBlock                       
-            self.modifyRecordsCompletionBlock?(records, recordIDs, error)
-            
             // Mark operation as complete
-            self.finish(error: [])
+            self.finish(error: nil)
             
         }
         
