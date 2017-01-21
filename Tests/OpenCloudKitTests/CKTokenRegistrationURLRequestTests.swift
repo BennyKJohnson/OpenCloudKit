@@ -7,8 +7,8 @@
 //
 
 import XCTest
-@testable import OpenCloudKit
 import Foundation
+@testable import OpenCloudKit
 
 class CKCreateTokensTests: XCTestCase {
     
@@ -25,18 +25,7 @@ class CKCreateTokensTests: XCTestCase {
         CloudKit.shared.configure(with: CKConfig(container: containerConfig))
     }
     
-    func testCreateTokenURL() {
-        let request = CKTokenCreateURLRequest(apnsEnvironment: .development)
-        let url = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!
-        print(request.url)
-        XCTAssertEqual(url.path, "/device/\(CKServerInfo.version)/\(containerID)/\(environment)/tokens/create")
-    }
-    
-    func testRegisterTokenURL() {
-        let request = CKTokenRegistrationURLRequest(token: Data(), apnsEnvironment: "\(environment)")
-        let url = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!
-        XCTAssertEqual(url.path, "/device/\(CKServerInfo.version)/\(containerID)/\(environment)/tokens/register")
-    }
+  
     
     func testCreateTokenOperation() {
         CloudKit.shared.verbose = true

@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import Foundation
+
 @testable import OpenCloudKit
 
 class CKConfigTests: XCTestCase {

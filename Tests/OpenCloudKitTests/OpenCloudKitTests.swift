@@ -1,4 +1,5 @@
 import XCTest
+import Foundation
 @testable import OpenCloudKit
 
 class OpenCloudKitTests: XCTestCase {
@@ -30,13 +31,18 @@ class OpenCloudKitTests: XCTestCase {
     func testVerifySignedData() {
         
         let evpKey = try! EVPKey(contentsOfFile: publicECKeyPath(), type: EVPKeyType.Public)
-        let data = try! Data(contentsOf: URL(fileURLWithPath: "\(pathForTests())/Supporting/test.txt"))
+        #if os(Linux)
+            let data = try! NSData(contentsOf: URL(fileURLWithPath: "\(pathForTests())/Supporting/test.txt"))
+        #else
+            let data = NSData(contentsOf: URL(fileURLWithPath: "\(pathForTests())/Supporting/test.txt"))!
+        #endif
         
         let signedBase64 = "MEUCIQCa5vSe3xRHpN4FuUeNeNNB7gHpexMN1RYal4wJCpHExAIgdi/IV/K88aeIzoM0YaWp4PkX9T1+1oZNKZQY679uqRk="
-        let signedData = Data(base64Encoded: signedBase64, options: [])!
+        let signedData = NSData(base64Encoded: signedBase64, options: [])!
         
         let context = try! MessageVerifyContext(try! MessageDigest("sha256WithRSAEncryption"), withKey: evpKey)
-        try! context.update(data: data as NSData)
+        try! context.update(data: data)
+        
         
         XCTAssert(context.verify(signature: signedData as NSData), "Signature should verify successfully")
         
@@ -47,11 +53,13 @@ class OpenCloudKitTests: XCTestCase {
         let requestDate = "2016-07-13T03:16:51Z"
         let urlPath = "/database/1/iCloud.benjamin.CloudTest/development/public/records/query"
         let requestBody =  requestBodyString.data(using: String.Encoding.utf8)!
+        let requestBodyData = NSData(bytes: requestBody.bytes, length: requestBody.bytes.count)
         
         // Should Equal 0sdWcosXLRqAQp9TQ4LzZOTgiETnGpqlODfsnN9Cqr0=
-        let requestBodyHash = (requestBody as Data).sha256().base64EncodedString(options: [])
         
-        let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBody as NSData, urlSubpath: urlPath)
+        let requestBodyHash = Data(requestBody).sha256().base64EncodedString(options: [])
+        
+        let rawPayload = CKServerRequestAuth.rawPayload(withRequestDate: requestDate, requestBody: requestBodyData, urlSubpath: urlPath)
         
         let expectedPayload = "\(requestDate):\(requestBodyHash):\(urlPath)"
         XCTAssertEqual(rawPayload, expectedPayload)
@@ -59,9 +67,10 @@ class OpenCloudKitTests: XCTestCase {
     }
     
     func testSignWithPrivateKey() {
-        
+       
         let requestBody = requestBodyString.data(using: String.Encoding.utf8)!
-        let signedData = CKServerRequestAuth.sign(data: requestBody as NSData, privateKeyPath: ECKeyPath())
+        let signedData = CKServerRequestAuth.sign(data: NSData(bytes: requestBody.bytes, length: requestBody.bytes.count)
+, privateKeyPath: ECKeyPath())
         XCTAssertNotNil(signedData)
         
         //TODO: Verify the signature is correct

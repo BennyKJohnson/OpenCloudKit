@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Foundation
 @testable import OpenCloudKit
 
 class CKShareMetadataTests: XCTestCase {
@@ -15,6 +16,13 @@ class CKShareMetadataTests: XCTestCase {
     let environment: CKEnvironment = .development
     let apiToken = "69d9716386808b294a5378c1eca316a84c440f3d9f0a684738a0c353a510c14a"
     let databaseScope = CKDatabaseScope.public
+    
+    static var allTests : [(String, (CKShareMetadataTests) -> () throws -> Void)] {
+        return [
+            ("testShareMetadataFromJSON", testShareMetadataFromJSON),
+        //    ("testAcceptShareOperation", testAcceptShareOperation)
+        ]
+    }
     
     func pathForTests() -> String {
         let parent = (#file).components(separatedBy: "/").dropLast().joined(separator: "/")

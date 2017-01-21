@@ -179,7 +179,7 @@ struct CKPredicateReader {
             case "\"":
                 currentIndex += 1
                 let string = try parseString(currentIndex)!
-                parameters.append(string.0.bridge())
+                parameters.append(string.0)
                 
                 currentIndex = string.1
                 chunkIndex = currentIndex
@@ -216,7 +216,7 @@ struct CKPredicateReader {
             if let number = number {
                 return number
             } else {
-                return token.bridge()
+                return token
             }
         } else {
             return nil
