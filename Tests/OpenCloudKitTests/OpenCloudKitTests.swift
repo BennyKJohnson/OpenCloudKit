@@ -17,8 +17,7 @@ class OpenCloudKitTests: XCTestCase {
     func publicECKeyPath() -> String {
         return "\(pathForTests())/Supporting/eckey.pub"
     }
-    
-
+ 
     
     func testSHA256() {
         let message = "test"

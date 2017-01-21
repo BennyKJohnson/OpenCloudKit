@@ -47,7 +47,9 @@ enum CKModifyOperation: String {
 public class CKDatabase {
     
     weak var container: CKContainer!
+    
     public let scope: CKDatabaseScope
+    
     let operationQueue = OperationQueue()
     
     init(container: CKContainer, scope: CKDatabaseScope) {
@@ -60,6 +62,15 @@ public class CKDatabase {
         // Add to queue
         operationQueue.addOperation(operation)
         
+    }
+    
+    func schedule(operation: CKDatabaseOperation) {
+        
+        operation.database = self
+        operation.queuePriority = .veryHigh
+        operation.qualityOfService = .default
+        operationQueue.addOperation(operation)
+
     }
 }
 
@@ -77,7 +88,8 @@ extension CKDatabase {
             completionHandler(recordIDsForRecords?[recordID], error)
         }
         
-        fetchRecordOperation.start()
+        schedule(operation: fetchRecordOperation)
+        
     }
     
     public func save(record: CKRecord, completionHandler: @escaping (CKRecord?,
@@ -91,7 +103,7 @@ extension CKDatabase {
             completionHandler(records?.first, error)
         }
         
-        operation.start()
+        schedule(operation: operation)
     }
     
     public func delete(withRecordID recordID: CKRecordID, completionHandler: @escaping (CKRecordID?,
@@ -104,7 +116,7 @@ extension CKDatabase {
             completionHandler(recordIDs?.first, error)
         }
         
-        operation.start()
+        schedule(operation: operation)
         
     }
     
@@ -131,7 +143,7 @@ extension CKDatabase {
             }
         }
         
-        queryOperation.start()
+        schedule(operation: queryOperation)
     }
     
     /* Zones convenience methods */
@@ -147,7 +159,7 @@ extension CKDatabase {
             }
         }
         
-        operation.start()
+        schedule(operation: operation)
     }
     
     public func fetch(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: @escaping (CKRecordZone?, Error?) -> Swift.Void) {
@@ -159,7 +171,7 @@ extension CKDatabase {
 
         }
         
-        operation.start()
+        schedule(operation: operation)
     }
     
     public func save(_ zone: CKRecordZone, completionHandler: @escaping (CKRecordZone?, NSError?) -> Swift.Void) {
@@ -170,7 +182,7 @@ extension CKDatabase {
             completionHandler(savedZones?.first, error)
         }
         
-        operation.start()
+        schedule(operation: operation)
     }
     
     public func delete(withRecordZoneID zoneID: CKRecordZoneID, completionHandler: @escaping (CKRecordZoneID?, NSError?) -> Swift.Void) {
@@ -180,8 +192,8 @@ extension CKDatabase {
             
             completionHandler(deletedZones?.first, error)
         }
-        
-        operation.start()
+    
+        schedule(operation: operation)
     }
 
     /* Subscriptions convenience methods */
@@ -197,7 +209,8 @@ extension CKDatabase {
                 completionHandler(nil, error)
             }
         }
-        operation.start()
+        
+        schedule(operation: operation)
     }
     
     public func fetch(withSubscriptionID subscriptionID: String, completionHandler: @escaping (CKSubscription?, Error?) -> Swift.Void) {
@@ -208,7 +221,8 @@ extension CKDatabase {
             completionHandler(subscriptionsBySubscriptionID?[subscriptionID], error)
           
         }
-        operation.start()
+        
+        schedule(operation: operation)
     }
     
     public func save(_ subscription: CKSubscription, completionHandler: @escaping (CKSubscription?, Error?) -> Swift.Void) {
@@ -219,7 +233,7 @@ extension CKDatabase {
             completionHandler(subscriptions?.first, error)
         }
         
-        modifyOperation.start()
+        schedule(operation: modifyOperation)
     }
     
     public func delete(withSubscriptionID subscriptionID: String, completionHandler: @escaping (String?, Error?) -> Swift.Void) {
@@ -230,7 +244,7 @@ extension CKDatabase {
             completionHandler(deleted?.first, error)
         }
         
-        modifyOperation.start()
+        schedule(operation: modifyOperation)
     }
  
 }

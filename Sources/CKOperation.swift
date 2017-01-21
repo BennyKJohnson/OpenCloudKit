@@ -41,6 +41,10 @@ public class CKOperation: Operation {
     private var state: CKOperationState = .initialized
     
     override init() {
+        if type(of: self) == CKOperation.self {
+            fatalError("You must use a concrete subclass of CKOperation")
+        }
+        
         operationID = NSUUID().uuidString
         super.init()
     }
@@ -103,7 +107,9 @@ public class CKOperation: Operation {
     func finishOnCallbackQueueWithError(error: Error) {
     }
     
-    func performCKOperation() {}
+    func performCKOperation() {
+        fatalError("performCKOperation should be override by \(self)")
+    }
 
     final func finish(error:[NSError] = []) {
         state = .finished

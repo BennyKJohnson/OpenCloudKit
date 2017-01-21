@@ -11,6 +11,8 @@ import Foundation
 
 public class CKContainer {
     
+    let convenienceOperationQueue = OperationQueue()
+    
     public let containerIdentifier: String
     
     public init(containerIdentifier: String) {
@@ -50,6 +52,22 @@ public class CKContainer {
         
         // Verify the account is valid
         completionHandler(.available, nil)
+    }
+    
+    func schedule(convenienceOperation: CKOperation) {
+        convenienceOperation.queuePriority = .veryHigh
+        convenienceOperation.qualityOfService = .utility
+        
+        add(convenienceOperation)
+    }
+    
+    public func add(_ operation: CKOperation) {
+        if !operation.isKind(of: CKDatabaseOperation.self) {
+            operation.container = self
+            convenienceOperationQueue.addOperation(operation)
+        } else {
+            fatalError("CKDatabaseOperations must be submitted to a CKDatabase")
+        }
     }
 
 }
