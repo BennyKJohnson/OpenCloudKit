@@ -62,7 +62,7 @@ public class CKContainer {
     }
     
     public func add(_ operation: CKOperation) {
-        if !operation.isKind(of: CKDatabaseOperation.self) {
+        if !(operation is CKDatabaseOperation) {
             operation.container = self
             convenienceOperationQueue.addOperation(operation)
         } else {

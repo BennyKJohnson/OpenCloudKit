@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Dispatch
 
 public class CKOperation: Operation {
     
@@ -51,7 +52,7 @@ public class CKOperation: Operation {
         
         // Check if operation is already cancelled
         if isCancelled && isFinished {
-            NSLog("Not starting already cancelled operation %@", self)
+            print("Not starting already cancelled operation \(self)")
             return
         }
  
@@ -67,7 +68,7 @@ public class CKOperation: Operation {
         if(isCancelled){
             
             // Must move the operation to the finished state if it is cancelled before it started.
-            let error = CKPrettyError(code: CKErrorCode.OperationCancelled, format: "Operation %@ was cancelled before it started", self)
+            let error = CKPrettyError(code: CKErrorCode.OperationCancelled, description: "Operation \(self) was cancelled before it started")
             
             finish(error: error)
             
@@ -92,7 +93,7 @@ public class CKOperation: Operation {
             do {
                 try CKOperationShouldRun()
                 performCKOperation()
-            } catch let error as Error {
+            } catch {
                 finish(error: error)
             }
         }
@@ -106,7 +107,7 @@ public class CKOperation: Operation {
         // Calling Super will update the isCancelled and send KVO notifications
         super.cancel()
         
-        let error = CKPrettyError.init(code: CKErrorCode.OperationCancelled, format: "Operation %@ was cancelled", self)
+        let error = CKPrettyError(code: CKErrorCode.OperationCancelled, description: "Operation \(self) was cancelled")
         
         finish(error: error)
         
@@ -124,7 +125,7 @@ public class CKOperation: Operation {
         }
         if(error == nil){
             if(isCancelled){
-                error = CKPrettyError(code: CKErrorCode.OperationCancelled, format: "Operation %@ was cancelled", self)
+                error = CKPrettyError(code: CKErrorCode.OperationCancelled, description: "Operation \(self) was cancelled")
             }
         }
         // not sure why this is retained yet
@@ -135,7 +136,8 @@ public class CKOperation: Operation {
             finishOnCallbackQueue(error: error)
             return
         }
-        NSLog("The operation operation %@ didn't start or is already finished", self)
+        
+        print("The operation operation \(self) didn't start or is already finished")
     }
     
 
@@ -160,9 +162,15 @@ public class CKOperation: Operation {
         get { return _finished }
         set {
             guard _finished != newValue else { return }
-            willChangeValue(forKey: "isFinished")
-            _finished = newValue
-            didChangeValue(forKey: "isFinished")
+            // Linux doesn't support KVO
+            #if os(Linux)
+                _finished = newValue
+            #else
+                willChangeValue(forKey: "isFinished")
+                _finished = newValue
+                didChangeValue(forKey: "isFinished")
+            #endif
+
         }
     }
     
@@ -170,9 +178,15 @@ public class CKOperation: Operation {
         get { return _executing }
         set {
             guard _executing != newValue else { return }
-            willChangeValue(forKey: "isExecuting")
-            _executing = newValue
-            didChangeValue(forKey: "isExecuting")
+            
+            // Linux doesn't support KVO
+            #if os(Linux)
+                _executing = newValue
+            #else
+                willChangeValue(forKey: "isExecuting")
+                _executing = newValue
+                didChangeValue(forKey: "isExecuting")
+            #endif
         }
     }
     

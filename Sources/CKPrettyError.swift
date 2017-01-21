@@ -66,13 +66,27 @@ enum CKError {
 }
 
 class CKPrettyError: NSError {
+
+    /*
+     
+     CVarArgs not automatically supported in Swift Linux
+
     convenience init(code: CKErrorCode, format: String, _ args: CVarArg...){
         let description = String(format: format, arguments: args)
         self.init(code, userInfo: nil, error: nil, path: nil, URL: nil, description: description)
     }
-    
+
     convenience init(code: CKErrorCode, userInfo: NSErrorUserInfoType, format: String, _ args: CVarArg...){
         let description = String(format: format, arguments: args)
+        self.init(code: code, userInfo: userInfo, description: description)
+    }
+    */
+    
+    convenience init(code: CKErrorCode, description: String) {
+        self.init(code, userInfo: nil, error: nil, path: nil, URL: nil, description: description)
+    }
+    
+    convenience init(code: CKErrorCode, userInfo: NSErrorUserInfoType, description: String) {
         self.init(code, userInfo: userInfo, error: nil, path: nil, URL: nil, description: description)
     }
     

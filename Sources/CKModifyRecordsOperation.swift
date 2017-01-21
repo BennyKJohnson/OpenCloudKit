@@ -145,7 +145,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
             // report any partial errors
 
             if(recordErrors.count > 0){
-                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [NSLocalizedDescriptionKey: "Partial Failure", CKPartialErrorsByItemIDKey: recordErrors], format: "Failed to modify some records")
+                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [NSLocalizedDescriptionKey: "Partial Failure", CKPartialErrorsByItemIDKey: recordErrors], description: "Failed to modify some records")
             }
         }
         

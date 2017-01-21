@@ -78,7 +78,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         var error = error
         if(error == nil){
             if self.recordZoneErrors.count > 0 {
-                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [CKPartialErrorsByItemIDKey: recordZoneErrors], format: "Failed to modify some zones")
+                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [CKPartialErrorsByItemIDKey: recordZoneErrors], description: "Failed to modify some zones")
             }
         }
         
