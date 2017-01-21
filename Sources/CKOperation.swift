@@ -52,7 +52,9 @@ public class CKOperation: Operation {
         }
  
         if(isExecuting || isFinished){
-            NSException.raise(NSExceptionName.invalidArgumentException, format: "You can't restart an executing or finished CKOperation: %@", arguments:getVaList([self]))
+            // NSException not available on Linux, fatalError is the alternative.
+            // NSException.raise(NSExceptionName.invalidArgumentException, format: "You can't restart an executing or finished CKOperation: %@", arguments:getVaList([self]))
+            fatalError("You can't restart an executing or finished CKOperation")
         }
         
         // Send out KVO notifications for the executing
