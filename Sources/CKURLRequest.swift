@@ -34,8 +34,6 @@ class CKURLRequest: NSObject {
     var accountInfoProvider: CKAccountInfoProvider?
     
     var databaseScope: CKDatabaseScope = .public
-    
-    var delegateQueue : OperationQueue?
 
     var dateRequestWentOut: Date?
     
