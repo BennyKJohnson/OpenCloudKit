@@ -149,7 +149,8 @@ extension CKLocationType {
         "altitude": NSNumber(value: altitude),
         "speed": NSNumber(value: speed),
         "course": NSNumber(value: course),
-        "timestamp": NSNumber(value: UInt(timestamp.timeIntervalSince1970))
+        // CKWebServicesReference doesn't say if this should be seconds or milliseconds, assuming millis since thats what TIMESTAMP uses.
+        "timestamp": NSNumber(value: UInt64(timestamp.timeIntervalSince1970 * 1000))
         ]
     }
 }

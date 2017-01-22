@@ -155,13 +155,13 @@ public class CKRecord: NSObject {
         // Parse Created Dictionary
         if let createdDictionary = recordDictionary[CKRecordDictionary.created] as? [String: Any], let created = CKRecordLog(dictionary: createdDictionary) {
             self.creatorUserRecordID = CKRecordID(recordName: created.userRecordName)
-            self.creationDate = NSDate(timeIntervalSince1970: created.timestamp)
+            self.creationDate = NSDate(timeIntervalSince1970: Double(created.timestamp) / 1000)
         }
         
         // Parse Modified Dictionary
         if let modifiedDictionary = recordDictionary[CKRecordDictionary.modified] as? [String: Any], let modified = CKRecordLog(dictionary: modifiedDictionary) {
             self.lastModifiedUserRecordID = CKRecordID(recordName: modified.userRecordName)
-            self.modificationDate = NSDate(timeIntervalSince1970: modified.timestamp)
+            self.modificationDate = NSDate(timeIntervalSince1970: Double(modified.timestamp) / 1000)
         }
         
         // Enumerate Fields
@@ -202,12 +202,12 @@ struct CKValueType {
 }
 
 struct CKRecordLog {
-    let timestamp: TimeInterval
+    let timestamp: UInt64 // milliseconds
     let userRecordName: String
     let deviceID: String
     
     init?(dictionary: [String: Any]) {
-        guard let timestamp = (dictionary["timestamp"] as? NSNumber)?.doubleValue, let userRecordName = dictionary["userRecordName"] as? String, let deviceID =  dictionary["deviceID"] as? String else {
+        guard let timestamp = (dictionary["timestamp"] as? NSNumber)?.uint64Value, let userRecordName = dictionary["userRecordName"] as? String, let deviceID =  dictionary["deviceID"] as? String else {
             return nil
         }
         
@@ -272,7 +272,7 @@ extension CKRecord {
     static func process(number: NSNumber, type: String) -> CKRecordValue {
         switch(type) {
         case "TIMESTAMP":
-            return NSDate(timeIntervalSince1970: number.doubleValue)
+            return NSDate(timeIntervalSince1970: number.doubleValue / 1000)
         default:
             return number
         }
@@ -340,8 +340,8 @@ extension CKRecord {
                    // let stringArray =  array.bridge() as! [String]
                     return array.bridge()
                 case "TIMESTAMP_LIST":
-                    let dateArray = (array as! [NSNumber]).map({ (dateInterval) -> NSDate in
-                        return  NSDate(timeIntervalSince1970: dateInterval.doubleValue)
+                    let dateArray = (array as! [NSNumber]).map({ (timestamp) -> NSDate in
+                        return  NSDate(timeIntervalSince1970: timestamp.doubleValue / 1000)
                     })
                     return NSArray(array: dateArray)
                     
