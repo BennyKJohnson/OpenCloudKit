@@ -73,14 +73,10 @@ public class CKFetchRecordZonesOperation : CKDatabaseOperation {
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
 
-// shouldnt be needed
-//            if self.isCancelled {
-//                // Send Cancelled Error to CompletionBlock
-//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-//                self.finishOnCallbackQueue(error: cancelError)
-//            }
-            
-            if let error = error {
+            if(self.isCancelled){
+                return
+            }
+            else if let error = error {
                 self.finish(error: error)
                 return
             } else if let dictionary = dictionary {

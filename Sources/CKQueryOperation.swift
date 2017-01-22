@@ -62,14 +62,22 @@ public class CKQueryOperation: CKDatabaseOperation {
         super.finishOnCallbackQueue(error: error)
     }
     
+    func fetched(record: CKRecord){
+        callbackQueue.async {
+            self.recordFetchedBlock?(record)
+        }
+    }
+    
     override func performCKOperation() {
         
         let queryOperationURLRequest = CKQueryURLRequest(query: query!, cursor: cursor?.data.bridge(), limit: resultsLimit, requestedFields: desiredKeys, zoneID: zoneID)
         queryOperationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         queryOperationURLRequest.databaseScope = database?.scope ?? .public
-
+        
         queryOperationURLRequest.completionBlock = { (result) in
-            
+            if(self.isCancelled){
+                return
+            }
             switch result {
             case .success(let dictionary):
                 
@@ -95,7 +103,7 @@ public class CKQueryOperation: CKDatabaseOperation {
                         
                         if let record = CKRecord(recordDictionary: recordDictionary) {
                             // Call RecordCallback
-                            self.recordFetchedBlock?(record)
+                            self.fetched(record: record)
                         } else {
                             // Create Error
                             // Invalid state to be in, this operation normally doesnt provide partial errors

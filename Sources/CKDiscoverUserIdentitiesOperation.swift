@@ -28,11 +28,14 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
     public var discoverUserIdentitiesCompletionBlock: ((Error?) -> Swift.Void)?
     
     override func finishOnCallbackQueue(error: Error?) {
-        
         self.discoverUserIdentitiesCompletionBlock?(error)
-        
         super.finishOnCallbackQueue(error: error)
-        
+    }
+    
+    func discovered(userIdentity: CKUserIdentity, lookupInfo: CKUserIdentityLookupInfo){
+        callbackQueue.async {
+            self.userIdentityDiscoveredBlock?(userIdentity, lookupInfo)
+        }
     }
     
     override func performCKOperation() {
@@ -46,15 +49,10 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
-            // Check if cancelled
-            // (should no longer be needed)
-//            if self.isCancelled {
-//                // Send Cancelled Error to CompletionBlock
-//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-//                self.finishOnCallbackQueue(error: cancelError)
-//            }
-            
-            if let error = error {
+            if(self.isCancelled){
+                return
+            }
+            else if let error = error {
                 self.finish(error: error)
                 return
             } else if let dictionary = dictionary {
@@ -66,7 +64,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
                         if let userIdenity = CKUserIdentity(dictionary: userDictionary) {
                             
                             // Call RecordCallback
-                            self.userIdentityDiscoveredBlock?(userIdenity, userIdenity.lookupInfo!)
+                            self.discovered(userIdentity: userIdenity, lookupInfo: userIdenity.lookupInfo!)
                             
                         } else {
                             
@@ -83,4 +81,7 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
             self.finish(error: nil)
         }
     }
+    
+
+    
 }

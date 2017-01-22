@@ -85,6 +85,18 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
         
         super.finishOnCallbackQueue(error: error)
     }
+    
+    func progressed(asset: CKAsset, progress: Double){
+        callbackQueue.async {
+            self.perAssetProgressBlock?(asset, progress)
+        }
+    }
+    
+    func completed(asset: CKAsset, error: Error?){
+        callbackQueue.async {
+            self.perAssetCompletionBlock?(asset, error)
+        }
+    }
 }
 
 extension CKDownloadAssetsOperation {
@@ -116,7 +128,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
         let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
         
         // Call Progress Block
-        perAssetProgressBlock?(currentAsset, progress)
+        progressed(asset: currentAsset, progress: progress)
     }
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -128,7 +140,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
         }
         
         if let error = error {
-            perAssetCompletionBlock?(currentAsset, error)
+            completed(asset: currentAsset, error: error)
             
             // todo add to assetErrors array
         }
@@ -166,7 +178,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
                 try fileManager.copyItem(at: location, to: destinationURL)
             } catch let error as NSError {
                 print("Could not copy downloaded asset file to disk: \(error.localizedDescription)")
-                perAssetCompletionBlock?(currentAsset, error)
+                completed(asset: currentAsset, error: error)
                 return
             }
             
@@ -174,8 +186,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             currentAsset.fileURL = destinationURL as NSURL
             
             // Call perAssetCompleteBlock
-            perAssetCompletionBlock?(currentAsset, nil)
-  
+            completed(asset: currentAsset, error: nil)
     }
  }
 #endif

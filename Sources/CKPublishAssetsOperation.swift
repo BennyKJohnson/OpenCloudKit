@@ -17,17 +17,24 @@ public class CKPublishAssetsOperation : CKOperation {
     public var assetPublishedBlock: ((CKAsset?, Error?) -> Void)?
 
     override func finishOnCallbackQueue(error: Error?) {
-
+        if(error == nil){
+            // build partial error
+        }
+        
+        // call assets completion block
+        
+        super.finishOnCallbackQueue(error: error)
     }
     
     
     override func performCKOperation() {
-       
+       //self.finish(error: error or nil)
     }
     
     init(assets: [CKAsset]) {
         self.assets = assets
         
     }
+    
 }
 

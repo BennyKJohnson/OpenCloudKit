@@ -98,9 +98,7 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
             if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.finishOnCallbackQueue(error: cancelError)
+                return
             }
             
             if let error = error {

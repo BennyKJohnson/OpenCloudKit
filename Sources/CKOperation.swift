@@ -32,12 +32,15 @@ public class CKOperation: Operation {
     
     private var error: Error?
     
-    private let callbackQueue: DispatchQueue = DispatchQueue(label: "queuename")
-
     override init() {
         operationID = NSUUID().uuidString
         super.init()
     }
+    
+    // using dispatch queue rather than operation queue because don't need cancellation for the callbacks.
+    lazy var callbackQueue: DispatchQueue = {
+        return DispatchQueue(label: "opencloudkit.operation-\(self.operationID).callback")
+    }()
     
     var operationContainer: CKContainer {
         return container ?? CKContainer.default()
@@ -87,10 +90,11 @@ public class CKOperation: Operation {
         if !isCancelled {
             do {
                 try CKOperationShouldRun()
-                performCKOperation()
             } catch let error as Error {
                 finish(error: error)
+                return
             }
+            performCKOperation()
         }
     }
     
@@ -128,6 +132,7 @@ public class CKOperation: Operation {
             self.error = error;
         }
         if(!isFinished){
+            // subclasses will 
             finishOnCallbackQueue(error: error)
             return
         }

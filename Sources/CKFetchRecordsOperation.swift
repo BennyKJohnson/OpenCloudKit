@@ -18,6 +18,20 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
     
     var recordIDsToRecords: [CKRecordID: CKRecord] = [:]
     
+    /* Called repeatedly during transfer. */
+    public var perRecordProgressBlock: ((CKRecordID, Double) -> Void)?
+    
+    /* Called on success or failure for each record. */
+    public var perRecordCompletionBlock: ((CKRecord?, CKRecordID?, Error?) -> Void)?
+    
+    
+    /*  This block is called when the operation completes.
+     The [NSOperation completionBlock] will also be called if both are set.
+     If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
+     a dictionary of recordIDs to errors keyed off of CKPartialErrorsByItemIDKey.
+     */
+    public var fetchRecordsCompletionBlock: (([CKRecordID : CKRecord]?, Error?) -> Void)?
+    
     public class func fetchCurrentUserRecord() -> Self {
         let operation = self.init()
         operation.isFetchCurrentUserOperation = true
@@ -47,6 +61,18 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         super.finishOnCallbackQueue(error: error)
     }
     
+    func completed(record: CKRecord?, recordID: CKRecordID?, error: Error?){
+        callbackQueue.async {
+            self.perRecordCompletionBlock?(record, recordID, error)
+        }
+    }
+    
+    func progressed(recordID: CKRecordID, progress: Double){
+        callbackQueue.async {
+            self.perRecordProgressBlock?(recordID, progress)
+        }
+    }
+    
     override func performCKOperation() {
         
         // Generate the CKOperation Web Service URL
@@ -61,15 +87,10 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
             
-            // Check if cancelled
-            // (Should no longer be needed)
-//            if self.isCancelled {
-//                // Send Cancelled Error to CompletionBlock
-//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-//                self.fetchRecordsCompletionBlock?(nil, cancelError)
-//            }
-            
-            if let error = error {
+            if(self.isCancelled){
+                return
+            }
+            else if let error = error {
                 self.finish(error: error)
             } else if let dictionary = dictionary {
                 // Process Records
@@ -79,26 +100,26 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
                         
                         // Call Progress Block, this is hacky support and not the callbacks intented purpose
                         let progress = Double(index + 1) / Double(self.recordIDs!.count)
-                        self.perRecordProgressBlock?(self.recordIDs![index],progress)
+                        let recordID = self.recordIDs![index]
+                        self.progressed(recordID: recordID, progress: progress)
                         
                         if let record = CKRecord(recordDictionary: recordDictionary) {
                             self.recordIDsToRecords[record.recordID] = record
                             
-                            // Call RecordCallback
-                            self.perRecordCompletionBlock?(record, record.recordID, nil)
+                            // Call per record callback, not to be confused with finished
+                            self.completed(record: record, recordID: record.recordID, error: nil)
                             
                         } else {
                             
                             // Create Error
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server".bridge()])
-                            // Call RecordCallback
-                            self.perRecordCompletionBlock?(nil, nil, error)
+                            
+                            // Call per record callback, not to be confused with finished
+                            self.completed(record: nil, recordID: nil, error: error)
                             
                             // todo add to recordErrors array
                             
                         }
-                        
-                        
                     }
                 }
             }
@@ -108,19 +129,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         }
     }
     
-    /* Called repeatedly during transfer. */
-    public var perRecordProgressBlock: ((CKRecordID, Double) -> Void)?
-    
-    /* Called on success or failure for each record. */
-    public var perRecordCompletionBlock: ((CKRecord?, CKRecordID?, Error?) -> Void)?
-    
-    
-    /*  This block is called when the operation completes.
-     The [NSOperation completionBlock] will also be called if both are set.
-     If the error is CKErrorPartialFailure, the error's userInfo dictionary contains
-     a dictionary of recordIDs to errors keyed off of CKPartialErrorsByItemIDKey.
-     */
-    public var fetchRecordsCompletionBlock: (([CKRecordID : CKRecord]?, Error?) -> Void)?
+
     
     
 }

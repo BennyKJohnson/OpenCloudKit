@@ -48,6 +48,9 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         let subscriptionURLRequest = CKModifySubscriptionsURLRequest(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete)
         subscriptionURLRequest.completionBlock = {
             (result) in
+            if(self.isCancelled){
+                return
+            }
             switch result {
             case .success(let dictionary):
                 
