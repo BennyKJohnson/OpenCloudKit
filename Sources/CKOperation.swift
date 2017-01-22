@@ -78,7 +78,9 @@ public class CKOperation: Operation {
             return;
         }
         
-        main()
+        callbackQueue.async {
+            self.main()
+        }
     }
     
     func addAndRun(childOperation: CKOperation) {
@@ -95,10 +97,11 @@ public class CKOperation: Operation {
         if !isCancelled {
             do {
                 try CKOperationShouldRun()
+                performCKOperation()
             } catch {
-                finish(error: error)
+                // since main is called on callback queue we can finish directly
+                finishOnCallbackQueue(error: error)
             }
-            performCKOperation()
         }
     }
     
