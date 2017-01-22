@@ -35,7 +35,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         var error = error
         if(error == nil){
             if subscriptionErrors.count > 0 {
-                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [CKPartialErrorsByItemIDKey : subscriptionErrors], format: "Errors modifying subscriptions")
+                error = CKPrettyError(code: CKErrorCode.PartialFailure, userInfo: [CKPartialErrorsByItemIDKey : subscriptionErrors], description: "Errors modifying subscriptions")
             }
         }
         self.modifySubscriptionsCompletionBlock?(subscriptions, deletedSubscriptionIDs, error)
@@ -70,7 +70,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                         } else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
                             
                             // Create Error
-                            let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
+                            let _ = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
                             
                             // todo add to errors
                             //subscriptionErrors["id"] = error

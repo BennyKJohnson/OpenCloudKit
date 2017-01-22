@@ -18,6 +18,16 @@ class CKURLRequestTests: XCTestCase {
     let apiToken = "AUTH_KEY"
     let databaseScope = CKDatabaseScope.public
     
+    static var allTests : [(String, (CKURLRequestTests) -> () throws -> Void)] {
+        return [
+            ("testCKQueryURLRequestURL", testCKQueryURLRequestURL),
+            ("testCKModifySubscriptionsURLRequestURL", testCKModifySubscriptionsURLRequestURL),
+            ("testCKModifyRecordsURL", testCKModifyRecordsURL),
+            ("testCreateTokenURL", testCreateTokenURL),
+            ("testRegisterTokenURL", testRegisterTokenURL)
+        ]
+    }
+    
     override func setUp() {
         super.setUp()
         
@@ -26,8 +36,8 @@ class CKURLRequestTests: XCTestCase {
     }
     
     func testCKQueryURLRequestURL() {
-        
-        let queryURLRequest = CKQueryURLRequest(query: CKQuery(recordType: "Items", predicate: NSPredicate(value: true)), cursor: nil, limit: 0, requestedFields: nil, zoneID: nil)
+       
+        let queryURLRequest = CKQueryURLRequest(query:  CKQuery(recordType: "Items", filters: []), cursor: nil, limit: 0, requestedFields: nil, zoneID: nil)
         
         
         let queryURLComponents = URLComponents(url: queryURLRequest.url, resolvingAgainstBaseURL: false)!
@@ -41,6 +51,26 @@ class CKURLRequestTests: XCTestCase {
         
         let urlComponents = URLComponents(url: subscriptionURLRequest.url, resolvingAgainstBaseURL: false)!
         XCTAssertEqual(urlComponents.path, "/database/1/\(containerID)/\(environment)/\(databaseScope)/subscriptions/modify")
+    }
+    
+    func testCKModifyRecordsURL() {
+        let modifySubscriptionsURLRequest = CKModifyRecordsURLRequest(recordsToSave: nil, recordIDsToDelete: nil, isAtomic: true, database: CKContainer.default().publicCloudDatabase, savePolicy: .ChangedKeys, zoneID: nil)
+        
+        let urlComponents = URLComponents(url: modifySubscriptionsURLRequest.url, resolvingAgainstBaseURL: false)!
+        XCTAssertEqual(urlComponents.path, "/database/1/\(containerID)/\(environment)/\(databaseScope)/records/modify")
+    }
+    
+    func testCreateTokenURL() {
+        let request = CKTokenCreateURLRequest(apnsEnvironment: .development)
+        let url = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!
+        print(request.url)
+        XCTAssertEqual(url.path, "/device/\(CKServerInfo.version)/\(containerID)/\(environment)/tokens/create")
+    }
+    
+    func testRegisterTokenURL() {
+        let request = CKTokenRegistrationURLRequest(token: Data(), apnsEnvironment: "\(environment)")
+        let url = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!
+        XCTAssertEqual(url.path, "/device/\(CKServerInfo.version)/\(containerID)/\(environment)/tokens/register")
     }
     
     func assertDatabasePath(components: URLComponents, query: String) {

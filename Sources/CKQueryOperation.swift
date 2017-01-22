@@ -51,13 +51,13 @@ public class CKQueryOperation: CKDatabaseOperation {
         // "Warn: There's no point in running a query if there are no progress or completion blocks set. Bailing early."
         
         if(query == nil && cursor == nil){
-            throw CKPrettyError(code: CKErrorCode.InvalidArguments, format: "either a query or query cursor must be provided for %@", self)
+            throw CKPrettyError(code: CKErrorCode.InvalidArguments, description: "either a query or query cursor must be provided for \(self)")
         }
     }
     
     override func finishOnCallbackQueue(error: Error?) {
         // log "Operation %@ has completed. Query cursor is %@.%@%@"
-        self.queryCompletionBlock?(self.resultsCursor, error as NSError?)
+        self.queryCompletionBlock?(self.resultsCursor, error as? NSError)
         
         super.finishOnCallbackQueue(error: error)
     }

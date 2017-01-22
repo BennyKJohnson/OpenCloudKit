@@ -174,7 +174,7 @@ struct CKPredicate {
                 return value(forCastParameters: parseFunction!.parameters)!
                 
             } else {
-                return string.bridge()
+                return string
             }
         }
     }

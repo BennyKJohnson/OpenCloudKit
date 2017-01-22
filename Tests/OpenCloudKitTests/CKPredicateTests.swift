@@ -7,15 +7,36 @@
 //
 
 import XCTest
+import Foundation
 @testable import OpenCloudKit
 
 class CKPredicateTests: XCTestCase {
+    
+    static var allTests : [(String, (CKPredicateTests) -> () throws -> Void)] {
+        return [
+            ("testParseLocationFunction", testParseLocationFunction),
+            ("testParseLocation", testParseLocation),
+            ("testParseLocationExpression", testParseLocationExpression),
+            ("testFunctionParse", testFunctionParse),
+            //("testParsingCompoundPredicate", testParsingCompoundPredicate),
+            //("testParsingComponents", testParsingComponents),
+            //("testParsingComponents2", testParsingComponents2),
+            //("testParsingEqualsPredicate", testParsingEqualsPredicate),
+            //("testParsingLessThanPredicate", testParsingLessThanPredicate),
+            //("testParsingGreaterThanPredicate", testParsingGreaterThanPredicate),
+            //("testParsingDatePredicate", testParsingDatePredicate),
+            //("testParsingLocationPredicate", testParsingLocationPredicate),
+            //("testFilterDictionary", testFilterDictionary),
+            //("testFilterDictionaryWithNumber", testFilterDictionaryWithNumber),
+            //("testFilterDictionaryWithLocation", testFilterDictionaryWithLocation),
+        ]
+    }
 
     func testParseLocationFunction() {
         let testString = "distanceToLocation:fromLocation:(Location, <-33.00000000,+150.00000000> +/- 0.00m (speed -1.00 mps / course -1.0))"
         let reader = CKPredicateReader(string: testString)
         let function = try! reader.parseFunction(0)
-        
+    
         XCTAssertEqual("distanceToLocation:fromLocation:", function.0)
         XCTAssertEqual("Location", function.parameters[0] as! String)
         XCTAssertEqual("<-33.00000000,+150.00000000> +/- 0.00m (speed -1.00 mps / course -1.0)", function.parameters[1] as! String)
@@ -74,7 +95,7 @@ class CKPredicateTests: XCTestCase {
     }
     
     func testParsingEqualsPredicate() {
-        let predicate = NSPredicate(format: "name = %@", "Benjamin")
+        let predicate = NSPredicate(format: "name = %@", argumentArray: ["Benjamin"])
         let ckPredicate = CKPredicate(predicate: predicate)
         
         let expectedResult = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "Benjamin")
@@ -100,7 +121,7 @@ class CKPredicateTests: XCTestCase {
     
     func testParsingDatePredicate() {
         let date = NSDate()
-        let predicate = NSPredicate(format: "lastUpdated > %@", date)
+        let predicate = NSPredicate(format: "lastUpdated > %@", argumentArray: [date])
         print(predicate.predicateFormat)
         let ckPredicate = CKPredicate(predicate: predicate)
         
@@ -115,10 +136,7 @@ class CKPredicateTests: XCTestCase {
         
         let location = CKLocation(latitude: -33.8688, longitude: 151.2093)
 
-        let locationPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(%K,%@) < %f",
-                                            "Location",
-                                            location,
-                                            radiusInKilometers)
+        let locationPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(%K,%@) < %f", argumentArray: ["Location".bridge(),location, radiusInKilometers])
        
         let expectedResult = CKQueryFilter(fieldName: "Location", comparator: .lessThan, fieldValue: location)
         let predicate = CKPredicate(predicate: locationPredicate)
@@ -128,7 +146,7 @@ class CKPredicateTests: XCTestCase {
     func testFilterDictionary() {
         let filter = CKQueryFilter(fieldName: "name", comparator: .equals, fieldValue: "jack")
         let filterDictionary = filter.dictionary
-        let expectedDictionary: [String: Any] = ["comparator": "EQUALS".bridge(), "fieldName": "name".bridge(), "fieldValue": "jack".bridge()]
+        let expectedDictionary: [String: Any] = ["comparator": "EQUALS", "fieldName": "name", "fieldValue": "jack"]
         
         XCTAssertEqual(filterDictionary["comparator"] as! String, expectedDictionary["comparator"] as! String)
         XCTAssertEqual(filterDictionary["fieldName"] as! String, expectedDictionary["fieldName"] as! String)
