@@ -81,7 +81,9 @@ class CKTokenCreateOperation: CKOperation {
         request.requestProperties = bodyDictionaryRepresentation
         
         request.completionBlock = { result in
-            
+            if(self.isCancelled){
+                return
+            }
             switch result {
             case .success(let dictionary):
                 self.info = CKPushTokenInfo(dictionaryRepresentation: dictionary)!

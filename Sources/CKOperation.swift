@@ -33,8 +33,6 @@ public class CKOperation: Operation {
     
     private var error: Error?
     
-    private let callbackQueue: DispatchQueue = DispatchQueue(label: "queuename")
-
     override init() {
         if type(of: self) == CKOperation.self {
             fatalError("You must use a concrete subclass of CKOperation")
@@ -43,6 +41,11 @@ public class CKOperation: Operation {
         operationID = NSUUID().uuidString
         super.init()
     }
+    
+    // using dispatch queue rather than operation queue because don't need cancellation for the callbacks.
+    lazy var callbackQueue: DispatchQueue = {
+        return DispatchQueue(label: "opencloudkit.operation-\(self.operationID).callback")
+    }()
     
     var operationContainer: CKContainer {
         return container ?? CKContainer.default()
@@ -75,7 +78,9 @@ public class CKOperation: Operation {
             return;
         }
         
-        main()
+        callbackQueue.async {
+            self.main()
+        }
     }
     
     func addAndRun(childOperation: CKOperation) {
@@ -94,7 +99,8 @@ public class CKOperation: Operation {
                 try CKOperationShouldRun()
                 performCKOperation()
             } catch {
-                finish(error: error)
+                // since main is called on callback queue we can finish directly
+                finishOnCallbackQueue(error: error)
             }
         }
     }
@@ -133,6 +139,7 @@ public class CKOperation: Operation {
             self.error = error;
         }
         if(!isFinished){
+            // subclasses will 
             finishOnCallbackQueue(error: error)
             return
         }

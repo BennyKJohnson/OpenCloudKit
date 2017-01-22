@@ -50,6 +50,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         super.finishOnCallbackQueue(error: error)
     }
+
     
     override func performCKOperation() {
         
@@ -63,7 +64,10 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
-            if let error = networkError {
+            if(self.isCancelled){
+                return
+            }
+            else if let error = networkError {
                 
                 self.finish(error: error)
                 

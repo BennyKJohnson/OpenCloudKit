@@ -117,11 +117,12 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
     
     /* Called repeatedly during transfer.
      It is possible for progress to regress when a retry is automatically triggered.
+     Todo: still to be implemented
      */
     public var perRecordProgressBlock: ((CKRecord, Double) -> Swift.Void)?
     
     /* Called on success or failure for each record. */
-    public var perRecordCompletionBlock: ((CKRecord?, NSError?) -> Swift.Void)?
+    public var perRecordCompletionBlock: ((CKRecord?, Error?) -> Swift.Void)?
     
     private var recordErrors: [CKRecordID: Error] = [:]
     
@@ -159,6 +160,18 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         super.finishOnCallbackQueue(error: error)
     }
     
+    func completed(record: CKRecord?, error: Error?){
+        callbackQueue.async {
+            self.perRecordCompletionBlock?(record, error)
+        }
+    }
+    
+    func progressed(record: CKRecord, progress: Double){
+        callbackQueue.async {
+            self.perRecordProgressBlock?(record, progress)
+        }
+    }
+    
     override func CKOperationShouldRun() throws {
         
         // todo validate recordsToSave
@@ -180,12 +193,10 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         request.accountInfoProvider = CloudKit.shared.defaultAccount
         
         request.completionBlock = { (result) in
-            // Check if cancelled
-            if self.isCancelled {
-                // Send Cancelled Error to CompletionBlock
-                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-                self.modifyRecordsCompletionBlock?(nil, nil, cancelError)
+            if(self.isCancelled){
+                return
             }
+            
             switch result {
             case .error(let error):
                 self.modifyRecordsCompletionBlock?(nil, nil, error.error)
@@ -202,11 +213,10 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                         if let record = CKRecord(recordDictionary: recordDictionary) {
                             // Append Record
                             //self.recordsByRecordIDs[record.recordID] = record
+                            self.savedRecords?.append(record)
                             
                             // Call RecordCallback
-                            self.perRecordCompletionBlock?(record, nil)
-                            
-                            self.savedRecords?.append(record)
+                            self.completed(record: record, error: nil)
                             
                         } else if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: recordDictionary) {
                             
@@ -216,7 +226,9 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                             let recordID = CKRecordID(recordName: recordName) // todo: get zone from dictionary
                             
                             self.recordErrors[recordID] = error
-                            self.perRecordCompletionBlock?(nil, error)
+                            
+                            // todo the original record should be passed in here, that is probably what the self.recordsByRecordIDs was for
+                            self.completed(record: nil, error: error)
                         } else {
                             
                             if let _ = recordDictionary["recordName"],

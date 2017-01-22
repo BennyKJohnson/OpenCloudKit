@@ -33,8 +33,6 @@ class CKURLRequest: NSObject {
     
     var accountInfoProvider: CKAccountInfoProvider?
     
-    var isCancelled: Bool = false
-    
     var databaseScope: CKDatabaseScope = .public
 
     var dateRequestWentOut: Date?
@@ -165,6 +163,8 @@ class CKURLRequest: NSObject {
     
     func performRequest() {
         dateRequestWentOut = Date()
+        
+        // maybe could have passed in CKOperation's callbackQueue as the delegateQueue, would have simplified the code
         let session = URLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
 
         urlSessionTask = session.dataTask(with: request)
@@ -173,7 +173,7 @@ class CKURLRequest: NSObject {
     }
     
     func cancel() {
-        isCancelled = true
+        urlSessionTask?.cancel()
     }
     
     func requestDidParseNodeFailure() {}

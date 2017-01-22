@@ -32,6 +32,12 @@ public class CKAcceptSharesOperation: CKOperation {
         super.finishOnCallbackQueue(error: error)
     }
     
+    func perShare(shareMetadata: CKShareMetadata, acceptedShare: CKShare?, error: Error?){
+        callbackQueue.async {
+            self.perShareCompletionBlock?(shareMetadata, nil, nil)
+        }
+    }
+
     override func performCKOperation() {
         
         let operationURLRequest = CKAcceptSharesURLRequest(shortGUIDs: shortGUIDs)
@@ -39,7 +45,9 @@ public class CKAcceptSharesOperation: CKOperation {
         operationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         
         operationURLRequest.completionBlock = { (result) in
-            
+            if(self.isCancelled){
+                return
+            }
             switch result {
             case .success(let dictionary):
                 
@@ -48,9 +56,8 @@ public class CKAcceptSharesOperation: CKOperation {
                     // Parse JSON into CKRecords
                     for resultDictionary in resultsDictionary {
                         if let shareMetadata = CKShareMetadata(dictionary: resultDictionary) {
-                            self.perShareCompletionBlock?(shareMetadata, nil, nil)
+                            self.perShare(shareMetadata: shareMetadata, acceptedShare: nil, error: nil)
                         }
-                        
                     }
                 }
                 
@@ -63,6 +70,7 @@ public class CKAcceptSharesOperation: CKOperation {
         
         operationURLRequest.performRequest()
     }
+
 
     
 }

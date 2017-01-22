@@ -28,6 +28,11 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
         super.finishOnCallbackQueue(error: error)
     }
     
+    func discovered(userIdentity: CKUserIdentity){
+        callbackQueue.async {
+            self.userIdentityDiscoveredBlock?(userIdentity)
+        }
+    }
     
     override func performCKOperation() {
         
@@ -35,14 +40,9 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
       
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url) { (dictionary, error) in
             
-            // Check if cancelled
-            // (Should no longer be needed)
-//            if self.isCancelled {
-//                // Send Cancelled Error to CompletionBlock
-//                let cancelError = NSError(domain: CKErrorDomain, code: CKErrorCode.OperationCancelled.rawValue, userInfo: nil)
-//                self.finishOnCallbackQueue(error: cancelError)
-//            }
-//            
+            if(self.isCancelled){
+                return
+            }
             if let error = error {
                 self.finish(error: error)
                 return
@@ -52,11 +52,11 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
                     // Parse JSON into CKRecords
                     for userDictionary in userDictionaries {
                         
-                        if let userIdenity = CKUserIdentity(dictionary: userDictionary) {
-                            self.discoveredIdentities.append(userIdenity)
+                        if let userIdentity = CKUserIdentity(dictionary: userDictionary) {
+                            self.discoveredIdentities.append(userIdentity)
                             
-                            // Call RecordCallback
-                            self.userIdentityDiscoveredBlock?(userIdenity)
+                            // Call discovered callback
+                            self.discovered(userIdentity: userIdentity)
                             
                         } else {
                             
