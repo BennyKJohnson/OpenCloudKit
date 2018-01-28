@@ -169,7 +169,7 @@ class CKURLRequest: NSObject {
 
         urlSessionTask = session.dataTask(with: request)
         urlSessionTask!.resume()
-        
+        session.finishTasksAndInvalidate()
     }
     
     func cancel() {
