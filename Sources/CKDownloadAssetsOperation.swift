@@ -176,7 +176,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             
             do {
                 try fileManager.copyItem(at: location, to: destinationURL)
-            } catch let error as NSError {
+            } catch let error {
                 CloudKit.debugPrint("Could not copy downloaded asset file to disk: \(error.localizedDescription)")
                 completed(asset: currentAsset, error: error)
                 return

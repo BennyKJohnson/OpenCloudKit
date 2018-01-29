@@ -209,7 +209,7 @@ extension CKURLRequest: URLSessionDataDelegate {
                 completionBlock?(result)
             }
         
-        } catch let error as NSError {
+        } catch let error {
             completionBlock?(.error(.parse(error)))
         }
     }
