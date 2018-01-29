@@ -44,7 +44,7 @@ class CKRegisterTokenOperation : CKOperation {
             switch result {
             case .success(let dictionary):
                 strongSelf.tokenInfo = CKPushTokenInfo(dictionaryRepresentation: dictionary)
-                print(dictionary)
+                CloudKit.debugPrint(dictionary)
                 strongSelf.finish(error: nil)
             case .error(let error):
                 strongSelf.finish(error: error.error)

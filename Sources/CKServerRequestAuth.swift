@@ -64,7 +64,7 @@ struct CKServerRequestAuth {
                     fatalError("Error occured while signing \(error)")
                 }
             } else {
-                print(error)
+                CloudKit.debugPrint(error)
                 return nil
             }
         }

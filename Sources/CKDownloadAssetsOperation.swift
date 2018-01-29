@@ -48,7 +48,7 @@ public class CKDownloadAssetsOperation: CKDatabaseOperation {
             // Create URLSessionDownloadTasks
             for asset in assetsToDownload {
                 if let downloadURL = asset.downloadURL {
-                    print("URL: \(downloadURL.absoluteString)")
+                    CloudKit.debugPrint("URL: \(downloadURL.absoluteString)")
                     // Create request for download URL
                     let downloadRequest = URLRequest(url: downloadURL)
                     // Create download task
@@ -134,7 +134,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         let downloadTask = task as! URLSessionDownloadTask
         
-        print(task.currentRequest?.url?.absoluteString as Any)
+        CloudKit.debugPrint(task.currentRequest?.url?.absoluteString as Any)
         guard let currentAsset = assetsByDownloadTask[downloadTask] else {
             fatalError("Asset should belong to completed download task")
         }
@@ -166,7 +166,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             let filename = NSUUID().uuidString
             let destinationURL = URL(fileURLWithPath: "\(temporaryDirectory)\(filename)")
             
-            print(destinationURL)
+            CloudKit.debugPrint(destinationURL)
         
             let fileManager = FileManager.default
             do {
@@ -177,7 +177,7 @@ extension CKDownloadAssetsOperation: URLSessionDownloadDelegate {
             do {
                 try fileManager.copyItem(at: location, to: destinationURL)
             } catch let error as NSError {
-                print("Could not copy downloaded asset file to disk: \(error.localizedDescription)")
+                CloudKit.debugPrint("Could not copy downloaded asset file to disk: \(error.localizedDescription)")
                 completed(asset: currentAsset, error: error)
                 return
             }

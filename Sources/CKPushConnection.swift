@@ -37,7 +37,7 @@ class CKPushConnection: NSObject, URLSessionDataDelegate {
         // Serialize JSON
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                print(json)
+                CloudKit.debugPrint(json)
                 // Create Notification
                 if let notification = CKNotification.notification(fromRemoteNotificationDictionary: json) {
                     callBack?(notification)
@@ -57,7 +57,7 @@ class CKPushConnection: NSObject, URLSessionDataDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
-            print(error)
+            CloudKit.debugPrint(error)
         }
         
         // Restart Task
