@@ -50,7 +50,7 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         super.finishOnCallbackQueue(error: error)
     }
-
+    
     
     override func performCKOperation() {
         
@@ -63,36 +63,38 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         }
         
         
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, networkError) in
-            if(self.isCancelled){
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, networkError) in
+            
+            guard self != nil, !self!.isCancelled else {
                 return
             }
-            else if let error = networkError {
+            
+            defer {
+                self?.finish(error: networkError)
+            }
+            
+            guard let dictionary = dictionary,
+                let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]],
+                networkError == nil else {
+                    return
+            }
+            
+            // Parse JSON into CKRecords
+            for subscriptionDictionary in subscriptionsDictionary {
                 
-                self.finish(error: error)
-                
-            } else if let dictionary = dictionary {
-                
-                if let subscriptionsDictionary = dictionary["subscriptions"] as? [[String: Any]] {
-                    // Parse JSON into CKRecords
-                    for subscriptionDictionary in subscriptionsDictionary {
-                        
-                        if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
-                            // Append Record
-                            self.subscriptionsIDToSubscriptions[subscription.subscriptionID] = subscription
-                            
-                        }  else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
-                           
-                            let errorCode = CKErrorCode.errorCode(serverError: subscriptionFetchError.serverErrorCode)!
-                            let error = NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
-                            
-                            self.subscriptionErrors[subscriptionFetchError.subscriptionID] = error
-                            
-                        } else {
-                            fatalError("Couldn't resolve record or record fetch error dictionary")
-                        }
-                    }
-                    self.finish(error: nil)
+                if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
+                    // Append Record
+                    self?.subscriptionsIDToSubscriptions[subscription.subscriptionID] = subscription
+                    
+                }  else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
+                    
+                    let errorCode = CKErrorCode.errorCode(serverError: subscriptionFetchError.serverErrorCode)!
+                    let error = NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
+                    
+                    self?.subscriptionErrors[subscriptionFetchError.subscriptionID] = error
+                    
+                } else {
+                    fatalError("Couldn't resolve record or record fetch error dictionary")
                 }
             }
         }

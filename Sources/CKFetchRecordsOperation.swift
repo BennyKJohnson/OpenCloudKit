@@ -85,51 +85,53 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         
         request["records"] = lookupRecords?.bridge() 
         
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, error) in
             
-            if(self.isCancelled){
+            guard self != nil, !self!.isCancelled else {
                 return
             }
-            else if let error = error {
-                self.finish(error: error)
-            } else if let dictionary = dictionary {
-                // Process Records
-                if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
-                    // Parse JSON into CKRecords
-                    for (index,recordDictionary) in recordsDictionary.enumerated() {
-                        
-                        // Call Progress Block, this is hacky support and not the callbacks intented purpose
-                        let progress = Double(index + 1) / Double(self.recordIDs!.count)
-                        let recordID = self.recordIDs![index]
-                        self.progressed(recordID: recordID, progress: progress)
-                        
-                        if let record = CKRecord(recordDictionary: recordDictionary) {
-                            self.recordIDsToRecords[record.recordID] = record
-                            
-                            // Call per record callback, not to be confused with finished
-                            self.completed(record: record, recordID: record.recordID, error: nil)
-                            
-                        } else {
-                            
-                            // Create Error
-                            let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server".bridge()])
-                            
-                            // Call per record callback, not to be confused with finished
-                            self.completed(record: nil, recordID: nil, error: error)
-                            
-                            // todo add to recordErrors array
-                            
-                        }
-                    }
-                }
-            }
-            // Mark operation as complete
-            self.finish(error: nil)
             
+            defer {
+                self?.finish(error: error)
+            }
+            
+            guard let dictionary = dictionary,
+                let recordsDictionary = dictionary["records"] as? [[String: Any]],
+                error == nil else {
+                    return
+            }
+            
+            // Process Records
+            // Parse JSON into CKRecords
+            for (index,recordDictionary) in recordsDictionary.enumerated() {
+                
+                // Call Progress Block, this is hacky support and not the callbacks intented purpose
+                let progress = Double(index + 1) / Double((self?.recordIDs!.count)!)
+                let recordID = self?.recordIDs![index]
+                self?.progressed(recordID: recordID!, progress: progress)
+                
+                if let record = CKRecord(recordDictionary: recordDictionary) {
+                    self?.recordIDsToRecords[record.recordID] = record
+                    
+                    // Call per record callback, not to be confused with finished
+                    self?.completed(record: record, recordID: record.recordID, error: nil)
+                    
+                } else {
+                    
+                    // Create Error
+                    let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server".bridge()])
+                    
+                    // Call per record callback, not to be confused with finished
+                    self?.completed(record: nil, recordID: nil, error: error)
+                    
+                    // todo add to recordErrors array
+                    
+                }
+            }            
         }
     }
     
-
+    
     
     
 }

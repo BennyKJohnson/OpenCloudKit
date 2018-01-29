@@ -37,17 +37,17 @@ class CKRegisterTokenOperation : CKOperation {
     override func performCKOperation() {
         
         let request = CKTokenRegistrationURLRequest(token: apnsToken, apnsEnvironment: "\(apnsEnvironment)")
-        request.completionBlock = { (result) in
-            if(self.isCancelled){
+        request.completionBlock = { [weak self] (result) in
+            guard self != nil, !self!.isCancelled else {
                 return
             }
             switch result {
             case .success(let dictionary):
-                self.tokenInfo = CKPushTokenInfo(dictionaryRepresentation: dictionary)
+                self?.tokenInfo = CKPushTokenInfo(dictionaryRepresentation: dictionary)
                 print(dictionary)
-                self.finish(error: nil)
+                self?.finish(error: nil)
             case .error(let error):
-                self.finish(error: error.error)
+                self?.finish(error: error.error)
             }
         }
         

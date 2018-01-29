@@ -95,38 +95,32 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         
         let request: [String: Any] = ["operations": zoneOperations]
         
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, error) in
             
-            if self.isCancelled {
+            guard self != nil, !self!.isCancelled else {
                 return
             }
             
-            if let error = error {
-                self.finish(error: error)
-                return
-            } else if let dictionary = dictionary {
-                // Process Records
-                if let zoneDictionaries = dictionary["zones"] as? [[String: Any]] {
-                    // Parse JSON into CKRecords
-                    for zoneDictionary in zoneDictionaries {
-                        
-                        if let zone = CKRecordZone(dictionary: zoneDictionary) {
-                            self.recordZonesByZoneIDs[zone.zoneID] = zone
-                        } else if let fetchError = CKFetchErrorDictionary<CKRecordZoneID>(dictionary: zoneDictionary) {
-                            
-                            // Append Error
-                            self.recordZoneErrors[fetchError.identifier] = fetchError.error()
-                        }
-                    }
+            defer {
+                self?.finish(error: error)
+            }
+            
+            guard let dictionary = dictionary,
+                let zoneDictionaries = dictionary["zones"] as? [[String: Any]],
+                error == nil else {
+                    return
+            }
+            
+            // Parse JSON into CKRecords
+            for zoneDictionary in zoneDictionaries {
+                if let zone = CKRecordZone(dictionary: zoneDictionary) {
+                    self?.recordZonesByZoneIDs[zone.zoneID] = zone
+                } else if let fetchError = CKFetchErrorDictionary<CKRecordZoneID>(dictionary: zoneDictionary) {
+                    
+                    // Append Error
+                    self?.recordZoneErrors[fetchError.identifier] = fetchError.error()
                 }
             }
-            
-
-            
-            // Mark operation as complete
-            self.finish(error: nil)
-
-  
+        }
     }
-}
 }
