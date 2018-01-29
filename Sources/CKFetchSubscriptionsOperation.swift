@@ -65,12 +65,12 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, networkError) in
             
-            guard self != nil, !self!.isCancelled else {
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             
             defer {
-                self?.finish(error: networkError)
+                strongSelf.finish(error: networkError)
             }
             
             guard let dictionary = dictionary,
@@ -84,14 +84,14 @@ public class CKFetchSubscriptionsOperation : CKDatabaseOperation {
                 
                 if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
                     // Append Record
-                    self?.subscriptionsIDToSubscriptions[subscription.subscriptionID] = subscription
+                    strongSelf.subscriptionsIDToSubscriptions[subscription.subscriptionID] = subscription
                     
                 }  else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
                     
                     let errorCode = CKErrorCode.errorCode(serverError: subscriptionFetchError.serverErrorCode)!
                     let error = NSError(domain: CKErrorDomain, code: errorCode.rawValue, userInfo: [NSLocalizedDescriptionKey: subscriptionFetchError.reason])
                     
-                    self?.subscriptionErrors[subscriptionFetchError.subscriptionID] = error
+                    strongSelf.subscriptionErrors[subscriptionFetchError.subscriptionID] = error
                     
                 } else {
                     fatalError("Couldn't resolve record or record fetch error dictionary")

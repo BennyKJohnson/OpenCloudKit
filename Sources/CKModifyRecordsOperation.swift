@@ -194,30 +194,30 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
         
         request.completionBlock = { [weak self] (result) in
             
-            guard self != nil, !self!.isCancelled else {
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             
             switch result {
             case .error(let error):
-                self?.modifyRecordsCompletionBlock?(nil, nil, error.error)
+                strongSelf.modifyRecordsCompletionBlock?(nil, nil, error.error)
             case .success(let dictionary):
                 
                 // Process Records
                 if let recordsDictionary = dictionary["records"] as? [[String: Any]] {
                     
-                    self?.savedRecords = [CKRecord]()
-                    self?.deletedRecordIDs = [CKRecordID]()
+                    strongSelf.savedRecords = [CKRecord]()
+                    strongSelf.deletedRecordIDs = [CKRecordID]()
                     // Parse JSON into CKRecords
                     for recordDictionary in recordsDictionary {
                         
                         if let record = CKRecord(recordDictionary: recordDictionary) {
                             // Append Record
                             //self.recordsByRecordIDs[record.recordID] = record
-                            self?.savedRecords?.append(record)
+                            strongSelf.savedRecords?.append(record)
                             
                             // Call RecordCallback
-                            self?.completed(record: record, error: nil)
+                            strongSelf.completed(record: record, error: nil)
                             
                         } else if let recordFetchError = CKRecordFetchErrorDictionary(dictionary: recordDictionary) {
                             
@@ -226,10 +226,10 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                             let recordName = recordDictionary["recordName"] as! String
                             let recordID = CKRecordID(recordName: recordName) // todo: get zone from dictionary
                             
-                            self?.recordErrors[recordID] = error
+                            strongSelf.recordErrors[recordID] = error
                             
                             // todo the original record should be passed in here, that is probably what the self.recordsByRecordIDs was for
-                            self?.completed(record: nil, error: error)
+                            strongSelf.completed(record: nil, error: error)
                         } else {
                             
                             if let _ = recordDictionary["recordName"],
@@ -237,7 +237,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
                                 
                                 let recordName = recordDictionary["recordName"] as! String
                                 let recordID = CKRecordID(recordName: recordName) // todo: get zone from dictionary
-                                self?.deletedRecordIDs?.append(recordID)
+                                strongSelf.deletedRecordIDs?.append(recordID)
                                 
                                 
                             } else {
@@ -249,7 +249,7 @@ public class CKModifyRecordsOperation: CKDatabaseOperation {
             }
             
             // Mark operation as complete
-            self?.finish(error: nil)
+            strongSelf.finish(error: nil)
             
         }
         

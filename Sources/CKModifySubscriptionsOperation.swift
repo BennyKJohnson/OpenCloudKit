@@ -47,7 +47,7 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
         
         let subscriptionURLRequest = CKModifySubscriptionsURLRequest(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete)
         subscriptionURLRequest.completionBlock = { [weak self] (result) in
-            guard self != nil, !self!.isCancelled else {
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             switch result {
@@ -61,10 +61,10 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                         
                         if let subscription = CKSubscription(dictionary: subscriptionDictionary) {
                             // Append Record
-                            self?.subscriptions.append(subscription)
+                            strongSelf.subscriptions.append(subscription)
                             
                         } else if let subscriptionID = subscriptionDictionary["subscriptionID"] as? String {
-                            self?.deletedSubscriptionIDs.append(subscriptionID)
+                            strongSelf.deletedSubscriptionIDs.append(subscriptionID)
                             
                         } else if let subscriptionFetchError = CKSubscriptionFetchErrorDictionary(dictionary: subscriptionDictionary) {
                             
@@ -80,9 +80,9 @@ public class CKModifySubscriptionsOperation : CKDatabaseOperation {
                     }
                 }
                 
-                self?.finish(error: nil)
+                strongSelf.finish(error: nil)
             case .error(let error):
-                self?.finish(error: error.error)
+                strongSelf.finish(error: error.error)
             }
         }
         

@@ -40,13 +40,13 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
       
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url) { [weak self] (dictionary, error) in
             
-            guard self != nil, !self!.isCancelled else {
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             
             var returnError = error
             defer {
-                self?.finish(error: returnError)
+                strongSelf.finish(error: returnError)
             }
             
             guard let dictionary = dictionary,
@@ -60,10 +60,10 @@ public class CKDiscoverAllUserIdentitiesOperation : CKOperation {
             for userDictionary in userDictionaries {
                 
                 if let userIdentity = CKUserIdentity(dictionary: userDictionary) {
-                    self?.discoveredIdentities.append(userIdentity)
+                    strongSelf.discoveredIdentities.append(userIdentity)
                     
                     // Call discovered callback
-                    self?.discovered(userIdentity: userIdentity)
+                    strongSelf.discovered(userIdentity: userIdentity)
                     
                 } else {
                     

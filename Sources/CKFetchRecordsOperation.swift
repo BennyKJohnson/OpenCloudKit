@@ -87,12 +87,12 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, error) in
             
-            guard self != nil, !self!.isCancelled else {
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             
             defer {
-                self?.finish(error: error)
+                strongSelf.finish(error: error)
             }
             
             guard let dictionary = dictionary,
@@ -106,15 +106,15 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
             for (index,recordDictionary) in recordsDictionary.enumerated() {
                 
                 // Call Progress Block, this is hacky support and not the callbacks intented purpose
-                let progress = Double(index + 1) / Double((self?.recordIDs!.count)!)
-                let recordID = self?.recordIDs![index]
-                self?.progressed(recordID: recordID!, progress: progress)
+                let progress = Double(index + 1) / Double((strongSelf.recordIDs!.count))
+                let recordID = strongSelf.recordIDs![index]
+                strongSelf.progressed(recordID: recordID, progress: progress)
                 
                 if let record = CKRecord(recordDictionary: recordDictionary) {
-                    self?.recordIDsToRecords[record.recordID] = record
+                    strongSelf.recordIDsToRecords[record.recordID] = record
                     
                     // Call per record callback, not to be confused with finished
-                    self?.completed(record: record, recordID: record.recordID, error: nil)
+                    strongSelf.completed(record: record, recordID: record.recordID, error: nil)
                     
                 } else {
                     
@@ -122,7 +122,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
                     let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server".bridge()])
                     
                     // Call per record callback, not to be confused with finished
-                    self?.completed(record: nil, recordID: nil, error: error)
+                    strongSelf.completed(record: nil, recordID: nil, error: error)
                     
                     // todo add to recordErrors array
                     

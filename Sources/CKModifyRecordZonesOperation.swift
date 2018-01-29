@@ -97,12 +97,12 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
         
         urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, error) in
             
-            guard self != nil, !self!.isCancelled else {
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             
             defer {
-                self?.finish(error: error)
+                strongSelf.finish(error: error)
             }
             
             guard let dictionary = dictionary,
@@ -114,11 +114,11 @@ public class CKModifyRecordZonesOperation : CKDatabaseOperation {
             // Parse JSON into CKRecords
             for zoneDictionary in zoneDictionaries {
                 if let zone = CKRecordZone(dictionary: zoneDictionary) {
-                    self?.recordZonesByZoneIDs[zone.zoneID] = zone
+                    strongSelf.recordZonesByZoneIDs[zone.zoneID] = zone
                 } else if let fetchError = CKFetchErrorDictionary<CKRecordZoneID>(dictionary: zoneDictionary) {
                     
                     // Append Error
-                    self?.recordZoneErrors[fetchError.identifier] = fetchError.error()
+                    strongSelf.recordZoneErrors[fetchError.identifier] = fetchError.error()
                 }
             }
         }
