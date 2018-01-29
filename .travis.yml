@@ -4,7 +4,10 @@ os:
 language: generic
 sudo: required
 dist: trusty
-osx_image: xcode8
+osx_image: xcode9.2
 script:
-  - eval "$(curl -sL https://apt.vapor.sh/ci)"
-
+  - if [[ "$TRAVIS_OS_NAME" == "linux"]]; then curl -sL https://apt.vapor.sh/ci; sudo apt-get -q install swift; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux"]]; then sudo apt-get install swift; fi
+  - cd src
+  - swift package update
+  - swift build
