@@ -74,8 +74,8 @@ public class CKQueryOperation: CKDatabaseOperation {
         queryOperationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         queryOperationURLRequest.databaseScope = database?.scope ?? .public
         
-        queryOperationURLRequest.completionBlock = { (result) in
-            if(self.isCancelled){
+        queryOperationURLRequest.completionBlock = { [weak self] (result) in
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             switch result {
@@ -91,7 +91,7 @@ public class CKQueryOperation: CKDatabaseOperation {
                     #endif
                     
                     if let data = data {
-                        self.resultsCursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
+                        strongSelf.resultsCursor = CKQueryCursor(data: data, zoneID: CKRecordZoneID(zoneName: "_defaultZone", ownerName: ""))
                     }
                 }
                 
@@ -103,19 +103,19 @@ public class CKQueryOperation: CKDatabaseOperation {
                         
                         if let record = CKRecord(recordDictionary: recordDictionary) {
                             // Call RecordCallback
-                            self.fetched(record: record)
+                            strongSelf.fetched(record: record)
                         } else {
                             // Create Error
                             // Invalid state to be in, this operation normally doesnt provide partial errors
                             let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server"])
-                            self.finish(error: error)
+                            strongSelf.finish(error: error)
                             return
                         }
                     }
                 }
-                self.finish(error: nil)
+                strongSelf.finish(error: nil)
             case .error(let error):
-                self.finish(error: error.error)
+                strongSelf.finish(error: error.error)
             }
         }
         

@@ -169,7 +169,7 @@ class CKURLRequest: NSObject {
 
         urlSessionTask = session.dataTask(with: request)
         urlSessionTask!.resume()
-        
+        session.finishTasksAndInvalidate()
     }
     
     func cancel() {
@@ -209,7 +209,7 @@ extension CKURLRequest: URLSessionDataDelegate {
                 completionBlock?(result)
             }
         
-        } catch let error as NSError {
+        } catch let error {
             completionBlock?(.error(.parse(error)))
         }
     }
@@ -227,7 +227,7 @@ extension CKURLRequest: URLSessionDataDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
-            print(error)
+            CloudKit.debugPrint(error)
             // Handle Error
             completionBlock?(.error(.network(error)))
         }

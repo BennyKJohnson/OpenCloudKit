@@ -47,41 +47,40 @@ public class CKDiscoverUserIdentitiesOperation : CKOperation {
         
         let request: [String: Any] = ["lookupInfos": lookUpInfos.bridge() as Any]
         
-        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { (dictionary, error) in
+        urlSessionTask = CKWebRequest(container: operationContainer).request(withURL: url, parameters: request) { [weak self] (dictionary, error) in
             
-            if(self.isCancelled){
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
-            else if let error = error {
-                self.finish(error: error)
-                return
-            } else if let dictionary = dictionary {
-                // Process Records
-                if let userDictionaries = dictionary["users"] as? [[String: Any]] {
-                    // Parse JSON into CKRecords
-                    for userDictionary in userDictionaries {
-                        
-                        if let userIdenity = CKUserIdentity(dictionary: userDictionary) {
-                            
-                            // Call RecordCallback
-                            self.discovered(userIdentity: userIdenity, lookupInfo: userIdenity.lookupInfo!)
-                            
-                        } else {
-                            
-                            // Create Error
-                            let error = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server"])
-                            // Call RecordCallback
-                            self.finish(error: error)
-                            return
-                        }
-                    }
+            
+            var returnError = error
+            defer {
+                strongSelf.finish(error: returnError)
+            }
+            
+            guard let dictionary = dictionary,
+                let userDictionaries = dictionary["users"] as? [[String: Any]],
+                error == nil else {
+                    return
+            }
+            
+            // Process Records
+            // Parse JSON into CKRecords
+            for userDictionary in userDictionaries {
+                
+                if let userIdenity = CKUserIdentity(dictionary: userDictionary) {
+                    
+                    // Call RecordCallback
+                    strongSelf.discovered(userIdentity: userIdenity, lookupInfo: userIdenity.lookupInfo!)
+                    
+                } else {
+                    
+                    // Create Error
+                    returnError = NSError(domain: CKErrorDomain, code: CKErrorCode.PartialFailure.rawValue, userInfo: [NSLocalizedDescriptionKey: "Failed to parse record from server"])
+                    // Call RecordCallback
+                    return
                 }
             }
-            // Mark operation as complete
-            self.finish(error: nil)
         }
     }
-    
-
-    
 }

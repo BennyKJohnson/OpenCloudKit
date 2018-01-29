@@ -230,7 +230,7 @@ extension CKRecord {
             }
         }
         
-        print(fieldsDictionary)
+        CloudKit.debugPrint(fieldsDictionary)
 
         
         return fieldsDictionary
