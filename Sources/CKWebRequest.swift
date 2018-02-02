@@ -101,7 +101,7 @@ class CKWebRequest {
                 
                 
                 let dataString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                print(dataString as Any)
+                CloudKit.debugPrint(dataString as Any)
                 let dictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
                 
                 if let httpResponse = response as? HTTPURLResponse {
@@ -134,7 +134,7 @@ class CKWebRequest {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
        
         components?.queryItems = authQueryItems
-        print(components?.path as Any)
+        CloudKit.debugPrint(components?.path as Any)
         guard let requestURL = components?.url else {
             return nil
         }
@@ -171,7 +171,7 @@ class CKWebRequest {
         // Build URL
         var components = URLComponents(string: url)
         components?.queryItems = authQueryItems
-        print(components?.path as Any)
+        CloudKit.debugPrint(components?.path as Any)
         guard let requestURL = components?.url else {
             return nil
         }
@@ -192,7 +192,7 @@ class CKWebRequest {
         // Build URL
         var components = URLComponents(string: url)
         components?.queryItems = authQueryItems
-        print(components?.path as Any)
+        CloudKit.debugPrint(components?.path as Any)
         guard let requestURL = components?.url else {
             return nil
         }

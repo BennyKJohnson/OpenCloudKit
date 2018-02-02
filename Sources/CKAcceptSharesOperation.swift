@@ -44,8 +44,8 @@ public class CKAcceptSharesOperation: CKOperation {
         
         operationURLRequest.accountInfoProvider = CloudKit.shared.defaultAccount
         
-        operationURLRequest.completionBlock = { (result) in
-            if(self.isCancelled){
+        operationURLRequest.completionBlock = { [weak self] (result) in
+            guard let strongSelf = self, !strongSelf.isCancelled else {
                 return
             }
             switch result {
@@ -56,15 +56,15 @@ public class CKAcceptSharesOperation: CKOperation {
                     // Parse JSON into CKRecords
                     for resultDictionary in resultsDictionary {
                         if let shareMetadata = CKShareMetadata(dictionary: resultDictionary) {
-                            self.perShare(shareMetadata: shareMetadata, acceptedShare: nil, error: nil)
+                            strongSelf.perShare(shareMetadata: shareMetadata, acceptedShare: nil, error: nil)
                         }
                     }
                 }
                 
-                self.finish(error: nil)
+                strongSelf.finish(error: nil)
                 
             case .error(let error):
-                self.finish(error: error.error)
+                strongSelf.finish(error: error.error)
             }
         }
         

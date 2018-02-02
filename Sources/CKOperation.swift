@@ -55,7 +55,7 @@ public class CKOperation: Operation {
         
         // Check if operation is already cancelled
         if isCancelled && isFinished {
-            print("Not starting already cancelled operation \(self)")
+            CloudKit.debugPrint("Not starting already cancelled operation \(self)")
             return
         }
  
@@ -144,7 +144,7 @@ public class CKOperation: Operation {
             return
         }
         
-        print("The operation operation \(self) didn't start or is already finished")
+        CloudKit.debugPrint("The operation operation \(self) didn't start or is already finished")
     }
     
 
