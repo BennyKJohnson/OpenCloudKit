@@ -57,7 +57,7 @@ public class CKQueryOperation: CKDatabaseOperation {
     
     override func finishOnCallbackQueue(error: Error?) {
         // log "Operation %@ has completed. Query cursor is %@.%@%@"
-        self.queryCompletionBlock?(self.resultsCursor, error as? NSError)
+        self.queryCompletionBlock?(self.resultsCursor, error as NSError?)
         
         super.finishOnCallbackQueue(error: error)
     }
