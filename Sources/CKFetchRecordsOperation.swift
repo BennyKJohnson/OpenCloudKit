@@ -110,7 +110,7 @@ public class CKFetchRecordsOperation: CKDatabaseOperation {
                 let recordID = strongSelf.recordIDs![index]
                 strongSelf.progressed(recordID: recordID, progress: progress)
                 
-                if let record = CKRecord(recordDictionary: recordDictionary) {
+                if let record = CKRecord(recordDictionary: recordDictionary, recordID: recordID) {
                     strongSelf.recordIDsToRecords[record.recordID] = record
                     
                     // Call per record callback, not to be confused with finished

@@ -26,6 +26,10 @@ public class CKRecordID: NSObject  {
     
     public var zoneID: CKRecordZoneID
     
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? CKRecordID else { return false }
+        return self.recordName == other.recordName && self.zoneID == other.zoneID
+    }
 }
 
 extension CKRecordID {

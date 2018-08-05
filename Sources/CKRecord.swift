@@ -126,7 +126,7 @@ public class CKRecord: NSObject {
         return"<\(type(of: self)); recordType = \(recordType);recordID = \(recordID); values = \(values)>"
     }
     
-    init?(recordDictionary: [String: Any]) {
+    init?(recordDictionary: [String: Any], recordID: CKRecordID? = nil) {
         
         guard let recordName = recordDictionary[CKRecordDictionary.recordName] as? String,
             let recordType = recordDictionary[CKRecordDictionary.recordType] as? String
@@ -142,10 +142,14 @@ public class CKRecord: NSObject {
             zoneID = CKRecordZoneID(zoneName: CKRecordZoneDefaultName, ownerName: "_defaultOwner")
         }
         
-        let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
-        // self.init(recordType: recordType, recordID: recordID)
+        if let recordID = recordID {
+            self.recordID = recordID
+        } else {
+            let recordID = CKRecordID(recordName: recordName, zoneID: zoneID)
+            self.recordID = recordID
+        }
+        
         self.recordType = recordType
-        self.recordID = recordID
         
         // Parse Record Change Tag
         if let changeTag = recordDictionary[CKRecordDictionary.recordChangeTag] as? String {
