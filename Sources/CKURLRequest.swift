@@ -196,7 +196,7 @@ extension CKURLRequest: URLSessionDataDelegate {
             metrics?.bytesDownloaded = UInt(data.count)
         }
         
-        if var receivedData = receivedData {
+        if let _ = receivedData {
             receivedData.append(data)
         } else {
             receivedData = data
