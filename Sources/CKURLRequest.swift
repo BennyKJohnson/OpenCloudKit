@@ -61,6 +61,8 @@ class CKURLRequest: NSObject {
     
     var completionBlock: ((CKURLRequestResult) -> ())?
     
+    var receivedData: Data?
+    
     var request: URLRequest {
         get {
             var urlRequest = URLRequest(url: url)
@@ -192,25 +194,12 @@ extension CKURLRequest: URLSessionDataDelegate {
         
         if let operationMetrics = metrics {
             metrics?.bytesDownloaded = UInt(data.count)
-            metricsDelegate?.requestDidFinish(withMetrics: operationMetrics)
         }
         
-        // Parse JSON
-        do {
-            let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-            
-            CloudKit.debugPrint(jsonObject)
-
-            // Call completion block
-            if let _ = CKErrorDictionary(dictionary: jsonObject) {
-                completionBlock?(.error(CKError.server(jsonObject)))
-            } else {
-                let result = CKURLRequestResult.success(jsonObject)
-                completionBlock?(result)
-            }
-        
-        } catch let error {
-            completionBlock?(.error(.parse(error)))
+        if let _ = receivedData {
+            receivedData!.append(data)
+        } else {
+            receivedData = data
         }
     }
 
@@ -220,9 +209,7 @@ extension CKURLRequest: URLSessionDataDelegate {
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        
         metrics = CKOperationMetrics(bytesDownloaded: 0, bytesUploaded: UInt(totalBytesSent), duration: 0, startDate: dateRequestWentOut!)
-        
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -230,6 +217,29 @@ extension CKURLRequest: URLSessionDataDelegate {
             CloudKit.debugPrint(error)
             // Handle Error
             completionBlock?(.error(.network(error)))
+        } else {
+            if let operationMetrics = metrics {
+                metricsDelegate?.requestDidFinish(withMetrics: operationMetrics)
+            }
+            
+            // Parse JSON
+            do {
+                //we'll assume that we received some sort of data; if we didn't the error would be handled
+                let jsonObject = try JSONSerialization.jsonObject(with: receivedData!, options: []) as! [String: Any]
+                
+                CloudKit.debugPrint(jsonObject)
+                
+                // Call completion block
+                if let _ = CKErrorDictionary(dictionary: jsonObject) {
+                    completionBlock?(.error(CKError.server(jsonObject)))
+                } else {
+                    let result = CKURLRequestResult.success(jsonObject)
+                    completionBlock?(result)
+                }
+                
+            } catch let error {
+                completionBlock?(.error(.parse(error)))
+            }
         }
     }
     
