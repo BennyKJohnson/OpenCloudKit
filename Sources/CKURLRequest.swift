@@ -197,7 +197,7 @@ extension CKURLRequest: URLSessionDataDelegate {
         }
         
         if let _ = receivedData {
-            receivedData.append(data)
+            receivedData!.append(data)
         } else {
             receivedData = data
         }
