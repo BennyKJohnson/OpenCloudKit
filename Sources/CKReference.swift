@@ -49,9 +49,9 @@ open class CKReference: NSObject {
         self.init(recordID: record.recordID, action: action)
     }
     
-    open let referenceAction: CKReferenceAction
+    public let referenceAction: CKReferenceAction
     
-    open let recordID: CKRecordID
+    public let recordID: CKRecordID
 }
 
 extension CKReference {

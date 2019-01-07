@@ -115,6 +115,7 @@ class CKPrettyError: NSError {
     
     override public var description: String {
         // \(withUnsafePointer(to: self))
-        return "<CKError: \"\(CKErrorCode(rawValue: self.code)?.description)\" (\(self.code)); \(self.userInfo)";
+        let errorDescription = CKErrorCode(rawValue: self.code)?.description ?? ""
+        return "<CKError: \"\(errorDescription)\" (\(self.code)); \(self.userInfo)"
     }
 }

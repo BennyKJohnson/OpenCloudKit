@@ -45,7 +45,7 @@ public class CKQueryOperation: CKDatabaseOperation {
 
     public var recordFetchedBlock: ((CKRecord) -> Swift.Void)?
 
-    public var queryCompletionBlock: ((CKQueryCursor?, NSError?) -> Swift.Void)?
+    public var queryCompletionBlock: ((CKQueryCursor?, Error?) -> Swift.Void)?
     
     override func CKOperationShouldRun() throws {
         // "Warn: There's no point in running a query if there are no progress or completion blocks set. Bailing early."
@@ -57,7 +57,7 @@ public class CKQueryOperation: CKDatabaseOperation {
     
     override func finishOnCallbackQueue(error: Error?) {
         // log "Operation %@ has completed. Query cursor is %@.%@%@"
-        self.queryCompletionBlock?(self.resultsCursor, error as? NSError)
+        self.queryCompletionBlock?(self.resultsCursor, error)
         
         super.finishOnCallbackQueue(error: error)
     }

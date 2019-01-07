@@ -30,7 +30,7 @@ struct CKPredicateReader {
         }
         
         func hasNext(_ input: Index) -> Bool {
-            return input + step <= buffer.characters.count
+            return input + step <= buffer.count
         }
         
         func takeCharacter(_ input: Index) -> (Character, Index)? {

@@ -4,12 +4,12 @@ os:
 language: generic
 sudo: required
 dist: trusty
-osx_image: xcode9.2
+osx_image: xcode10
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         DIR="$(pwd)";
         cd ..;
-        export SWIFT_VERSION=4.0.3;
+        export SWIFT_VERSION=4.1;
         wget https://swift.org/builds/swift-${SWIFT_VERSION}-release/ubuntu1404/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE-ubuntu14.04.tar.gz;
         tar xzf swift-${SWIFT_VERSION}-RELEASE-ubuntu14.04.tar.gz;
         export PATH="${PWD}/swift-${SWIFT_VERSION}-RELEASE-ubuntu14.04/usr/bin:${PATH}";
