@@ -150,7 +150,11 @@ public class CKRecordZoneID: NSObject {
         
         self.init(zoneName: zoneName, ownerName: ownerName)
     }
-    
+
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? CKRecordZoneID else { return false }
+        return self.zoneName == other.zoneName && self.ownerName == other.ownerName
+    }
 }
 
 
